@@ -201,22 +201,28 @@
       position: relative;
       flex: 1 1 0%;
       min-height: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       isolation: isolate;
+      contain: paint layout;
     }
     .page-transition-layer {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
+      width: 100%;
+      height: 100%;
       min-width: 0;
       min-height: 0;
       overflow: hidden;
       background: #183278;
-      transform: translate3d(0, 0, 0);
       backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translate3d(0, 0, 0);
+      -webkit-transform: translate3d(0, 0, 0);
       will-change: transform;
-      transition: transform 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     .page-transition-current {
       z-index: 2;
@@ -225,77 +231,152 @@
       z-index: 1;
       pointer-events: none;
     }
-    .page-transition-current.entering.forward {
-      transform: translate3d(100%, 0, 0);
+
+    /* Keyframe Animations for Smooth Page Transitions on Android & Mobile */
+    @keyframes pageSlideInFromRight {
+      0% {
+        transform: translate3d(100%, 0, 0);
+        -webkit-transform: translate3d(100%, 0, 0);
+      }
+      100% {
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+      }
     }
-    .page-transition-current.active.forward {
-      transform: translate3d(0, 0, 0);
+    @-webkit-keyframes pageSlideInFromRight {
+      0% { -webkit-transform: translate3d(100%, 0, 0); }
+      100% { -webkit-transform: translate3d(0, 0, 0); }
     }
-    .page-transition-outgoing.active.forward {
-      transform: translate3d(-20%, 0, 0);
+
+    @keyframes pageSlideOutToLeft {
+      0% {
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+      }
+      100% {
+        transform: translate3d(-25%, 0, 0);
+        -webkit-transform: translate3d(-25%, 0, 0);
+      }
     }
-    .page-transition-current.entering.back {
-      transform: translate3d(-20%, 0, 0);
+    @-webkit-keyframes pageSlideOutToLeft {
+      0% { -webkit-transform: translate3d(0, 0, 0); }
+      100% { -webkit-transform: translate3d(-25%, 0, 0); }
     }
-    .page-transition-current.active.back {
-      transform: translate3d(0, 0, 0);
+
+    @keyframes pageSlideInFromLeft {
+      0% {
+        transform: translate3d(-25%, 0, 0);
+        -webkit-transform: translate3d(-25%, 0, 0);
+      }
+      100% {
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+      }
     }
-    .page-transition-outgoing.back {
+    @-webkit-keyframes pageSlideInFromLeft {
+      0% { -webkit-transform: translate3d(-25%, 0, 0); }
+      100% { -webkit-transform: translate3d(0, 0, 0); }
+    }
+
+    @keyframes pageSlideOutToRight {
+      0% {
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+      }
+      100% {
+        transform: translate3d(100%, 0, 0);
+        -webkit-transform: translate3d(100%, 0, 0);
+      }
+    }
+    @-webkit-keyframes pageSlideOutToRight {
+      0% { -webkit-transform: translate3d(0, 0, 0); }
+      100% { -webkit-transform: translate3d(100%, 0, 0); }
+    }
+
+    /* Direction: Forward (Next screen slides in from right to left, old slides out to left) */
+    .page-anim-in-forward {
+      z-index: 2;
+      animation: pageSlideInFromRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      -webkit-animation: pageSlideInFromRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+    }
+    .page-anim-out-forward {
+      z-index: 1;
+      animation: pageSlideOutToLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      -webkit-animation: pageSlideOutToLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+    }
+
+    /* Direction: Back (Previous screen slides in from left to right, old slides out to right) */
+    .page-anim-in-back {
+      z-index: 1;
+      animation: pageSlideInFromLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      -webkit-animation: pageSlideInFromLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+    }
+    .page-anim-out-back {
       z-index: 3;
+      animation: pageSlideOutToRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      -webkit-animation: pageSlideOutToRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
     }
-    .page-transition-outgoing.active.back {
-      transform: translate3d(100%, 0, 0);
+
+    /* Hint Screen: Slide Up / Down */
+    @keyframes hintSlideInUp {
+      0% { transform: translate3d(0, 100%, 0); -webkit-transform: translate3d(0, 100%, 0); }
+      100% { transform: translate3d(0, 0, 0); -webkit-transform: translate3d(0, 0, 0); }
+    }
+    @-webkit-keyframes hintSlideInUp {
+      0% { -webkit-transform: translate3d(0, 100%, 0); }
+      100% { -webkit-transform: translate3d(0, 0, 0); }
+    }
+    @keyframes hintSlideOutDown {
+      0% { transform: translate3d(0, 0, 0); -webkit-transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(0, 100%, 0); -webkit-transform: translate3d(0, 100%, 0); }
+    }
+    @-webkit-keyframes hintSlideOutDown {
+      0% { -webkit-transform: translate3d(0, 0, 0); }
+      100% { -webkit-transform: translate3d(0, 100%, 0); }
+    }
+
+    .page-anim-in-hint {
+      z-index: 3;
+      background: transparent !important;
+      animation: hintSlideInUp 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      -webkit-animation: hintSlideInUp 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+    }
+    .page-anim-out-hint {
+      z-index: 3;
+      animation: hintSlideOutDown 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      -webkit-animation: hintSlideOutDown 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
     }
     .page-transition-layer.hint-layer {
       background: transparent;
     }
-    .page-transition-current.hint-entering {
-      z-index: 3;
-      transform: translate3d(0, 100%, 0);
-      transition: transform 280ms cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    /* Result Screens (Correct / Wrong) */
+    @keyframes resultFadeIn {
+      0% { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.98); -webkit-transform: translate3d(0, 8px, 0) scale(0.98); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); -webkit-transform: translate3d(0, 0, 0) scale(1); }
     }
-    .page-transition-current.hint-active {
-      z-index: 3;
-      transform: translate3d(0, 0, 0);
+    @-webkit-keyframes resultFadeIn {
+      0% { opacity: 0; -webkit-transform: translate3d(0, 8px, 0) scale(0.98); }
+      100% { opacity: 1; -webkit-transform: translate3d(0, 0, 0) scale(1); }
     }
-    .page-transition-outgoing.hint-underlay,
-    .page-transition-current.hint-return {
+    @keyframes resultFadeOut {
+      0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); -webkit-transform: translate3d(0, 0, 0) scale(1); }
+      100% { opacity: 0; transform: translate3d(0, -4px, 0) scale(0.99); -webkit-transform: translate3d(0, -4px, 0) scale(0.99); }
+    }
+    @-webkit-keyframes resultFadeOut {
+      0% { opacity: 1; -webkit-transform: translate3d(0, 0, 0) scale(1); }
+      100% { opacity: 0; -webkit-transform: translate3d(0, -4px, 0) scale(0.99); }
+    }
+
+    .page-anim-in-result {
+      z-index: 2;
+      animation: resultFadeIn 220ms ease-out both;
+      -webkit-animation: resultFadeIn 220ms ease-out both;
+    }
+    .page-anim-out-result {
       z-index: 1;
-      transform: translate3d(0, 0, 0);
-    }
-    .page-transition-outgoing.hint-exit {
-      z-index: 3;
-      transform: translate3d(0, 0, 0);
-      transition: transform 280ms cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
-    .page-transition-outgoing.hint-exit.active {
-      transform: translate3d(0, 100%, 0);
-    }
-    .page-transition-layer.result-layer {
-      transition: opacity 220ms ease-out, transform 220ms ease-out;
-      will-change: opacity, transform;
-    }
-    .page-transition-current.result-entering {
-      opacity: 0;
-      transform: translate3d(0, 8px, 0) scale(0.98);
-    }
-    .page-transition-current.result-active {
-      opacity: 1;
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-    .page-transition-outgoing.result-exit {
-      opacity: 1;
-      transform: translate3d(0, 0, 0) scale(1);
-      transition: opacity 180ms ease-out, transform 180ms ease-out;
-    }
-    .page-transition-outgoing.result-exit.active {
-      opacity: 0;
-      transform: translate3d(0, -4px, 0) scale(0.99);
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .page-transition-layer {
-        transition-duration: 1ms !important;
-      }
+      animation: resultFadeOut 180ms ease-out both;
+      -webkit-animation: resultFadeOut 180ms ease-out both;
     }
     body {
       touch-action: manipulation;
@@ -404,83 +485,87 @@
     const sound = new SoundEngine();
 
     function PageTransition({ screenKey, direction, children }) {
+      const [displayedKey, setDisplayedKey] = useState(screenKey);
       const [transition, setTransition] = useState(null);
-      const [phase, setPhase] = useState('idle');
-      const lastPageRef = useRef({ screenKey, children });
-      const framesRef = useRef([]);
+      const prevChildrenRef = useRef(children);
       const timeoutRef = useRef(null);
+
       const getPageKind = key => key === 'hint'
         ? 'hint'
         : key === 'correct' || key === 'wrong'
           ? 'result'
           : 'page';
 
-      useLayoutEffect(() => {
-        const previousPage = lastPageRef.current;
-        if (previousPage.screenKey !== screenKey) {
-          framesRef.current.forEach(cancelAnimationFrame);
-          framesRef.current = [];
-          if (timeoutRef.current !== null) clearTimeout(timeoutRef.current);
+      // Detect screen change during render
+      if (screenKey !== displayedKey) {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        const prevKey = displayedKey;
+        const prevChildren = prevChildrenRef.current;
+        setDisplayedKey(screenKey);
+        setTransition({
+          outgoingKey: prevKey,
+          outgoingChildren: prevChildren,
+          incomingKey: screenKey,
+          outgoingKind: getPageKind(prevKey),
+          incomingKind: getPageKind(screenKey),
+          direction: direction || 'forward',
+        });
+      }
 
-          setTransition({
-            outgoing: previousPage.children,
-            outgoingKind: getPageKind(previousPage.screenKey),
-            incomingKind: getPageKind(screenKey),
-            direction,
-          });
-          setPhase('entering');
-          const firstFrame = requestAnimationFrame(() => {
-            const secondFrame = requestAnimationFrame(() => setPhase('active'));
-            framesRef.current.push(secondFrame);
-          });
-          framesRef.current.push(firstFrame);
+      useEffect(() => {
+        prevChildrenRef.current = children;
+      }, [children]);
+
+      useEffect(() => {
+        if (transition) {
           timeoutRef.current = setTimeout(() => {
             timeoutRef.current = null;
-            if (screenKey !== 'hint') {
-              setTransition(null);
-              setPhase('idle');
-            }
-          }, 320);
+            setTransition(null);
+          }, 290);
+          return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          };
         }
-        lastPageRef.current = { screenKey, children };
-      }, [screenKey, direction, children]);
+      }, [transition]);
 
-      useEffect(() => () => {
-        framesRef.current.forEach(cancelAnimationFrame);
-        if (timeoutRef.current !== null) clearTimeout(timeoutRef.current);
-      }, []);
+      let incomingAnimClass = '';
+      let outgoingAnimClass = '';
 
-      const pageKind = getPageKind(screenKey);
-      const currentTransitionClass = transition
-        ? pageKind === 'hint'
-          ? `hint-layer hint-${phase}`
-          : pageKind === 'result'
-            ? `result-layer result-${phase}`
-            : transition.outgoingKind === 'hint'
-              ? 'hint-return'
-              : `${transition.direction} ${phase}`
-        : pageKind === 'hint' ? 'hint-layer' : pageKind === 'result' ? 'result-layer' : '';
-      const outgoingTransitionClass = transition
-        ? transition.outgoingKind === 'hint' && transition.incomingKind !== 'hint'
-          ? `hint-exit ${phase}`
-          : transition.incomingKind === 'hint'
-            ? 'hint-underlay'
-            : transition.outgoingKind === 'result'
-              ? `result-layer result-exit ${phase}`
-              : `${transition.direction} ${phase}`
-        : '';
+      if (transition) {
+        if (transition.incomingKind === 'hint') {
+          incomingAnimClass = 'page-anim-in-hint';
+        } else if (transition.incomingKind === 'result') {
+          incomingAnimClass = 'page-anim-in-result';
+        } else {
+          incomingAnimClass = transition.direction === 'back' ? 'page-anim-in-back' : 'page-anim-in-forward';
+        }
+
+        if (transition.outgoingKind === 'hint') {
+          outgoingAnimClass = 'page-anim-out-hint';
+        } else if (transition.outgoingKind === 'result') {
+          outgoingAnimClass = 'page-anim-out-result';
+        } else {
+          outgoingAnimClass = transition.direction === 'back' ? 'page-anim-out-back' : 'page-anim-out-forward';
+        }
+      }
+
+      const isHintLayer = getPageKind(screenKey) === 'hint';
 
       return (
         <div className="page-transition-stage">
           {transition && (
             <div
+              key={`outgoing-${transition.outgoingKey}`}
               aria-hidden="true"
-              className={`page-transition-layer page-transition-outgoing ${outgoingTransitionClass}`}
+              className={`page-transition-layer page-transition-outgoing ${outgoingAnimClass}`}
             >
-              {transition.outgoing}
+              {transition.outgoingChildren}
             </div>
           )}
-          <div key={screenKey} className={`page-transition-layer page-transition-current ${currentTransitionClass}`}>
+          <div
+            key={`current-${screenKey}`}
+            className={`page-transition-layer page-transition-current ${isHintLayer ? 'hint-layer' : ''} ${incomingAnimClass}`}
+          >
             {children}
           </div>
         </div>
@@ -610,6 +695,64 @@
         setCurrentScreen(screen);
         setShowScreenPicker(false);
       };
+
+      const navigateBack = () => {
+        const stack = navigationStackRef.current;
+        if (stack.length > 1) {
+          const target = stack[stack.length - 2];
+          navigateTo(target);
+        } else if (currentScreen !== 'home') {
+          navigateTo('home');
+        }
+      };
+
+      // Native Swipe Navigation (Left-to-Right = Back) and Hardware Back support on Android
+      useEffect(() => {
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        const onTouchStart = (e) => {
+          if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          }
+        };
+
+        const onTouchEnd = (e) => {
+          if (e.changedTouches.length === 1) {
+            // Ignore if swiping inside horizontal scrollable containers (e.g. champions reel)
+            if (e.target && e.target.closest && e.target.closest('.overflow-x-auto')) return;
+
+            const deltaX = e.changedTouches[0].clientX - touchStartX;
+            const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+            // Prominent horizontal swipe (> 55px and horizontally dominant)
+            if (Math.abs(deltaX) > 55 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+              if (deltaX > 0) {
+                // Swiped Left to Right -> Go Back!
+                navigateBack();
+              }
+            }
+          }
+        };
+
+        const onHardwareBack = (e) => {
+          if (currentScreen !== 'home') {
+            if (e && e.preventDefault) e.preventDefault();
+            navigateBack();
+          }
+        };
+
+        window.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchend', onTouchEnd, { passive: true });
+        document.addEventListener('backbutton', onHardwareBack);
+
+        return () => {
+          window.removeEventListener('touchstart', onTouchStart);
+          window.removeEventListener('touchend', onTouchEnd);
+          document.removeEventListener('backbutton', onHardwareBack);
+        };
+      }, [currentScreen]);
 
       const puzzleSlots = [
         { slot: 0, row: 0, column: 0, answer: 10 },
