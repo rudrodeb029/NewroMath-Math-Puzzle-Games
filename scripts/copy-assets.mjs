@@ -12,3 +12,4 @@ function copyDir(src, dest) {
 
 copyDir('assets', 'dist/assets');
 copyDir('image', 'dist/image');
+

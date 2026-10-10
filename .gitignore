@@ -21,6 +21,7 @@ node_modules/
 dist/
 dist-ssr/
 *.local
+assets_backup/
 
 # Editor / OS
 .DS_Store
