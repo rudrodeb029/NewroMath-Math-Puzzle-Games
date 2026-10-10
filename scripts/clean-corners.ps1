@@ -39,36 +39,36 @@ public class ImageClipper {
 }
 "@
 
-Write-Host "Processing card images..."
+Write-Host "Processing card images from assets_backup with precision deeper cuts..."
 
 # 1. card_daily_clean.png (540 x 167)
-[float[]]$d_xs = @(13, 527, 540, 540, 527, 13, 0, 0)
-[float[]]$d_ys = @(0, 0, 13, 154, 167, 167, 154, 13)
-[ImageClipper]::ClipPolygon("assets\card_daily_clean.png", "assets\card_daily_clean.png", $d_xs, $d_ys)
+[float[]]$d_xs = @(17, 519, 538, 538, 524, 17, 2, 2)
+[float[]]$d_ys = @(0, 0, 19, 151, 167, 167, 150, 17)
+[ImageClipper]::ClipPolygon("assets_backup\card_daily_clean.png", "assets\card_daily_clean.png", $d_xs, $d_ys)
 Write-Host "Cleaned card_daily_clean.png"
 
 # 2. card_level3_scifi.png (258 x 130)
-[float[]]$l_xs = @(15, 245, 258, 258, 245, 15, 2, 2)
-[float[]]$l_ys = @(0, 0, 13, 117, 130, 130, 117, 13)
-[ImageClipper]::ClipPolygon("assets\card_level3_scifi.png", "assets\card_level3_scifi.png", $l_xs, $l_ys)
+[float[]]$l_xs = @(18, 242, 256, 256, 243, 18, 3, 3)
+[float[]]$l_ys = @(0, 0, 15, 115, 130, 130, 112, 17)
+[ImageClipper]::ClipPolygon("assets_backup\card_level3_scifi.png", "assets\card_level3_scifi.png", $l_xs, $l_ys)
 Write-Host "Cleaned card_level3_scifi.png"
 
 # 3. card_endless_scifi.png (272 x 130)
-[float[]]$e_xs = @(13, 257, 270, 270, 257, 13, 0, 0)
-[float[]]$e_ys = @(0, 0, 13, 117, 130, 130, 117, 13)
-[ImageClipper]::ClipPolygon("assets\card_endless_scifi.png", "assets\card_endless_scifi.png", $e_xs, $e_ys)
+[float[]]$e_xs = @(15, 252, 270, 270, 253, 16, 0, 0)
+[float[]]$e_ys = @(0, 0, 18, 113, 130, 130, 114, 15)
+[ImageClipper]::ClipPolygon("assets_backup\card_endless_scifi.png", "assets\card_endless_scifi.png", $e_xs, $e_ys)
 Write-Host "Cleaned card_endless_scifi.png"
 
 # 4. card_continue_clean.png (540 x 74)
-[float[]]$c_xs = @(14, 526, 537, 537, 527, 13, 3, 3)
-[float[]]$c_ys = @(0, 0, 11, 63, 74, 74, 63, 11)
-[ImageClipper]::ClipPolygon("assets\card_continue_clean.png", "assets\card_continue_clean.png", $c_xs, $c_ys)
+[float[]]$c_xs = @(18, 521, 536, 536, 526, 13, 3, 3)
+[float[]]$c_ys = @(0, 0, 15, 63, 73, 73, 63, 15)
+[ImageClipper]::ClipPolygon("assets_backup\card_continue_clean.png", "assets\card_continue_clean.png", $c_xs, $c_ys)
 Write-Host "Cleaned card_continue_clean.png"
 
 # 5. card_newgame_clean.png (540 x 72)
-[float[]]$n_xs = @(14, 526, 537, 537, 527, 13, 3, 3)
-[float[]]$n_ys = @(0, 0, 11, 61, 72, 72, 61, 11)
-[ImageClipper]::ClipPolygon("assets\card_newgame_clean.png", "assets\card_newgame_clean.png", $n_xs, $n_ys)
+[float[]]$n_xs = @(18, 522, 536, 536, 526, 13, 3, 3)
+[float[]]$n_ys = @(0, 0, 15, 61, 71, 71, 61, 15)
+[ImageClipper]::ClipPolygon("assets_backup\card_newgame_clean.png", "assets\card_newgame_clean.png", $n_xs, $n_ys)
 Write-Host "Cleaned card_newgame_clean.png"
 
-Write-Host "All card corners cleaned with transparency!"
+Write-Host "All card corners cleaned with precision and smooth antialiasing!"
