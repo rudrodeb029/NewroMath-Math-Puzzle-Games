@@ -563,6 +563,99 @@
       transform: translateY(2px);
       box-shadow: 0 2px 0 #064e3b, 0 3px 8px rgba(16, 185, 129, 0.4);
     }
+
+    /* Target locked pending pulse on slot during flight */
+    .scifi-tile-slot-target-locked {
+      background: radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.35) 0%, rgba(9, 24, 62, 0.9) 100%);
+      border: 2px solid #22d3ee;
+      border-radius: 10px;
+      box-shadow: 0 0 18px rgba(6, 182, 212, 0.8), inset 0 0 10px rgba(34, 211, 238, 0.5);
+      position: relative;
+      transform: scale(1.04);
+      transition: all 0.15s ease-out;
+    }
+
+    /* Landing Impact Shockwave Wave */
+    @keyframes slotImpactPulse {
+      0% {
+        transform: scale(0.85);
+        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.95), 0 0 25px rgba(0, 229, 255, 0.9);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.3);
+        box-shadow: 0 0 0 8px rgba(52, 211, 153, 0.35), 0 0 35px rgba(0, 229, 255, 0.65);
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(1.6);
+        box-shadow: 0 0 0 16px rgba(52, 211, 153, 0), 0 0 0 rgba(0, 229, 255, 0);
+        opacity: 0;
+      }
+    }
+    .slot-impact-wave {
+      position: absolute;
+      inset: -4px;
+      border-radius: 14px;
+      pointer-events: none;
+      animation: slotImpactPulse 0.42s cubic-bezier(0.12, 0.9, 0.24, 1) forwards;
+      border: 2px solid #67e8f9;
+      z-index: 30;
+    }
+
+    /* Flying Tile Ghost Element */
+    .scifi-flying-tile {
+      position: absolute;
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 100%);
+      border: 2px solid #a7f3d0;
+      border-radius: 12px;
+      color: #ffffff;
+      font-weight: 900;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 4px 0 #064e3b, 0 0 22px rgba(52, 211, 153, 0.85), 0 0 40px rgba(0, 229, 255, 0.65);
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
+
+    .scifi-flying-tile-return {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%);
+      border-color: #7dd3fc;
+      box-shadow: 0 4px 0 #075985, 0 0 22px rgba(56, 189, 248, 0.85), 0 0 40px rgba(0, 229, 255, 0.65);
+    }
+
+    .scifi-flying-trail-halo {
+      position: absolute;
+      inset: -6px;
+      border-radius: 16px;
+      background: radial-gradient(circle, rgba(52, 211, 153, 0.45) 0%, rgba(0, 229, 255, 0.3) 50%, transparent 80%);
+      filter: blur(4px);
+      pointer-events: none;
+      animation: pulseHalo 0.22s infinite alternate ease-in-out;
+    }
+    @keyframes pulseHalo {
+      0% { transform: scale(0.95); opacity: 0.6; }
+      100% { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* Trailing Energy Sparks */
+    .scifi-energy-spark {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(circle, #ffffff 0%, #34d399 50%, #00e5ff 100%);
+      box-shadow: 0 0 10px #34d399, 0 0 18px #00e5ff;
+      animation: sparkFade 0.36s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+      z-index: 9998;
+    }
+    @keyframes sparkFade {
+      0% { transform: scale(1) translate(0, 0); opacity: 1; }
+      100% { transform: scale(0.2) translate(var(--tx, 0px), var(--ty, 0px)); opacity: 0; }
+    }
   </style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-0 sm:p-4 bg-gradient-to-br from-[#0e1d47] via-[#14285e] to-[#0d1a40] text-slate-100">
@@ -640,6 +733,52 @@
         gain.connect(this.ctx.destination);
         osc.start();
         osc.stop(this.ctx.currentTime + 0.2);
+      }
+      whoosh() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(450, this.ctx.currentTime);
+          filter.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 0.12);
+          filter.frequency.exponentialRampToValueAtTime(380, this.ctx.currentTime + 0.25);
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(620, this.ctx.currentTime + 0.1);
+          osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.25);
+
+          gain.gain.setValueAtTime(0.09, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.25);
+        } catch (e) {}
+      }
+      snap() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(760, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(290, this.ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.08);
+        } catch (e) {}
       }
     }
     const sound = new SoundEngine();
@@ -729,6 +868,128 @@
             {children}
           </div>
         </div>
+      );
+    }
+
+    // ==========================================
+    // 3D CYBER-ARCADE FLYING TILE ANIMATOR
+    // ==========================================
+    function FlyingTileItem({ tile, onFinish, largeFontEnabled }) {
+      const elRef = useRef(null);
+      const [sparks, setSparks] = useState([]);
+
+      useEffect(() => {
+        const el = elRef.current;
+        if (!el) return;
+
+        const dx = tile.toX - tile.fromX;
+        const dy = tile.toY - tile.fromY;
+
+        // Parabolic ballistic arc:
+        // Curves sideways slightly towards the center of the board
+        const arcX = dx * 0.12 + (dx > 0 ? 16 : -16);
+        const arcY = dy * 0.5 + (tile.isReturn ? 28 : -38);
+        const midX = tile.fromX + dx * 0.5 + arcX;
+        const midY = tile.fromY + arcY;
+        const tilt = (dx > 0 ? 12 : -12) * (tile.isReturn ? -1 : 1);
+
+        // Spawn trailing energy sparks while in mid-air
+        const sparkTimer = setInterval(() => {
+          if (!el) return;
+          const tRect = el.getBoundingClientRect();
+          const parentRect = el.parentElement ? el.parentElement.getBoundingClientRect() : { left: 0, top: 0 };
+          const sx = tRect.left - parentRect.left + tRect.width / 2;
+          const sy = tRect.top - parentRect.top + tRect.height / 2;
+          
+          const sparkId = Math.random().toString(36).substring(2, 7);
+          const angle = Math.random() * Math.PI * 2;
+          const dist = Math.random() * 14 + 6;
+          const tx = Math.cos(angle) * dist;
+          const ty = Math.sin(angle) * dist;
+          const size = Math.random() * 6 + 6;
+
+          setSparks(prev => [...prev.slice(-8), { id: sparkId, x: sx, y: sy, tx, ty, size }]);
+        }, 45);
+
+        const animation = el.animate([
+          {
+            transform: `translate3d(${tile.fromX}px, ${tile.fromY}px, 0) scale(1) rotate(0deg)`,
+            width: `${tile.fromW}px`,
+            height: `${tile.fromH}px`,
+            boxShadow: tile.isReturn
+              ? '0 4px 0 #075985, 0 8px 18px rgba(2, 132, 199, 0.6)'
+              : '0 4px 0 #064e3b, 0 8px 18px rgba(16, 185, 129, 0.6)',
+            opacity: 1
+          },
+          {
+            offset: 0.45,
+            transform: `translate3d(${midX}px, ${midY}px, 0) scale(1.22) rotate(${tilt}deg)`,
+            width: `${(tile.fromW + tile.toW) / 2}px`,
+            height: `${(tile.fromH + tile.toH) / 2}px`,
+            boxShadow: tile.isReturn
+              ? '0 0 25px rgba(56, 189, 248, 0.95), 0 0 45px rgba(0, 229, 255, 0.85)'
+              : '0 0 25px rgba(52, 211, 153, 0.95), 0 0 45px rgba(0, 229, 255, 0.85)',
+            opacity: 1
+          },
+          {
+            transform: `translate3d(${tile.toX}px, ${tile.toY}px, 0) scale(1) rotate(0deg)`,
+            width: `${tile.toW}px`,
+            height: `${tile.toH}px`,
+            boxShadow: tile.isReturn
+              ? '0 4px 0 #075985, 0 6px 14px rgba(2, 132, 199, 0.5)'
+              : '0 4px 0 #064e3b, 0 6px 14px rgba(16, 185, 129, 0.5)',
+            opacity: 1
+          }
+        ], {
+          duration: 300,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          fill: 'forwards'
+        });
+
+        animation.onfinish = () => {
+          clearInterval(sparkTimer);
+          onFinish(tile);
+        };
+
+        return () => {
+          clearInterval(sparkTimer);
+          try { animation.cancel(); } catch (e) {}
+        };
+      }, []);
+
+      return (
+        <React.Fragment>
+          {sparks.map(s => (
+            <span
+              key={s.id}
+              className="scifi-energy-spark"
+              style={{
+                left: `${s.x}px`,
+                top: `${s.y}px`,
+                width: `${s.size}px`,
+                height: `${s.size}px`,
+                '--tx': `${s.tx}px`,
+                '--ty': `${s.ty}px`
+              }}
+            />
+          ))}
+          <div
+            ref={elRef}
+            className={`scifi-flying-tile ${tile.isReturn ? 'scifi-flying-tile-return' : ''} pointer-events-none absolute select-none flex items-center justify-center font-black ${
+              largeFontEnabled ? 'text-[clamp(20px,6.5vw,30px)]' : 'text-[clamp(16px,5vw,24px)]'
+            }`}
+            style={{
+              left: 0,
+              top: 0,
+              willChange: 'transform, opacity'
+            }}
+          >
+            <div className="scifi-flying-trail-halo" />
+            <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              {tile.number}
+            </span>
+          </div>
+        </React.Fragment>
       );
     }
 
@@ -1115,37 +1376,72 @@
     ];
 
     // ==========================================
+    // LEVEL ENTRY COST PROGRESSION CHAIN
+    // Level 1 starts at 100 Gold Coins & 10 Diamond Coins (Gems).
+    // The economy chain progressively scales as missions become harder.
+    // ==========================================
+    // Each level is a series of puzzles: 10 on Level 1, growing steadily to 20 on Level 25.
+    function getStageCount(levelNum) {
+      const lvl = Math.max(1, Math.min(25, Number(levelNum) || 1));
+      return Math.round(10 + ((lvl - 1) * 10) / 24);
+    }
+
+    function getLevelEntryCost(levelNum) {
+      const lvl = Math.max(1, Math.min(25, Number(levelNum) || 1));
+      let coins = 100;
+      let gems = 10;
+      if (lvl <= 8) {
+        // World 1: Easy (Levels 1 - 8)
+        coins = 100 + (lvl - 1) * 25;
+        gems = 10 + (lvl - 1) * 2;
+      } else if (lvl <= 17) {
+        // World 2: Medium (Levels 9 - 17)
+        coins = 275 + (lvl - 8) * 40;
+        gems = 24 + (lvl - 8) * 2;
+      } else {
+        // World 3: Hard (Levels 18 - 25)
+        coins = 635 + (lvl - 17) * 70;
+        gems = 42 + (lvl - 17) * 4;
+        if (lvl === 25) {
+          coins = 1200;
+          gems = 75;
+        }
+      }
+      return { coins, gems };
+    }
+
+    // ==========================================
     const ALL_LEVELS = [
       // World 1: Easy (Levels 1 - 8)
-      { num: 1, title: 'Warm-Up Ignition', diff: 'Easy', range: '0 - 50', xp: 15, coins: 10, tag: 'WARM-UP', tier: 'easy' },
-      { num: 2, title: 'Addition Circuit', diff: 'Easy', range: '51 - 100', xp: 20, coins: 12, tag: 'CIRCUIT', tier: 'easy' },
-      { num: 3, title: 'Cross Pulse', diff: 'Easy', range: '101 - 150', xp: 25, coins: 14, tag: 'CURRENT', tier: 'easy' },
-      { num: 4, title: 'Binary Junction', diff: 'Easy', range: '151 - 200', xp: 25, coins: 16, tag: 'LOGIC', tier: 'easy' },
-      { num: 5, title: 'Logic Step', diff: 'Easy', range: '201 - 250', xp: 30, coins: 18, tag: 'GATE', tier: 'easy' },
-      { num: 6, title: 'Sub-Zero Drift', diff: 'Easy', range: '251 - 300', xp: 30, coins: 20, tag: 'DRIFT', tier: 'easy' },
-      { num: 7, title: 'Cipher Key', diff: 'Easy', range: '301 - 350', xp: 35, coins: 22, tag: 'CIPHER', tier: 'easy' },
-      { num: 8, title: 'Milestone Arena', diff: 'Easy', range: '351 - 400', xp: 35, coins: 25, tag: 'ARENA', tier: 'easy' },
+      { num: 1, title: 'Warm-Up Ignition', diff: 'Easy', range: '0 - 50', xp: 15, coins: 10, tag: 'WARM-UP', tier: 'easy', cost: getLevelEntryCost(1) },
+      { num: 2, title: 'Addition Circuit', diff: 'Easy', range: '51 - 100', xp: 20, coins: 12, tag: 'CIRCUIT', tier: 'easy', cost: getLevelEntryCost(2) },
+      { num: 3, title: 'Cross Pulse', diff: 'Easy', range: '101 - 150', xp: 25, coins: 14, tag: 'CURRENT', tier: 'easy', cost: getLevelEntryCost(3) },
+      { num: 4, title: 'Binary Junction', diff: 'Easy', range: '151 - 200', xp: 25, coins: 16, tag: 'LOGIC', tier: 'easy', cost: getLevelEntryCost(4) },
+      { num: 5, title: 'Logic Step', diff: 'Easy', range: '201 - 250', xp: 30, coins: 18, tag: 'GATE', tier: 'easy', cost: getLevelEntryCost(5) },
+      { num: 6, title: 'Sub-Zero Drift', diff: 'Easy', range: '251 - 300', xp: 30, coins: 20, tag: 'DRIFT', tier: 'easy', cost: getLevelEntryCost(6) },
+      { num: 7, title: 'Cipher Key', diff: 'Easy', range: '301 - 350', xp: 35, coins: 22, tag: 'CIPHER', tier: 'easy', cost: getLevelEntryCost(7) },
+      { num: 8, title: 'Milestone Arena', diff: 'Easy', range: '351 - 400', xp: 35, coins: 25, tag: 'ARENA', tier: 'easy', cost: getLevelEntryCost(8) },
 
       // World 2: Medium (Levels 9 - 17)
-      { num: 9, title: 'Vector Flux', diff: 'Medium', range: '401 - 450', xp: 40, coins: 26, tag: 'FLUX', tier: 'medium' },
-      { num: 10, title: 'Hyper Matrix', diff: 'Medium', range: '451 - 500', xp: 40, coins: 28, tag: 'MATRIX', tier: 'medium' },
-      { num: 11, title: 'Photon Grid', diff: 'Medium', range: '501 - 550', xp: 45, coins: 30, tag: 'PHOTON', tier: 'medium' },
-      { num: 12, title: 'Quantum Leap', diff: 'Medium', range: '551 - 600', xp: 45, coins: 32, tag: 'QUANTUM', tier: 'medium' },
-      { num: 13, title: 'Delta Shift', diff: 'Medium', range: '601 - 650', xp: 50, coins: 34, tag: 'DELTA', tier: 'medium' },
-      { num: 14, title: 'Synapse Overload', diff: 'Medium', range: '651 - 700', xp: 50, coins: 36, tag: 'SYNAPSE', tier: 'medium' },
-      { num: 15, title: 'Cosmic Ray', diff: 'Medium', range: '701 - 750', xp: 55, coins: 38, tag: 'COSMIC', tier: 'medium' },
-      { num: 16, title: 'Plasma Core', diff: 'Medium', range: '751 - 800', xp: 55, coins: 40, tag: 'PLASMA', tier: 'medium' },
-      { num: 17, title: 'Mastery Trial', diff: 'Medium', range: '801 - 850', xp: 60, coins: 45, tag: 'TRIAL', tier: 'medium' },
+      { num: 9, title: 'Vector Flux', diff: 'Medium', range: '401 - 450', xp: 40, coins: 26, tag: 'FLUX', tier: 'medium', cost: getLevelEntryCost(9) },
+      { num: 10, title: 'Hyper Matrix', diff: 'Medium', range: '451 - 500', xp: 40, coins: 28, tag: 'MATRIX', tier: 'medium', cost: getLevelEntryCost(10) },
+      { num: 11, title: 'Photon Grid', diff: 'Medium', range: '501 - 550', xp: 45, coins: 30, tag: 'PHOTON', tier: 'medium', cost: getLevelEntryCost(11) },
+      { num: 12, title: 'Quantum Leap', diff: 'Medium', range: '551 - 600', xp: 45, coins: 32, tag: 'QUANTUM', tier: 'medium', cost: getLevelEntryCost(12) },
+      { num: 13, title: 'Delta Shift', diff: 'Medium', range: '601 - 650', xp: 50, coins: 34, tag: 'DELTA', tier: 'medium', cost: getLevelEntryCost(13) },
+      { num: 14, title: 'Synapse Overload', diff: 'Medium', range: '651 - 700', xp: 50, coins: 36, tag: 'SYNAPSE', tier: 'medium', cost: getLevelEntryCost(14) },
+      { num: 15, title: 'Cosmic Ray', diff: 'Medium', range: '701 - 750', xp: 55, coins: 38, tag: 'COSMIC', tier: 'medium', cost: getLevelEntryCost(15) },
+      { num: 16, title: 'Plasma Core', diff: 'Medium', range: '751 - 800', xp: 55, coins: 40, tag: 'PLASMA', tier: 'medium', cost: getLevelEntryCost(16) },
+      { num: 17, title: 'Mastery Trial', diff: 'Medium', range: '801 - 850', xp: 60, coins: 45, tag: 'TRIAL', tier: 'medium', cost: getLevelEntryCost(17) },
 
       // World 3: Hard (Levels 18 - 25)
-      { num: 18, title: 'Vortex Rift', diff: 'Hard', range: '851 - 920', xp: 65, coins: 48, tag: 'VORTEX', tier: 'hard' },
-      { num: 19, title: 'Singularity Node', diff: 'Hard', range: '921 - 1000', xp: 70, coins: 50, tag: 'NODE', tier: 'hard' },
-      { num: 20, title: 'Dark Matter Maze', diff: 'Hard', range: '1001 - 1100', xp: 75, coins: 55, tag: 'DARK', tier: 'hard' },
-      { num: 21, title: 'Neutron Blitz', diff: 'Hard', range: '1101 - 1200', xp: 80, coins: 60, tag: 'BLITZ', tier: 'hard' },
-      { num: 22, title: 'Chrono Shift', diff: 'Hard', range: '1201 - 1300', xp: 85, coins: 65, tag: 'CHRONO', tier: 'hard' },
-      { num: 23, title: 'Supernova Grid', diff: 'Hard', range: '1301 - 1400', xp: 90, coins: 70, tag: 'NOVA', tier: 'hard' },
-      { num: 24, title: 'Omega Frontier', diff: 'Hard', range: '1401 - 1490', xp: 95, coins: 80, tag: 'OMEGA', tier: 'hard' },
-      { num: 25, title: 'Apex Boss Stage', diff: 'Hard', range: '1491 - 1600', xp: 100, coins: 100, tag: 'APEX BOSS', tier: 'hard' },
+      { num: 18, title: 'Vortex Rift', diff: 'Hard', range: '851 - 920', xp: 65, coins: 48, tag: 'VORTEX', tier: 'hard', cost: getLevelEntryCost(18) },
+      { num: 19, title: 'Singularity Node', diff: 'Hard', range: '921 - 1000', xp: 70, coins: 50, tag: 'NODE', tier: 'hard', cost: getLevelEntryCost(19) },
+      { num: 20, title: 'Dark Matter Maze', diff: 'Hard', range: '1001 - 1100', xp: 75, coins: 55, tag: 'DARK', tier: 'hard', cost: getLevelEntryCost(20) },
+      { num: 21, title: 'Neutron Blitz', diff: 'Hard', range: '1101 - 1200', xp: 80, coins: 60, tag: 'BLITZ', tier: 'hard', cost: getLevelEntryCost(21) },
+      { num: 22, title: 'Chrono Shift', diff: 'Hard', range: '1201 - 1300', xp: 85, coins: 65, tag: 'CHRONO', tier: 'hard', cost: getLevelEntryCost(22) },
+      { num: 23, title: 'Supernova Grid', diff: 'Hard', range: '1301 - 1400', xp: 90, coins: 70, tag: 'NOVA', tier: 'hard', cost: getLevelEntryCost(23) },
+      { num: 24, title: 'Omega Frontier', diff: 'Hard', range: '1401 - 1490', xp: 95, coins: 80, tag: 'OMEGA', tier: 'hard', cost: getLevelEntryCost(24) },
+      { num: 25, title: 'Apex Boss Stage', diff: 'Hard', range: '1491 - 1600', xp: 100, coins: 100, tag: 'APEX BOSS', tier: 'hard', cost: getLevelEntryCost(25) },
     ];
 
     // ==========================================
@@ -1366,16 +1662,39 @@
       // Active player level dynamically reflects the highest attained level
       const activePlayerLevel = Math.max(unlockedLevelMax, playerLevel, selectedLevelNum);
 
+      // Live leaderboard score & rank (reacts to level, XP and coin balance)
+      const LEADERBOARD_BOT_SCORES = [2490680, 2385400, 2290150, 2250680, 2187730, 2128024, 2097730, 2053538];
+      const playerScore = 1200000 + activePlayerLevel * 28000 + playerXp * 300 + coins * 35;
+      const playerRank = 1 + LEADERBOARD_BOT_SCORES.filter(s => s > playerScore).length;
+
       // Rewards & Ad State
       const [adModalOpen, setAdModalOpen] = useState(false);
-      const [adReward, setAdReward] = useState({ type: 'coins', amount: 250, title: 'Math Speed Boost Sponsor Ad' });
+      const [adReward, setAdReward] = useState({ type: 'coins', amount: 250, title: 'Math Speed Boost Sponsor Ad', coinAmount: 250, gemAmount: 15, onComplete: null });
       const [adCountdown, setAdCountdown] = useState(3);
       const [dailyGiftClaimed, setDailyGiftClaimed] = useState(false);
       const [rewardToast, setRewardToast] = useState(null);
 
+      // Level Entry Fee & Economy Modal States
+      const [insufficientFundsModal, setInsufficientFundsModal] = useState({
+        isOpen: false,
+        targetLvl: 1,
+        cost: { coins: 100, gems: 10 },
+        missingCoins: 0,
+        missingGems: 0
+      });
+      const [isTimeOver, setIsTimeOver] = useState(false);
+
+      // Multi-puzzle level progress: which puzzle (stage) of the level the player is on
+      const [stageNum, setStageNum] = useState(1);
+      const [lastResult, setLastResult] = useState({
+        level: 1, stage: 1, total: 10, levelCleared: false,
+        solvedText: '', coins: 0, gems: 0, xp: 0
+      });
+      const stageTotal = getStageCount(selectedLevelNum);
+
       useEffect(() => {
         if (rewardToast) {
-          const timer = setTimeout(() => setRewardToast(null), 3000);
+          const timer = setTimeout(() => setRewardToast(null), 3200);
           return () => clearTimeout(timer);
         }
       }, [rewardToast]);
@@ -1389,6 +1708,68 @@
         }
         return () => clearInterval(timer);
       }, [adModalOpen, adCountdown]);
+
+      // Global Ad Watch & Reward System
+      const handleWatchAd = (type, amount, title, extra = {}) => {
+        sound.click();
+        setAdReward({
+          type,
+          amount,
+          title: title || 'Quantum Sponsor Booster',
+          coinAmount: extra.coinAmount || (type === 'coins' ? amount : 350),
+          gemAmount: extra.gemAmount || (type === 'gems' ? amount : 15),
+          onComplete: extra.onComplete || null
+        });
+        setAdCountdown(3);
+        setAdModalOpen(true);
+      };
+
+      const handleClaimAdReward = () => {
+        sound.correct();
+        confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+        if (adReward.type === 'coins') {
+          const val = adReward.amount || adReward.coinAmount || 250;
+          setCoins(c => {
+            const next = c + val;
+            try { localStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+            return next;
+          });
+          setRewardToast(`🎉 Ad Reward: +${val.toLocaleString()} Coins Collected!`);
+        } else if (adReward.type === 'gems') {
+          const val = adReward.amount || adReward.gemAmount || 15;
+          setGems(g => {
+            const next = g + val;
+            try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+            return next;
+          });
+          setRewardToast(`💎 Ad Reward: +${val.toLocaleString()} Gems Collected!`);
+        } else if (adReward.type === 'time') {
+          const extraSec = adReward.amount || 30;
+          setGameTimer(t => t + extraSec);
+          setIsTimeOver(false);
+          setRewardToast(`⏱️ Extra Time: +${extraSec}s Added! Mission Resumed!`);
+        } else {
+          // 'both' / supply drop
+          const cAmt = adReward.coinAmount || 350;
+          const gAmt = adReward.gemAmount || 15;
+          setCoins(c => {
+            const next = c + cAmt;
+            try { localStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+            return next;
+          });
+          setGems(g => {
+            const next = g + gAmt;
+            try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+            return next;
+          });
+          setRewardToast(`⚡ Supply Drop: +${cAmt} 🪙 & +${gAmt} 💎 Added!`);
+        }
+        setAdModalOpen(false);
+        if (adReward.onComplete) {
+          adReward.onComplete();
+        }
+      };
+
       const [levelFilterTab, setLevelFilterTab] = useState('all'); // 'all' | 'easy' | 'medium' | 'hard'
       const [profileMode, setProfileMode] = useState('Classic');
       const [profileDifficulty, setProfileDifficulty] = useState('Easy');
@@ -1412,6 +1793,17 @@
       const puzzleAnswersRef = useRef({});
       const [puzzleHistory, setPuzzleHistory] = useState([]);
       const [selectedPuzzleSlot, setSelectedPuzzleSlot] = useState(null);
+
+      // Flying number animation state
+      const [flyingTiles, setFlyingTiles] = useState([]);
+      const [impactSlot, setImpactSlot] = useState(null);
+      const pendingNumbersRef = useRef(new Set());
+      const pendingSlotsRef = useRef(new Set());
+      const [pendingNumbers, setPendingNumbers] = useState(new Set());
+      const [pendingSlots, setPendingSlots] = useState(new Set());
+      const slotRefs = useRef({});
+      const trayRefs = useRef({});
+      const gameContainerRef = useRef(null);
       const [hintActiveStep, setHintActiveStep] = useState(0);
       const [isGamePaused, setIsGamePaused] = useState(false);
       const [showGamePreferences, setShowGamePreferences] = useState(false);
@@ -1437,16 +1829,103 @@
       // Statistics Tab
       const [statsTab, setStatsTab] = useState('overview');
 
-      // Timer effect in gameplay
+      // Timer effect in gameplay with Modern Cyber Timeout Trigger
       useEffect(() => {
         let interval = null;
-        if (currentScreen === 'game' && !isGamePaused) {
+        if (currentScreen === 'game' && !isGamePaused && !isTimeOver) {
           interval = setInterval(() => {
-            setGameTimer(t => (t > 0 ? t - 1 : 0));
+            setGameTimer(t => {
+              if (t <= 1) {
+                setIsTimeOver(true);
+                sound.wrong();
+                return 0;
+              }
+              return t - 1;
+            });
           }, 1000);
         }
         return () => clearInterval(interval);
-      }, [currentScreen, isGamePaused]);
+      }, [currentScreen, isGamePaused, isTimeOver]);
+
+      // Level Entry Fee verification and launch flow
+      const attemptStartLevel = (targetLvl = selectedLevelNum, bypassFee = false) => {
+        const cost = getLevelEntryCost(targetLvl);
+        if (bypassFee) {
+          startNewPuzzle(targetLvl);
+          return;
+        }
+
+        if (coins >= cost.coins && gems >= cost.gems) {
+          // Deduct entry fee
+          setCoins(c => {
+            const nextCoins = c - cost.coins;
+            try { localStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
+            return nextCoins;
+          });
+          setGems(g => {
+            const nextGems = g - cost.gems;
+            try { localStorage.setItem('newromath_gems', nextGems.toString()); } catch (e) {}
+            return nextGems;
+          });
+          sound.click();
+          setRewardToast(`⚡ Mission L${targetLvl} Entry: -${cost.coins} Coins & -${cost.gems} Gems`);
+          startNewPuzzle(targetLvl);
+        } else {
+          sound.wrong();
+          setInsufficientFundsModal({
+            isOpen: true,
+            targetLvl,
+            cost,
+            missingCoins: Math.max(0, cost.coins - coins),
+            missingGems: Math.max(0, cost.gems - gems)
+          });
+        }
+      };
+
+      // Restart mission cleanly after timeout banner
+      const restartLevelAfterTimeout = () => {
+        sound.click();
+        setIsTimeOver(false);
+        resetPuzzle(selectedLevelNum);
+      };
+
+      // Move on to the next puzzle inside the current level (no extra entry fee)
+      const continueToNextStage = () => {
+        sound.click();
+        resetPuzzle(selectedLevelNum);
+        navigateTo('game');
+      };
+
+      // Retry the same puzzle after a wrong answer (progress in the level is kept)
+      const retryCurrentStage = () => {
+        sound.click();
+        resetPuzzle(selectedLevelNum);
+        navigateTo('game');
+      };
+
+      // Expose for testing and inspection
+      window.__triggerTimeout = () => {
+        setIsTimeOver(true);
+        sound.wrong();
+      };
+      window.__resetTimeout = restartLevelAfterTimeout;
+      window.__solvePuzzle = () => {
+        const solved = {};
+        puzzleSlots.forEach(({ slot, answer }) => { solved[slot] = answer; });
+        puzzleAnswersRef.current = solved;
+        setPuzzleAnswers(solved);
+        submitPuzzle(solved);
+      };
+      window.__triggerInsufficientFunds = () => {
+        setInsufficientFundsModal({
+          isOpen: true,
+          targetLvl: 5,
+          cost: { coins: 200, gems: 18 },
+          missingCoins: 0,
+          missingGems: 11
+        });
+      };
+      window.__navigateTo = navigateTo;
 
       // Auto-slide ticker for 3D Champions Reel cards (sliding smoothly left to right)
       const championsReelRef = useRef(null);
@@ -1572,6 +2051,25 @@
         return generateCrossMathPuzzle(selectedLevelNum, puzzleSeed);
       }, [selectedLevelNum, puzzleSeed]);
 
+      // One unique puzzle seed per stage of the selected level (no repeated equations inside a level)
+      const stageSeeds = useMemo(() => {
+        const total = getStageCount(selectedLevelNum);
+        const seen = new Set();
+        const seeds = [];
+        for (let st = 0; st < total; st++) {
+          let seed = st * 101;
+          let guard = 0;
+          while (guard < 40) {
+            const text = generateCrossMathPuzzle(selectedLevelNum, seed).solvedText;
+            if (!seen.has(text)) { seen.add(text); break; }
+            seed += 1;
+            guard += 1;
+          }
+          seeds.push(seed);
+        }
+        return seeds;
+      }, [selectedLevelNum]);
+
       const currentLevelMeta = useMemo(() => {
         return ALL_LEVELS.find(l => l.num === selectedLevelNum) || ALL_LEVELS[0];
       }, [selectedLevelNum]);
@@ -1593,6 +2091,12 @@
         setPuzzleAnswers({});
         setPuzzleHistory([]);
         setSelectedPuzzleSlot(null);
+        pendingNumbersRef.current.clear();
+        pendingSlotsRef.current.clear();
+        setPendingNumbers(new Set());
+        setPendingSlots(new Set());
+        setFlyingTiles([]);
+        setIsTimeOver(false);
         setGameTimer(getLevelTimer(targetLvl));
       };
 
@@ -1604,6 +2108,12 @@
         setPuzzleAnswers({});
         setPuzzleHistory([]);
         setSelectedPuzzleSlot(null);
+        pendingNumbersRef.current.clear();
+        pendingSlotsRef.current.clear();
+        setPendingNumbers(new Set());
+        setPendingSlots(new Set());
+        setFlyingTiles([]);
+        setIsTimeOver(false);
         setGameTimer(getLevelTimer(selectedLevelNum));
         setTimeout(() => setIsSpinningReroll(false), 500);
       };
@@ -1614,8 +2124,10 @@
         try { localStorage.setItem('newromath_selected_level', targetLvl.toString()); } catch (e) {}
         try { localStorage.setItem('newromath_player_level', Math.max(playerLevel, targetLvl).toString()); } catch (e) {}
         setPuzzleSeed(0);
+        setStageNum(1);
         const lvlObj = ALL_LEVELS.find(l => l.num === targetLvl) || ALL_LEVELS[0];
         setProfileDifficulty(lvlObj.diff);
+        setIsTimeOver(false);
         resetPuzzle(targetLvl);
         navigateTo('game');
       };
@@ -1627,36 +2139,67 @@
           sound.correct();
           confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
           const lvlObj = ALL_LEVELS.find(l => l.num === selectedLevelNum) || { xp: 15, coins: 10 };
-          const earnedXp = lvlObj.xp || 20;
-          const earnedCoins = lvlObj.coins || 15;
+          const cost = getLevelEntryCost(selectedLevelNum);
+          const total = getStageCount(selectedLevelNum);
+          const isFinalStage = stageNum >= total;
+          const levelXp = lvlObj.xp || 20;
 
-          // 1. Earn Coins
+          // Reward for this puzzle: small per-puzzle payout, full payout on the level's last puzzle
+          const earnedXp = isFinalStage ? levelXp : Math.max(1, Math.round(levelXp / total));
+          const earnedCoins = isFinalStage ? Math.round(cost.coins * 1.8) : Math.max(5, Math.round(cost.coins * 0.06));
+          const earnedGems = isFinalStage ? Math.round(cost.gems * 1.3) + 2 : 0;
+
+          setLastResult({
+            level: selectedLevelNum,
+            stage: stageNum,
+            total,
+            levelCleared: isFinalStage,
+            solvedText: activePuzzle.solvedText,
+            coins: earnedCoins,
+            gems: earnedGems,
+            xp: earnedXp
+          });
+
+          // 1. Earn Coins & Diamond Coins
           setCoins(c => {
             const nextCoins = c + earnedCoins;
             try { localStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
             return nextCoins;
           });
+          if (earnedGems > 0) {
+            setGems(g => {
+              const nextGems = g + earnedGems;
+              try { localStorage.setItem('newromath_gems', nextGems.toString()); } catch (e) {}
+              return nextGems;
+            });
+          }
 
-          // 2. Next Level Progression
-          const nextLvl = Math.min(25, selectedLevelNum + 1);
+          // 2. Level Progression only when the final puzzle of the level is solved
+          const nextLvl = isFinalStage ? Math.min(25, selectedLevelNum + 1) : selectedLevelNum;
 
-          // 3. Unlock Next Mission
-          setUnlockedLevelMax(prev => {
-            const nextVal = Math.max(prev, nextLvl);
-            try { localStorage.setItem('newromath_unlocked_level', nextVal.toString()); } catch (e) {}
-            return nextVal;
-          });
+          if (isFinalStage) {
+            // 3. Unlock Next Mission
+            setUnlockedLevelMax(prev => {
+              const nextVal = Math.max(prev, nextLvl);
+              try { localStorage.setItem('newromath_unlocked_level', nextVal.toString()); } catch (e) {}
+              return nextVal;
+            });
 
-          // 4. Update Player Campaign Level
-          setPlayerLevel(prev => {
-            const nextVal = Math.max(prev, nextLvl);
-            try { localStorage.setItem('newromath_player_level', nextVal.toString()); } catch (e) {}
-            return nextVal;
-          });
+            // 4. Update Player Campaign Level
+            setPlayerLevel(prev => {
+              const nextVal = Math.max(prev, nextLvl);
+              try { localStorage.setItem('newromath_player_level', nextVal.toString()); } catch (e) {}
+              return nextVal;
+            });
 
-          // 5. Select Next Mission
-          setSelectedLevelNum(nextLvl);
-          try { localStorage.setItem('newromath_selected_level', nextLvl.toString()); } catch (e) {}
+            // 5. Select Next Mission
+            setSelectedLevelNum(nextLvl);
+            try { localStorage.setItem('newromath_selected_level', nextLvl.toString()); } catch (e) {}
+          } else {
+            // Queue up the next puzzle of this level (different puzzle each stage)
+            setStageNum(stageNum + 1);
+            setPuzzleSeed(stageSeeds[stageNum] !== undefined ? stageSeeds[stageNum] : stageNum * 101);
+          }
 
           // 6. Update Player XP & Level-up wrap
           setPlayerXp(prevXp => {
@@ -1683,31 +2226,136 @@
         }
       };
 
-      const placePuzzleNumber = (number) => {
-        if (Object.values(puzzleAnswersRef.current).includes(number)) return;
-        const slot = selectedPuzzleSlot !== null && puzzleAnswersRef.current[selectedPuzzleSlot] === undefined
-          ? selectedPuzzleSlot
-          : puzzleSlots.findIndex(({ slot: index }) => puzzleAnswersRef.current[index] === undefined);
-        if (slot < 0) return;
-        const nextAnswers = { ...puzzleAnswersRef.current, [slot]: number };
+      const finalizePlacement = (number, targetSlot) => {
+        pendingNumbersRef.current.delete(number);
+        pendingSlotsRef.current.delete(targetSlot);
+        setPendingNumbers(new Set(pendingNumbersRef.current));
+        setPendingSlots(new Set(pendingSlotsRef.current));
+
+        const nextAnswers = { ...puzzleAnswersRef.current, [targetSlot]: number };
         puzzleAnswersRef.current = nextAnswers;
         setPuzzleAnswers(nextAnswers);
-        setPuzzleHistory(history => [...history, slot]);
-        setSelectedPuzzleSlot(null);
+        setPuzzleHistory(history => [...history, targetSlot]);
+
+        // Landing impact animation on slot
+        setImpactSlot(targetSlot);
+        setTimeout(() => setImpactSlot(current => current === targetSlot ? null : current), 420);
+
+        sound.snap();
+        if (hapticsEnabled && typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate([15, 30, 15]); } catch (e) {}
+        }
+
         if (Object.keys(nextAnswers).length === puzzleSlots.length) {
-          setTimeout(() => submitPuzzle(nextAnswers), 250);
+          setTimeout(() => submitPuzzle(nextAnswers), 280);
+        }
+      };
+
+      const placePuzzleNumber = (number, sourceElement) => {
+        if (Object.values(puzzleAnswersRef.current).includes(number)) return;
+        if (pendingNumbersRef.current.has(number)) return;
+
+        const targetSlot = (selectedPuzzleSlot !== null && puzzleAnswersRef.current[selectedPuzzleSlot] === undefined && !pendingSlotsRef.current.has(selectedPuzzleSlot))
+          ? selectedPuzzleSlot
+          : puzzleSlots.findIndex(({ slot: index }) => puzzleAnswersRef.current[index] === undefined && !pendingSlotsRef.current.has(index));
+
+        if (targetSlot < 0) return;
+
+        // Reserve immediately to block repeated clicks
+        pendingNumbersRef.current.add(number);
+        pendingSlotsRef.current.add(targetSlot);
+        setPendingNumbers(new Set(pendingNumbersRef.current));
+        setPendingSlots(new Set(pendingSlotsRef.current));
+        setSelectedPuzzleSlot(null);
+
+        sound.whoosh();
+        if (hapticsEnabled && typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(10); } catch (e) {}
+        }
+
+        const container = gameContainerRef.current || document.getElementById('root');
+        const sourceEl = sourceElement || trayRefs.current[number];
+        const targetEl = slotRefs.current[targetSlot];
+
+        if (container && sourceEl && targetEl) {
+          const cRect = container.getBoundingClientRect();
+          const sRect = sourceEl.getBoundingClientRect();
+          const tRect = targetEl.getBoundingClientRect();
+
+          const tileId = 'fly-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+          const newFlyTile = {
+            id: tileId,
+            number: number,
+            targetSlot: targetSlot,
+            fromX: sRect.left - cRect.left,
+            fromY: sRect.top - cRect.top,
+            fromW: sRect.width,
+            fromH: sRect.height,
+            toX: tRect.left - cRect.left,
+            toY: tRect.top - cRect.top,
+            toW: tRect.width,
+            toH: tRect.height,
+            isReturn: false
+          };
+
+          setFlyingTiles(prev => [...prev, newFlyTile]);
+        } else {
+          finalizePlacement(number, targetSlot);
+        }
+      };
+
+      const returnNumberToTray = (number, slot) => {
+        sound.whoosh();
+        const container = gameContainerRef.current || document.getElementById('root');
+        const sourceEl = slotRefs.current[slot];
+        const targetEl = trayRefs.current[number];
+
+        if (container && sourceEl && targetEl) {
+          const cRect = container.getBoundingClientRect();
+          const sRect = sourceEl.getBoundingClientRect();
+          const tRect = targetEl.getBoundingClientRect();
+
+          const tileId = 'ret-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+          const returnTile = {
+            id: tileId,
+            number: number,
+            targetSlot: slot,
+            fromX: sRect.left - cRect.left,
+            fromY: sRect.top - cRect.top,
+            fromW: sRect.width,
+            fromH: sRect.height,
+            toX: tRect.left - cRect.left,
+            toY: tRect.top - cRect.top,
+            toW: tRect.width,
+            toH: tRect.height,
+            isReturn: true
+          };
+
+          setFlyingTiles(prev => [...prev, returnTile]);
+        }
+      };
+
+      const finalizeReturn = (number) => {
+        sound.snap();
+        if (hapticsEnabled && typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(10); } catch (e) {}
         }
       };
 
       const undoPuzzleNumber = () => {
         const lastSlot = puzzleHistory[puzzleHistory.length - 1];
         if (lastSlot === undefined) return;
+        const number = puzzleAnswersRef.current[lastSlot];
+        if (number === undefined) return;
+
         const nextAnswers = { ...puzzleAnswersRef.current };
         delete nextAnswers[lastSlot];
         puzzleAnswersRef.current = nextAnswers;
         setPuzzleAnswers(nextAnswers);
         setPuzzleHistory(history => history.slice(0, -1));
         setSelectedPuzzleSlot(lastSlot);
+
+        returnNumberToTray(number, lastSlot);
       };
 
       // Primary screens list for quick switcher
@@ -2218,7 +2866,7 @@
             <div 
               onClick={() => {
                 sound.click();
-                startNewPuzzle(activePlayerLevel);
+                attemptStartLevel(activePlayerLevel);
               }}
               className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0"
             >
@@ -2459,14 +3107,6 @@
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/>
                     </svg>
                   </button>
-                  <div className="flex flex-col justify-center min-w-0">
-                    <h1 className="text-white font-extrabold text-sm tracking-wide font-display drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">
-                      Categories
-                    </h1>
-                    <span className="text-cyan-300/80 font-bold text-[9px] tracking-tight">
-                      Select Training Discipline
-                    </span>
-                  </div>
                 </div>
 
                 {/* Currency Capsules */}
@@ -2632,14 +3272,6 @@
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/>
                     </svg>
                   </button>
-                  <div className="flex flex-col justify-center min-w-0">
-                    <h1 className="text-white font-extrabold text-sm tracking-wide font-display drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">
-                      Select Level
-                    </h1>
-                    <span className="text-cyan-300/80 font-bold text-[9px] tracking-tight">
-                      25 Missions • World 1 - 3
-                    </span>
-                  </div>
                 </div>
 
                 {/* Currency Capsules */}
@@ -2655,7 +3287,7 @@
                       <polygon points="12,6.5 13.6,9.8 17.2,10.3 14.6,12.7 15.2,16.2 12,14.5 8.8,16.2 9.4,12.7 6.8,10.3 10.4,9.8" fill="#fef08a" stroke="#d97706" strokeWidth="0.5" />
                     </svg>
                     <span className="text-amber-300 font-black text-[10.5px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                      {Math.max(coins, 10).toLocaleString()}
+                      {coins.toLocaleString()}
                     </span>
                     <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
                       +
@@ -2802,7 +3434,8 @@
                           return;
                         }
                         sound.click();
-                        startNewPuzzle(lvl.num);
+                        setSelectedLevelNum(lvl.num);
+                        attemptStartLevel(lvl.num);
                       }}
                       className={`math-arch-card relative rounded-2xl p-3.5 flex items-center justify-between transition-all cursor-pointer overflow-hidden ${
                         isSelected
@@ -2830,38 +3463,42 @@
                         </div>
 
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
+                          <div className="flex items-center gap-2">
                             <span className="text-sm font-black text-white font-display">
                               Level {lvl.num}
                             </span>
-                            <span className="text-xs text-cyan-200/90 font-bold truncate max-w-[120px]">
+                            <span className="text-xs text-cyan-200/90 font-bold truncate max-w-[130px]">
                               {lvl.title}
                             </span>
-                            <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full border ${
-                              lvl.diff === 'Easy'
-                                ? 'bg-emerald-950/70 border-emerald-400/50 text-emerald-300'
-                                : lvl.diff === 'Medium'
-                                ? 'bg-amber-950/70 border-amber-400/50 text-amber-300'
-                                : 'bg-rose-950/70 border-rose-400/50 text-rose-300'
-                            }`}>
-                              {lvl.diff}
-                            </span>
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="flex items-center gap-1 text-[10px] text-cyan-200/90 font-mono font-bold bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-400/30">
-                              <span>⏱️</span>
-                              <span>{getLevelTimer(lvl.num)}s</span>
-                            </span>
-                            <span className="text-[10px] text-amber-300 font-bold">⭐ +{lvl.xp} XP</span>
-                            <span className="flex items-center gap-1 text-[10px] text-amber-300 font-bold">
-                              <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="#fde68a" strokeWidth="1.5" />
-                                <circle cx="12" cy="12" r="7.5" fill="none" stroke="#b45309" strokeWidth="1" />
-                                <path d="M14.8 8.8c-.6-.7-1.5-1.1-2.8-1.1-1.6 0-2.7.8-2.7 2 0 1.3 1.2 1.8 2.7 2.2 1.5.4 2.7.9 2.7 2.2 0 1.3-1.2 2.2-2.9 2.2-1.3 0-2.4-.5-3.2-1.4M12 6.5v11" fill="none" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round" />
-                              </svg>
-                              <span>+{lvl.coins}</span>
-                            </span>
-                          </div>
+                          {/* Essential Mission Requirements Only */}
+                          {(() => {
+                            const cost = getLevelEntryCost(lvl.num);
+                            return (
+                              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                                {/* Puzzles in this level */}
+                                <span className="flex items-center gap-1 text-[10px] text-emerald-200 font-mono font-bold bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-400/30" title="Puzzles in this level">
+                                  <span>🎮</span>
+                                  <span>{getStageCount(lvl.num)}</span>
+                                </span>
+                                {/* Timer */}
+                                <span className="flex items-center gap-1 text-[10px] text-cyan-200/90 font-mono font-bold bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-400/30">
+                                  <span>⏱️</span>
+                                  <span>{getLevelTimer(lvl.num)}s</span>
+                                </span>
+                                {/* Fee: Gold Coins */}
+                                <span className="flex items-center gap-1 text-[10px] text-amber-300 font-extrabold font-mono bg-amber-950/70 px-1.5 py-0.5 rounded border border-amber-400/40 shadow-xs" title="Entry Coins">
+                                  <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
+                                  <span>{cost.coins}</span>
+                                </span>
+                                {/* Fee: Diamonds */}
+                                <span className="flex items-center gap-1 text-[10px] text-cyan-200 font-extrabold font-mono bg-sky-950/70 px-1.5 py-0.5 rounded border border-cyan-400/40 shadow-xs" title="Entry Diamonds">
+                                  <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
+                                  <span>{cost.gems}</span>
+                                </span>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -2894,17 +3531,30 @@
                 })}
               </div>
 
-              {/* Hero Action Button */}
-              <button
-                onClick={() => {
-                  sound.click();
-                  startNewPuzzle(selectedLevelNum);
-                }}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black text-base shadow-[0_6px_22px_rgba(245,158,11,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-amber-200 cursor-pointer mb-4"
-              >
-                <span>🚀</span>
-                <span>Launch Mission (Level {selectedLevelNum})</span>
-              </button>
+              {/* Hero Action Button with Entry Fee summary */}
+              {(() => {
+                const selectedCost = getLevelEntryCost(selectedLevelNum);
+                return (
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      attemptStartLevel(selectedLevelNum);
+                    }}
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black text-base shadow-[0_6px_22px_rgba(245,158,11,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] active:scale-[0.98] transition-all flex flex-col items-center justify-center border border-amber-200 cursor-pointer mb-4"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>🚀</span>
+                      <span>Launch Mission (Level {selectedLevelNum})</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-amber-950/85 font-mono font-black mt-0.5">
+                      <span>Entry Fee: 🪙 {selectedCost.coins}</span>
+                      <span>•</span>
+                      <span>💎 {selectedCost.gems}</span>
+                      <span className="text-[9.5px] bg-amber-950/20 px-1.5 py-0.5 rounded font-sans uppercase font-bold tracking-wider">Play</span>
+                    </div>
+                  </button>
+                );
+              })()}
             </div>
           </div>
         );
@@ -3025,7 +3675,7 @@
                   <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-400/50 text-emerald-300">
                     {profileDifficulty}
                   </span>
-                  <span className="text-[10px] text-cyan-300/70 font-mono">STAGE 1/1</span>
+                  <span className="text-[10px] text-cyan-300/70 font-mono">PUZZLE {stageNum}/{stageTotal}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -3065,37 +3715,51 @@
                       const isFilled = isSlot && puzzleAnswers[slot] !== undefined;
 
                       if (isSlot) {
+                        const isSlotPending = pendingSlots.has(slot);
+                        const hasImpact = impactSlot === slot;
                         return (
                           <button
                             key={`${rowIndex}-${columnIndex}`}
+                            ref={el => { if (el) slotRefs.current[slot] = el; }}
+                            data-puzzle-slot={slot}
                             onClick={() => {
+                              if (isTimeOver) return;
                               sound.click();
                               if (puzzleAnswers[slot] !== undefined) {
+                                const num = puzzleAnswers[slot];
                                 const nextAnswers = { ...puzzleAnswersRef.current };
                                 delete nextAnswers[slot];
                                 puzzleAnswersRef.current = nextAnswers;
                                 setPuzzleAnswers(nextAnswers);
                                 setPuzzleHistory(history => history.filter(item => item !== slot));
+                                setSelectedPuzzleSlot(slot);
+                                returnNumberToTray(num, slot);
+                              } else {
+                                setSelectedPuzzleSlot(slot);
                               }
-                              setSelectedPuzzleSlot(slot);
                             }}
                             aria-label={`Puzzle blank ${slot + 1}${puzzleAnswers[slot] !== undefined ? `, ${puzzleAnswers[slot]}` : ''}`}
                             aria-pressed={isSelected}
-                            className={`flex aspect-square min-w-0 items-center justify-center select-none ${
+                            className={`relative flex aspect-square min-w-0 items-center justify-center select-none ${
                               isFilled
-                                ? `scifi-tile-slot-filled animate-tile-pop ${largeFontEnabled ? 'text-[clamp(17px,5.5vw,26px)]' : 'text-[clamp(14px,4.5vw,22px)]'}`
+                                ? `scifi-tile-slot-filled ${hasImpact ? 'animate-tile-pop' : ''} ${largeFontEnabled ? 'text-[clamp(17px,5.5vw,26px)]' : 'text-[clamp(14px,4.5vw,22px)]'}`
                                 : isSelected
                                 ? `scifi-tile-slot-selected ${largeFontEnabled ? 'text-[clamp(17px,5.5vw,26px)]' : 'text-[clamp(14px,4.5vw,22px)]'}`
+                                : isSlotPending
+                                ? 'scifi-tile-slot-target-locked'
                                 : 'scifi-tile-slot-empty'
                             }`}
                           >
                             {isFilled ? (
                               puzzleAnswers[slot]
+                            ) : isSlotPending ? (
+                              <span className="w-2.5 h-2.5 rounded-full bg-cyan-300 animate-ping opacity-90" />
                             ) : isSelected ? (
                               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping opacity-80" />
                             ) : (
                               <span className="text-[10px] text-cyan-400/50 font-bold leading-none select-none">◇</span>
                             )}
+                            {hasImpact && <span className="slot-impact-wave" />}
                           </button>
                         );
                       }
@@ -3122,20 +3786,23 @@
               {/* Number Tray Keyboard */}
               <div className="relative z-10 flex items-center justify-center gap-2 pt-4 border-t border-cyan-400/20">
                 {puzzleNumbers.map(number => {
-                  const used = Object.values(puzzleAnswers).includes(number);
+                  const isAnswered = Object.values(puzzleAnswers).includes(number);
+                  const isPending = pendingNumbers.has(number);
+                  const used = isAnswered || isPending;
                   return (
                     <button
                       key={number}
-                      onClick={() => {
-                        sound.click();
-                        placePuzzleNumber(number);
+                      ref={el => { if (el) trayRefs.current[number] = el; }}
+                      data-tray-number={number}
+                      onClick={(e) => {
+                        placePuzzleNumber(number, e.currentTarget);
                       }}
-                      disabled={used || isGamePaused}
+                      disabled={used || isGamePaused || isTimeOver}
                       aria-label={`Place number ${number}`}
                       className={`grid aspect-square min-w-0 flex-1 max-w-[54px] place-items-center rounded-xl transition-all ${
                         used
                           ? 'opacity-25 scale-95 border border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed'
-                          : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_4px_0_#064e3b,0_6px_12px_rgba(16,185,129,0.35)] active:translate-y-1 active:shadow-[0_1px_0_#064e3b] cursor-pointer'
+                          : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_4px_0_#064e3b,0_6px_12px_rgba(16,185,129,0.35)] active:translate-y-1 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
                       } ${largeFontEnabled ? 'text-[clamp(20px,6.5vw,32px)]' : 'text-[clamp(17px,5.5vw,26px)]'}`}
                     >
                       {number}
@@ -3208,6 +3875,131 @@
               </button>
             </div>
           </div>
+
+          {/* Modern Attractive Cyber Timeout Banner Modal (Icon-Only Edition) */}
+          {isTimeOver && (
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+              <div className="relative rounded-[32px] p-6 bg-gradient-to-b from-[#181333]/98 via-[#0f152d]/98 to-[#070b1c]/98 border-2 border-rose-500/70 shadow-[0_0_50px_rgba(244,63,94,0.35),0_24px_60px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.2)] max-w-[290px] sm:max-w-[320px] w-full text-center overflow-hidden">
+                {/* Holographic Blueprint Grid */}
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-rose-500/15 blur-3xl pointer-events-none" />
+
+                {/* Dismiss / Close Icon */}
+                <button
+                  onClick={() => {
+                    sound.click();
+                    setIsTimeOver(false);
+                    navigateTo('levels');
+                  }}
+                  aria-label="Close"
+                  title="Close"
+                  className="absolute top-3.5 right-3.5 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-slate-300 hover:text-white flex items-center justify-center active:scale-90 transition-all cursor-pointer shadow-sm"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Glowing 3D Chronometer Hero Badge */}
+                <div className="relative z-10 mx-auto w-20 h-20 mt-1 mb-4 flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-rose-500/30 via-pink-600/20 to-red-600/30 border border-rose-400/40 rotate-6" />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#260f28] to-[#12071e] border border-rose-400/50 -rotate-3 shadow-[0_0_30px_rgba(244,63,94,0.5)] flex items-center justify-center">
+                    <svg className="w-10 h-10 text-rose-400 drop-shadow-[0_0_12px_rgba(244,63,94,0.9)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="13" r="8" fill="rgba(244,63,94,0.18)" />
+                      <path d="M12 9v4l2.5 1.5" stroke="#ffffff" strokeWidth="2.5" />
+                      <path d="M5 3L2 6" />
+                      <path d="M22 6L19 3" />
+                      <path d="M10 2h4" />
+                    </svg>
+                  </div>
+                  {/* Warning Indicator Pip */}
+                  <span className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-full bg-gradient-to-br from-rose-400 to-red-600 border-2 border-[#12071e] flex items-center justify-center shadow-[0_0_14px_rgba(244,63,94,0.9)]">
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                      <path d="M12 8v5M12 16h.01" />
+                    </svg>
+                  </span>
+                </div>
+
+                {/* Status Meter Bar (All-Icon Minimalist Strip) */}
+                <div className="relative z-10 mb-5 p-2 rounded-2xl bg-black/45 border border-white/10 flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shrink-0">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 3" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-2 w-full rounded-full bg-slate-800/80 overflow-hidden border border-rose-500/30 p-0.5">
+                      <div className="h-full w-full rounded-full bg-gradient-to-r from-rose-600 to-red-500 shadow-[0_0_8px_rgba(244,63,94,0.8)] animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shrink-0">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 22h14" />
+                      <path d="M5 2h14" />
+                      <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
+                      <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Action Buttons (All-Icon Architecture) */}
+                <div className="relative z-10 space-y-2.5">
+                  {/* Two Buttons in the Same Row */}
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {/* Primary: Replay / Restart Level */}
+                    <button
+                      onClick={restartLevelAfterTimeout}
+                      aria-label="Restart Level"
+                      title="Restart"
+                      className="h-14 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:brightness-110 text-emerald-950 shadow-[0_6px_20px_rgba(16,185,129,0.45)] active:scale-95 transition-all border border-emerald-200 cursor-pointer flex items-center justify-center"
+                    >
+                      <svg className="w-7 h-7 text-emerald-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                      </svg>
+                    </button>
+
+                    {/* Secondary: Extra Time Ad (Video + Boost) */}
+                    <button
+                      onClick={() => handleWatchAd('time', 30, 'Chronometer Extender Sponsor')}
+                      aria-label="Extra Time (Watch Ad)"
+                      title="Extra Time"
+                      className="h-14 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-110 text-amber-950 shadow-[0_6px_20px_rgba(245,158,11,0.45)] active:scale-95 transition-all border border-amber-200 cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {/* Video Camera / Play icon */}
+                      <svg className="w-6 h-6 fill-amber-950 text-amber-950 shrink-0" viewBox="0 0 24 24">
+                        <path d="M4 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2.5l4.24 2.54A1 1 0 0 0 22 18.2V5.8a1 1 0 0 0-1.76-.84L16 7.5V7a2 2 0 0 0-2-2H4Z" />
+                      </svg>
+                      {/* Lightning / Boost icon */}
+                      <svg className="w-5 h-5 fill-amber-950 text-amber-950 shrink-0" viewBox="0 0 24 24">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Exit to Level Select (Grid Icon) */}
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      setIsTimeOver(false);
+                      navigateTo('levels');
+                    }}
+                    aria-label="Level Select"
+                    title="Levels"
+                    className="w-full h-11 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 text-slate-300 hover:text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="7" height="7" x="3" y="3" rx="1.5" />
+                      <rect width="7" height="7" x="14" y="3" rx="1.5" />
+                      <rect width="7" height="7" x="14" y="14" rx="1.5" />
+                      <rect width="7" height="7" x="3" y="14" rx="1.5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       );
 
@@ -3413,46 +4205,66 @@
             </div>
             
             <h2 className="text-2xl font-black font-display text-white tracking-tight">
-              MISSION ACCOMPLISHED!
+              {lastResult.levelCleared ? 'MISSION ACCOMPLISHED!' : 'PUZZLE SOLVED!'}
             </h2>
             <p className="text-xs text-cyan-200/80 mt-1">
-              Level {selectedLevelNum} Cleared • Equations Balanced!
+              {lastResult.levelCleared
+                ? `Level ${lastResult.level} Cleared • All ${lastResult.total} Puzzles Done!`
+                : `Level ${lastResult.level} • Puzzle ${lastResult.stage} of ${lastResult.total} Complete`}
             </p>
+
+            {/* Level Puzzle Progress */}
+            <div className="w-full mt-3 h-2 rounded-full bg-[#030919] border border-cyan-500/30 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#00d2ff] via-[#2f75f7] to-[#a855f7] transition-all duration-500"
+                style={{ width: `${Math.round((lastResult.stage / lastResult.total) * 100)}%` }}
+              />
+            </div>
 
             {/* Solved Card */}
             <div className="bg-gradient-to-b from-[#142d68] to-[#0d1f47] border border-cyan-400/50 rounded-2xl p-4 my-5 w-full shadow-[0_8px_20px_rgba(0,0,0,0.5)]">
               <span className="text-[10px] font-mono text-cyan-300/80 block mb-1 uppercase tracking-wider">Cross-Math Solved</span>
-              <span className="text-2xl font-black font-mono text-white">{activePuzzle.solvedText}</span>
+              <span className="text-2xl font-black font-mono text-white">{lastResult.solvedText}</span>
             </div>
 
-            {/* Rewards Capsules */}
-            <div className="flex items-center gap-3">
-              <div className="bg-black/40 border border-cyan-400/50 rounded-full px-3 py-1 flex items-center gap-1.5 shadow-sm">
+            {/* Rewards Capsules for this result */}
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              <div className="bg-black/50 border border-cyan-400/50 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
                 <span className="text-amber-300">⭐</span>
-                <span className="text-cyan-200 font-black text-xs">+{currentLevelMeta.xp} XP</span>
+                <span className="text-cyan-200 font-black text-xs">+{lastResult.xp} XP</span>
               </div>
-              <div className="bg-black/40 border border-amber-400/50 rounded-full px-3 py-1 flex items-center gap-1.5 shadow-sm">
-                <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="#fde68a" strokeWidth="1.5" />
-                  <circle cx="12" cy="12" r="7.5" fill="none" stroke="#b45309" strokeWidth="1" />
-                  <path d="M14.8 8.8c-.6-.7-1.5-1.1-2.8-1.1-1.6 0-2.7.8-2.7 2 0 1.3 1.2 1.8 2.7 2.2 1.5.4 2.7.9 2.7 2.2 0 1.3-1.2 2.2-2.9 2.2-1.3 0-2.4-.5-3.2-1.4M12 6.5v11" fill="none" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-                <span className="text-amber-300 font-black text-xs">+{currentLevelMeta.coins} Coins</span>
+              <div className="bg-black/50 border border-amber-400/60 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
+                <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-4 h-4 object-contain" />
+                <span className="text-amber-300 font-black text-xs">+{lastResult.coins} Coins</span>
               </div>
+              {lastResult.gems > 0 && (
+                <div className="bg-black/50 border border-cyan-400/60 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
+                  <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-4 h-4 object-contain" />
+                  <span className="text-cyan-200 font-black text-xs">+{lastResult.gems} Gems</span>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="w-full relative z-10 max-w-xs space-y-2.5">
-            <button
-              onClick={() => {
-                sound.click();
-                const nextLvl = Math.min(25, selectedLevelNum);
-                startNewPuzzle(nextLvl);
-              }}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 hover:brightness-110 text-emerald-950 font-black text-base shadow-[0_6px_20px_rgba(16,185,129,0.5)] active:scale-95 transition-all border border-emerald-300 cursor-pointer"
-            >
-              Next Mission (Level {selectedLevelNum}) →
-            </button>
+            {lastResult.levelCleared ? (
+              <button
+                onClick={() => {
+                  sound.click();
+                  attemptStartLevel(Math.min(25, selectedLevelNum));
+                }}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 hover:brightness-110 text-emerald-950 font-black text-base shadow-[0_6px_20px_rgba(16,185,129,0.5)] active:scale-95 transition-all border border-emerald-300 cursor-pointer"
+              >
+                Next Mission (Level {selectedLevelNum}) →
+              </button>
+            ) : (
+              <button
+                onClick={continueToNextStage}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 hover:brightness-110 text-emerald-950 font-black text-base shadow-[0_6px_20px_rgba(16,185,129,0.5)] active:scale-95 transition-all border border-emerald-300 cursor-pointer"
+              >
+                Next Puzzle ({stageNum}/{stageTotal}) →
+              </button>
+            )}
             <button
               onClick={() => {
                 sound.click();
@@ -3496,13 +4308,10 @@
 
           <div className="w-full space-y-2.5 relative z-10 max-w-xs">
             <button
-              onClick={() => {
-                sound.click();
-                startNewPuzzle(selectedLevelNum);
-              }}
+              onClick={retryCurrentStage}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-rose-500 to-red-600 hover:brightness-110 text-white font-black text-base shadow-[0_6px_20px_rgba(244,63,94,0.4)] active:scale-95 transition-all border border-rose-400 cursor-pointer"
             >
-              Retry Mission (Level {selectedLevelNum})
+              Retry Puzzle ({stageNum}/{stageTotal})
             </button>
             <button
               onClick={() => {
@@ -4452,12 +5261,7 @@
                 >
                   ‹
                 </button>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🏆</span>
-                  <h1 className="text-base font-black font-display tracking-wider bg-gradient-to-r from-cyan-300 via-sky-100 to-white bg-clip-text text-transparent uppercase">
-                    Leaderboard
-                  </h1>
-                </div>
+                <div />
                 <button 
                   onClick={() => { sound.click(); navigateTo('help'); }} 
                   aria-label="Leaderboard information" 
@@ -4598,7 +5402,7 @@
                 <div className="bg-gradient-to-r from-[#0284c7] via-[#0369a1] to-[#1e40af] border-2 border-cyan-300 rounded-2xl p-3 flex items-center justify-between shadow-[0_0_20px_rgba(0,229,255,0.4)]">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-9 h-9 rounded-xl bg-white text-blue-950 font-mono font-black text-sm flex items-center justify-center shadow-md shrink-0">
-                      #10
+                      #{playerRank}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
@@ -4611,15 +5415,15 @@
                         </span>
                       </div>
                       <span className="text-[10px] font-mono text-cyan-100/90 block mt-0.5">
-                        Level {selectedLevelNum} • Tier Master
-                      </span>
-                    </div>
-                  </div>
+                         Level {activePlayerLevel} • Tier Master
+                       </span>
+                     </div>
+                   </div>
 
-                  <div className="shrink-0 flex items-center gap-1.5 bg-black/40 border border-cyan-200/50 px-3 py-1.5 rounded-xl">
-                    <span className="text-xs">⭐</span>
-                    <span className="font-mono font-black text-xs text-white">
-                      1,840,250
+                   <div className="shrink-0 flex items-center gap-1.5 bg-black/40 border border-cyan-200/50 px-3 py-1.5 rounded-xl">
+                     <span className="text-xs">⭐</span>
+                     <span className="font-mono font-black text-xs text-white">
+                       {playerScore.toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -4733,12 +5537,7 @@
                 >
                   ‹
                 </button>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">👤</span>
-                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-300 via-sky-100 to-white bg-clip-text text-transparent uppercase">
-                    Player Profile
-                  </h1>
-                </div>
+                <div />
                 <button 
                   onClick={() => { sound.click(); navigateTo('settings'); }} 
                   aria-label="Settings" 
@@ -4817,7 +5616,7 @@
                   <div className="relative shrink-0 flex flex-col items-center justify-center px-2 py-1.5 rounded-2xl bg-gradient-to-b from-[#1b4394]/60 to-[#0c204d]/80 border border-cyan-400/40 shadow-inner">
                     <img src="/assets/icon_trophy_3d.png" alt="Trophy" className="w-8 h-8 object-contain drop-shadow-[0_2px_6px_rgba(255,200,0,0.5)]" />
                     <span className="text-[8.5px] font-black text-amber-300 uppercase tracking-tight mt-0.5">
-                      RANK #1
+                      RANK #{playerRank}
                     </span>
                   </div>
                 </div>
@@ -5459,13 +6258,6 @@
       // 19. REWARDS & SHOP (3D Sci-Fi Arcade Rewards Store)
       // ========================================================
       const renderRewardsScreen = () => {
-        const handleWatchAd = (type, amount, title) => {
-          sound.click();
-          setAdReward({ type, amount, title });
-          setAdCountdown(3);
-          setAdModalOpen(true);
-        };
-
         const handleClaimDailyGift = () => {
           if (dailyGiftClaimed) return;
           sound.correct();
@@ -5503,19 +6295,6 @@
           }
         };
 
-        const handleClaimAdReward = () => {
-          sound.correct();
-          confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
-          if (adReward.type === 'coins') {
-            setCoins(c => c + adReward.amount);
-            setRewardToast(`🎉 Ad Reward: +${adReward.amount} Coins Collected!`);
-          } else {
-            setGems(g => g + adReward.amount);
-            setRewardToast(`💎 Ad Reward: +${adReward.amount} Gems Collected!`);
-          }
-          setAdModalOpen(false);
-        };
-
         return (
           <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
             {/* Top Bar Header */}
@@ -5528,12 +6307,6 @@
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-amber-400 text-base">🎁</span>
-                  <h1 className="text-sm font-extrabold uppercase tracking-wider font-display text-white drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]">
-                    Rewards & Shop
-                  </h1>
-                </div>
               </div>
 
               {/* Right Currencies */}
@@ -5768,60 +6541,6 @@
               </div>
 
             </div>
-
-            {/* Interactive Simulated Ad Modal */}
-            {adModalOpen && (
-              <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-                <div className="bg-gradient-to-b from-[#14285e] to-[#0b1736] border border-cyan-400/60 rounded-3xl p-5 max-w-xs w-full shadow-[0_0_30px_rgba(0,229,255,0.4)] text-center space-y-4">
-                  {/* Ad Header with Countdown */}
-                  <div className="flex items-center justify-between border-b border-cyan-400/20 pb-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wide text-cyan-300">
-                      ⚡ Sponsor Video
-                    </span>
-                    <span className="text-[10px] font-mono font-bold text-amber-300 bg-black/40 px-2 py-0.5 rounded-full border border-amber-400/30">
-                      {adCountdown > 0 ? `Reward in ${adCountdown}s` : 'Reward Ready! ✓'}
-                    </span>
-                  </div>
-
-                  {/* Ad Creative Simulation */}
-                  <div className="h-40 rounded-2xl bg-gradient-to-br from-[#1d4ed8] via-[#1e3a8a] to-[#0f172a] border border-cyan-400/30 p-3 flex flex-col items-center justify-center relative overflow-hidden">
-                    <div className="text-4xl mb-2 animate-bounce">
-                      {adReward.type === 'coins' ? '🪙' : '💎'}
-                    </div>
-                    <span className="text-xs font-black text-white">{adReward.title}</span>
-                    <span className="text-[10px] text-cyan-200 mt-1">
-                      Win up to {adReward.amount} {adReward.type === 'coins' ? 'Coins' : 'Diamonds'}
-                    </span>
-                    <div className="mt-3 flex items-center gap-1.5 text-[9px] text-slate-300 bg-black/30 px-2 py-1 rounded-full">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                      <span>Verified Sponsor Partner</span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="space-y-2">
-                    <button
-                      disabled={adCountdown > 0}
-                      onClick={handleClaimAdReward}
-                      className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-md ${
-                        adCountdown > 0
-                          ? 'bg-slate-700/60 text-slate-400 border border-slate-600 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-emerald-950 border border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)] active:scale-95 cursor-pointer'
-                      }`}
-                    >
-                      {adCountdown > 0 ? `Please Wait (${adCountdown}s)...` : `Collect +${adReward.amount} Reward!`}
-                    </button>
-
-                    <button
-                      onClick={() => setAdModalOpen(false)}
-                      className="text-[10px] text-slate-400 hover:text-white font-bold cursor-pointer"
-                    >
-                      Close Ad
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         );
       };
@@ -5856,10 +6575,232 @@
       };
 
       return (
-        <div className="flex-1 flex flex-col h-full relative font-sans">
+        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans">
           <PageTransition screenKey={currentScreen} direction={transitionDirection}>
             {renderActiveScreen()}
           </PageTransition>
+
+          {/* 3D Cyber-Arcade Flying Number Tiles Layer */}
+          {flyingTiles.length > 0 && (
+            <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
+              {flyingTiles.map(tile => (
+                <FlyingTileItem
+                  key={tile.id}
+                  tile={tile}
+                  largeFontEnabled={largeFontEnabled}
+                  onFinish={(t) => {
+                    setFlyingTiles(prev => prev.filter(item => item.id !== t.id));
+                    if (t.isReturn) {
+                      finalizeReturn(t.number);
+                    } else {
+                      finalizePlacement(t.number, t.targetSlot);
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          {/* Cyber Notification Toast Banner */}
+          {rewardToast && (
+            <div className="fixed top-5 inset-x-4 z-50 flex justify-center pointer-events-none animate-in fade-in slide-in-from-top-4 duration-200">
+              <div className="bg-gradient-to-r from-[#0d2254]/95 via-[#153473]/95 to-[#0c1f4a]/95 border-2 border-cyan-400/80 rounded-2xl px-4 py-2.5 shadow-[0_8px_25px_rgba(0,229,255,0.6)] text-white font-black text-xs font-display flex items-center gap-2 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+                <span>{rewardToast}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Insufficient Resources — icon-only modal */}
+          {insufficientFundsModal.isOpen && (() => {
+            const need = insufficientFundsModal.cost;
+            const rows = [
+              { key: 'coins', icon: '/assets/icon_gold_coin_3d_clean.png', have: coins, need: need.coins, tone: 'amber' },
+              { key: 'gems', icon: '/assets/icon_gem_3d_clean.png', have: gems, need: need.gems, tone: 'cyan' }
+            ];
+            const closeModal = () => {
+              sound.click();
+              setInsufficientFundsModal(prev => ({ ...prev, isOpen: false }));
+            };
+            return (
+              <div
+                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-5 animate-in fade-in duration-200"
+                onClick={closeModal}
+              >
+                <div
+                  className="relative w-full max-w-[300px] rounded-[28px] p-5 bg-gradient-to-b from-[#16306b] to-[#08122e] border border-cyan-300/30 shadow-[0_24px_60px_rgba(0,0,0,0.7),0_0_40px_rgba(0,229,255,0.18),inset_0_1px_0_rgba(255,255,255,0.18)] overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-amber-400/15 blur-3xl pointer-events-none" />
+
+                  {/* Close (icon) */}
+                  <button
+                    onClick={closeModal}
+                    aria-label="Close"
+                    title="Close"
+                    className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 flex items-center justify-center active:scale-90 transition-all cursor-pointer"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                  </button>
+
+                  {/* Hero: wallet icon with alert badge */}
+                  <div className="relative z-10 mx-auto w-20 h-20 mt-1 mb-4 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-amber-400/25 to-cyan-400/15 border border-amber-300/40 rotate-6" />
+                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#1d3a80] to-[#0c1d4a] border border-cyan-300/40 -rotate-3 shadow-[0_0_24px_rgba(0,229,255,0.35)]" />
+                    <img src="/assets/icon_gold_coin_3d_clean.png" alt="" className="relative w-10 h-10 object-contain -translate-x-1.5 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
+                    <img src="/assets/icon_gem_3d_clean.png" alt="" className="absolute w-7 h-7 object-contain translate-x-5 translate-y-3 drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
+                    <span className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-full bg-gradient-to-br from-rose-400 to-red-600 border-2 border-[#0c1d4a] flex items-center justify-center shadow-[0_0_14px_rgba(244,63,94,0.7)]">
+                      <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 7v6M12 17h.01" /></svg>
+                    </span>
+                  </div>
+
+                  {/* Have / Need meters */}
+                  <div className="relative z-10 space-y-2.5">
+                    {rows.map(r => {
+                      const ok = r.have >= r.need;
+                      const pct = Math.min(100, Math.round((r.have / Math.max(1, r.need)) * 100));
+                      return (
+                        <div key={r.key} className={`flex items-center gap-2.5 rounded-2xl px-3 py-2.5 border ${ok ? 'bg-emerald-500/10 border-emerald-400/40' : 'bg-rose-500/10 border-rose-400/50'}`}>
+                          <img src={r.icon} alt={r.key} className="w-7 h-7 object-contain shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="h-2 rounded-full bg-black/50 overflow-hidden border border-white/10">
+                              <div
+                                className={`h-full rounded-full transition-all duration-500 ${ok ? 'bg-gradient-to-r from-emerald-400 to-teal-400' : 'bg-gradient-to-r from-rose-500 to-orange-400'}`}
+                                style={{ width: `${Math.max(6, pct)}%` }}
+                              />
+                            </div>
+                            <div className="mt-1 flex items-center justify-between font-mono font-black text-[11px] leading-none">
+                              <span className={ok ? 'text-emerald-300' : 'text-rose-300'}>{r.have.toLocaleString()}</span>
+                              <span className="text-slate-400">/ {r.need.toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${ok ? 'bg-emerald-500/90 text-white' : 'bg-rose-500/90 text-white'}`}>
+                            {ok ? (
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                            ) : (
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Icon actions */}
+                  <div className="relative z-10 mt-4 flex items-stretch gap-3">
+                    {/* Watch ad: free coins + gems */}
+                    <button
+                      aria-label="Watch ad for free coins and gems"
+                      title="Watch ad: +350 coins, +15 gems"
+                      onClick={() => {
+                        sound.click();
+                        const targetLvl = insufficientFundsModal.targetLvl;
+                        setInsufficientFundsModal(prev => ({ ...prev, isOpen: false }));
+                        handleWatchAd('both', 0, 'Quantum Supply Depot Sponsor', {
+                          coinAmount: 350,
+                          gemAmount: 15,
+                          onComplete: () => {
+                            setRewardToast(`⚡ +350 Coins & +15 Diamonds Claimed! Launching Level ${targetLvl}...`);
+                            setTimeout(() => {
+                              attemptStartLevel(targetLvl);
+                            }, 600);
+                          }
+                        });
+                      }}
+                      className="flex-1 rounded-2xl py-3 bg-gradient-to-b from-emerald-300 via-emerald-400 to-teal-600 hover:brightness-110 border border-emerald-200 shadow-[0_8px_22px_rgba(16,185,129,0.5),inset_0_1px_0_rgba(255,255,255,0.5)] active:scale-95 transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5"
+                    >
+                      <svg className="w-8 h-8 text-emerald-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2.5" y="5" width="19" height="14" rx="3.5" />
+                        <path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor" />
+                      </svg>
+                      <span className="flex items-center gap-1.5 font-mono font-black text-[11px] text-emerald-950 leading-none">
+                        <span>+350</span>
+                        <img src="/assets/icon_gold_coin_3d_clean.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <span>+15</span>
+                        <img src="/assets/icon_gem_3d_clean.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                      </span>
+                    </button>
+
+                    {/* Store */}
+                    <button
+                      aria-label="Open store"
+                      title="Open store"
+                      onClick={() => {
+                        sound.click();
+                        setInsufficientFundsModal(prev => ({ ...prev, isOpen: false }));
+                        navigateTo('rewards');
+                      }}
+                      className="w-[72px] rounded-2xl bg-gradient-to-b from-[#2d63e8] to-[#1b3b9c] hover:brightness-110 border border-cyan-300/50 shadow-[0_8px_20px_rgba(37,99,235,0.45),inset_0_1px_0_rgba(255,255,255,0.35)] active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                    >
+                      <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2" />
+                        <circle cx="9.5" cy="19.2" r="1.4" fill="currentColor" />
+                        <circle cx="16.5" cy="19.2" r="1.4" fill="currentColor" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Interactive Global Simulated Ad Modal */}
+          {adModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+              <div className="bg-gradient-to-b from-[#14285e] to-[#0b1736] border border-cyan-400/60 rounded-3xl p-5 max-w-xs w-full shadow-[0_0_30px_rgba(0,229,255,0.4)] text-center space-y-4">
+                {/* Ad Header with Countdown */}
+                <div className="flex items-center justify-between border-b border-cyan-400/20 pb-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wide text-cyan-300">
+                    ⚡ Sponsor Video
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-amber-300 bg-black/40 px-2 py-0.5 rounded-full border border-amber-400/30">
+                    {adCountdown > 0 ? `Reward in ${adCountdown}s` : 'Reward Ready! ✓'}
+                  </span>
+                </div>
+
+                {/* Ad Creative Simulation */}
+                <div className="h-40 rounded-2xl bg-gradient-to-br from-[#1d4ed8] via-[#1e3a8a] to-[#0f172a] border border-cyan-400/30 p-3 flex flex-col items-center justify-center relative overflow-hidden">
+                  <div className="text-4xl mb-2 animate-bounce">
+                    {adReward.type === 'coins' ? '🪙' : adReward.type === 'gems' ? '💎' : adReward.type === 'time' ? '⏱️' : '⚡'}
+                  </div>
+                  <span className="text-xs font-black text-white">{adReward.title}</span>
+                  <span className="text-[10px] text-cyan-200 mt-1">
+                    {adReward.type === 'both'
+                      ? `Get +${adReward.coinAmount || 350} Coins & +${adReward.gemAmount || 15} Gems`
+                      : adReward.type === 'time'
+                      ? `Get +${adReward.amount || 30}s Extra Time`
+                      : `Get +${adReward.amount || 250} ${adReward.type === 'coins' ? 'Coins' : 'Diamonds'}`}
+                  </span>
+                  <div className="mt-3 flex items-center gap-1.5 text-[9px] text-slate-300 bg-black/30 px-2 py-1 rounded-full">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>Verified Sponsor Partner</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="space-y-2">
+                  <button
+                    disabled={adCountdown > 0}
+                    onClick={handleClaimAdReward}
+                    className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-md ${
+                      adCountdown > 0
+                        ? 'bg-slate-700/60 text-slate-400 border border-slate-600 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-emerald-950 border border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)] active:scale-95 cursor-pointer'
+                    }`}
+                  >
+                    {adCountdown > 0 ? `Please Wait (${adCountdown}s)...` : `Collect Reward!`}
+                  </button>
+
+                  <button
+                    onClick={() => setAdModalOpen(false)}
+                    className="text-[10px] text-slate-400 hover:text-white font-bold cursor-pointer"
+                  >
+                    Close Ad
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
