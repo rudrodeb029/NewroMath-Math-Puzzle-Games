@@ -400,382 +400,2357 @@ import './index.css';
     // Multiple distinct mathematically verified cross-math layouts
     // ==========================================
         const PUZZLE_TEMPLATES = [
+  {
+    "id": 0,
+    "cols": 5,
+    "solvedText": "3 + 5 = 8",
+    "hintStep": "Top row: 3 + 5 = 8",
+    "slots": [
       {
-        id: 0,
-        cols: 5,
-        solvedText: '3 + 5 = 8',
-        hintStep: 'Top row: 3 + 5 = 8',
-        slots: [{"slot":0,"row":0,"column":0,"answer":3},{"slot":1,"row":0,"column":2,"answer":5},{"slot":2,"row":2,"column":4,"answer":6},{"slot":3,"row":4,"column":2,"answer":7}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '8'],
-        ['+', null, '+', null, '+'],
-        ['4', '+', '2', '=', { slot: 2 }],
-        ['=', null, '=', null, '='],
-        ['7', '+', { slot: 3 }, '=', '14']
-        ],
-        numbers: [3,5,6,7,9,12],
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 3
       },
       {
-        id: 1,
-        cols: 5,
-        solvedText: '6 + 9 = 15',
-        hintStep: 'Top row: 6 + 9 = 15',
-        slots: [{"slot":0,"row":0,"column":0,"answer":6},{"slot":1,"row":0,"column":2,"answer":9},{"slot":2,"row":2,"column":4,"answer":8},{"slot":3,"row":4,"column":2,"answer":12}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '15'],
-        ['+', null, '+', null, '+'],
-        ['5', '+', '3', '=', { slot: 2 }],
-        ['=', null, '=', null, '='],
-        ['11', '+', { slot: 3 }, '=', '23']
-        ],
-        numbers: [6,9,8,12,10,14],
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 5
       },
       {
-        id: 2,
-        cols: 5,
-        solvedText: '7 + 8 = 15',
-        hintStep: 'Top row: 7 + 8 = 15',
-        slots: [{"slot":0,"row":0,"column":0,"answer":7},{"slot":1,"row":2,"column":0,"answer":9},{"slot":2,"row":2,"column":2,"answer":4},{"slot":3,"row":2,"column":4,"answer":13},{"slot":4,"row":4,"column":2,"answer":12}],
-        rows: [
-        [{ slot: 0 }, '+', '8', '=', '15'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 1 }, '+', { slot: 2 }, '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        ['16', '+', { slot: 4 }, '=', '28']
-        ],
-        numbers: [7,9,4,13,12,10],
+        "slot": 2,
+        "row": 2,
+        "column": 4,
+        "answer": 6
       },
       {
-        id: 3,
-        cols: 5,
-        solvedText: '9 − 4 = 5',
-        hintStep: 'Top row: 9 − 4 = 5',
-        slots: [{"slot":0,"row":0,"column":0,"answer":9},{"slot":1,"row":0,"column":2,"answer":4},{"slot":2,"row":2,"column":0,"answer":6},{"slot":3,"row":2,"column":4,"answer":4},{"slot":4,"row":4,"column":0,"answer":15}],
-        rows: [
-        [{ slot: 0 }, '-', { slot: 1 }, '=', '5'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '-', '2', '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        [{ slot: 4 }, '-', '6', '=', '9']
-        ],
-        numbers: [9,4,6,15,8,11],
-      },
-      {
-        id: 4,
-        cols: 5,
-        solvedText: '5 + 8 = 13',
-        hintStep: 'Top row: 5 + 8 = 13',
-        slots: [{"slot":0,"row":0,"column":0,"answer":5},{"slot":1,"row":0,"column":2,"answer":8},{"slot":2,"row":2,"column":0,"answer":6},{"slot":3,"row":2,"column":4,"answer":7},{"slot":4,"row":4,"column":2,"answer":9}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '13'],
-        ['+', null, null, null, '+'],
-        [{ slot: 2 }, null, null, null, { slot: 3 }],
-        ['=', null, null, null, '='],
-        ['11', '+', { slot: 4 }, '=', '20']
-        ],
-        numbers: [5,8,6,7,9,14],
-      },
-      {
-        id: 5,
-        cols: 5,
-        solvedText: '12 + 6 = 18',
-        hintStep: 'Top row: 12 + 6 = 18',
-        slots: [{"slot":0,"row":0,"column":0,"answer":12},{"slot":1,"row":0,"column":2,"answer":6},{"slot":2,"row":2,"column":0,"answer":8},{"slot":3,"row":4,"column":2,"answer":11},{"slot":4,"row":2,"column":4,"answer":13}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '18'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '+', '5', '=', { slot: 4 }],
-        ['=', null, '=', null, '='],
-        ['20', '+', { slot: 3 }, '=', '31']
-        ],
-        numbers: [12,6,8,11,13,17],
-      },
-      {
-        id: 6,
-        cols: 5,
-        solvedText: '8 + 7 = 15',
-        hintStep: 'Top row: 8 + 7 = 15',
-        slots: [{"slot":0,"row":0,"column":0,"answer":8},{"slot":1,"row":0,"column":2,"answer":7},{"slot":2,"row":2,"column":0,"answer":5},{"slot":3,"row":2,"column":4,"answer":9},{"slot":4,"row":4,"column":2,"answer":11}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '15'],
-        ['+', null, null, null, '+'],
-        [{ slot: 2 }, null, null, null, { slot: 3 }],
-        ['=', null, null, null, '='],
-        ['13', '+', { slot: 4 }, '=', '24']
-        ],
-        numbers: [8,7,5,9,11,16],
-      },
-      {
-        id: 7,
-        cols: 5,
-        solvedText: '14 + 11 = 25',
-        hintStep: 'Top row: 14 + 11 = 25',
-        slots: [{"slot":0,"row":0,"column":0,"answer":14},{"slot":1,"row":0,"column":2,"answer":11},{"slot":2,"row":2,"column":2,"answer":7},{"slot":3,"row":4,"column":0,"answer":23},{"slot":4,"row":2,"column":4,"answer":16}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '25'],
-        ['+', null, '+', null, '+'],
-        ['9', '+', { slot: 2 }, '=', { slot: 4 }],
-        ['=', null, '=', null, '='],
-        [{ slot: 3 }, '+', '18', '=', '41']
-        ],
-        numbers: [14,11,7,23,16,20],
-      },
-      {
-        id: 8,
-        cols: 5,
-        solvedText: '15 + 12 = 27',
-        hintStep: 'Top row: 15 + 12 = 27',
-        slots: [{"slot":0,"row":0,"column":0,"answer":15},{"slot":1,"row":0,"column":2,"answer":12},{"slot":2,"row":2,"column":0,"answer":10},{"slot":3,"row":2,"column":2,"answer":8},{"slot":4,"row":4,"column":2,"answer":20}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '27'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '+', { slot: 3 }, '=', '18'],
-        ['=', null, '=', null, '='],
-        ['25', '+', { slot: 4 }, '=', '45']
-        ],
-        numbers: [15,12,10,8,20,25],
-      },
-      {
-        id: 9,
-        cols: 5,
-        solvedText: '11 + 14 = 25',
-        hintStep: 'Top row: 11 + 14 = 25',
-        slots: [{"slot":0,"row":0,"column":0,"answer":11},{"slot":1,"row":0,"column":2,"answer":14},{"slot":2,"row":2,"column":0,"answer":9},{"slot":3,"row":2,"column":4,"answer":8},{"slot":4,"row":4,"column":2,"answer":13}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '25'],
-        ['+', null, null, null, '+'],
-        [{ slot: 2 }, null, null, null, { slot: 3 }],
-        ['=', null, null, null, '='],
-        ['20', '+', { slot: 4 }, '=', '33']
-        ],
-        numbers: [11,14,9,8,13,19],
-      },
-      {
-        id: 10,
-        cols: 5,
-        solvedText: '18 − 7 = 11',
-        hintStep: 'Top row: 18 − 7 = 11',
-        slots: [{"slot":0,"row":0,"column":0,"answer":18},{"slot":1,"row":0,"column":2,"answer":7},{"slot":2,"row":2,"column":0,"answer":12},{"slot":3,"row":2,"column":4,"answer":7},{"slot":4,"row":4,"column":2,"answer":12}],
-        rows: [
-        [{ slot: 0 }, '-', { slot: 1 }, '=', '11'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '-', '5', '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        ['30', '-', { slot: 4 }, '=', '18']
-        ],
-        numbers: [18,7,12,15,21,30],
-      },
-      {
-        id: 11,
-        cols: 5,
-        solvedText: '16 + 13 = 29',
-        hintStep: 'Top row: 16 + 13 = 29',
-        slots: [{"slot":0,"row":0,"column":0,"answer":16},{"slot":1,"row":0,"column":2,"answer":13},{"slot":2,"row":2,"column":2,"answer":9},{"slot":3,"row":4,"column":0,"answer":27},{"slot":4,"row":4,"column":4,"answer":49}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '29'],
-        ['+', null, '+', null, '+'],
-        ['11', '+', { slot: 2 }, '=', '20'],
-        ['=', null, '=', null, '='],
-        [{ slot: 3 }, '+', '22', '=', { slot: 4 }]
-        ],
-        numbers: [16,13,9,27,49,35],
-      },
-      {
-        id: 12,
-        cols: 5,
-        solvedText: '14 + 12 = 26',
-        hintStep: 'Top row: 14 + 12 = 26',
-        slots: [{"slot":0,"row":0,"column":0,"answer":14},{"slot":1,"row":0,"column":2,"answer":12},{"slot":2,"row":2,"column":0,"answer":10},{"slot":3,"row":2,"column":4,"answer":13},{"slot":4,"row":4,"column":2,"answer":15}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '26'],
-        ['+', null, null, null, '+'],
-        [{ slot: 2 }, null, null, null, { slot: 3 }],
-        ['=', null, null, null, '='],
-        ['24', '+', { slot: 4 }, '=', '39']
-        ],
-        numbers: [14,12,10,13,15,22],
-      },
-      {
-        id: 13,
-        cols: 5,
-        solvedText: '20 + 15 = 35',
-        hintStep: 'Top row: 20 + 15 = 35',
-        slots: [{"slot":0,"row":0,"column":0,"answer":20},{"slot":1,"row":0,"column":2,"answer":15},{"slot":2,"row":2,"column":0,"answer":14},{"slot":3,"row":2,"column":4,"answer":24},{"slot":4,"row":4,"column":2,"answer":25}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '35'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '+', '10', '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        ['34', '+', { slot: 4 }, '=', '59']
-        ],
-        numbers: [20,15,14,24,25,31],
-      },
-      {
-        id: 14,
-        cols: 5,
-        solvedText: '22 + 17 = 39',
-        hintStep: 'Top row: 22 + 17 = 39',
-        slots: [{"slot":0,"row":0,"column":0,"answer":22},{"slot":1,"row":0,"column":2,"answer":17},{"slot":2,"row":2,"column":2,"answer":11},{"slot":3,"row":4,"column":0,"answer":38},{"slot":4,"row":2,"column":4,"answer":27}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '39'],
-        ['+', null, '+', null, '+'],
-        ['16', '+', { slot: 2 }, '=', { slot: 4 }],
-        ['=', null, '=', null, '='],
-        [{ slot: 3 }, '+', '28', '=', '66']
-        ],
-        numbers: [22,17,11,38,27,45],
-      },
-      {
-        id: 15,
-        cols: 5,
-        solvedText: '18 + 15 = 33',
-        hintStep: 'Top row: 18 + 15 = 33',
-        slots: [{"slot":0,"row":0,"column":0,"answer":18},{"slot":1,"row":0,"column":2,"answer":15},{"slot":2,"row":2,"column":0,"answer":12},{"slot":3,"row":2,"column":4,"answer":14},{"slot":4,"row":4,"column":2,"answer":17}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '33'],
-        ['+', null, null, null, '+'],
-        [{ slot: 2 }, null, null, null, { slot: 3 }],
-        ['=', null, null, null, '='],
-        ['30', '+', { slot: 4 }, '=', '47']
-        ],
-        numbers: [18,15,12,14,17,26],
-      },
-      {
-        id: 16,
-        cols: 5,
-        solvedText: '25 + 18 = 43',
-        hintStep: 'Top row: 25 + 18 = 43',
-        slots: [{"slot":0,"row":0,"column":0,"answer":25},{"slot":1,"row":0,"column":2,"answer":18},{"slot":2,"row":2,"column":0,"answer":19},{"slot":3,"row":2,"column":4,"answer":33},{"slot":4,"row":4,"column":2,"answer":32}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '43'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '+', '14', '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        ['44', '+', { slot: 4 }, '=', '76']
-        ],
-        numbers: [25,18,19,33,32,40],
-      },
-      {
-        id: 17,
-        cols: 5,
-        solvedText: '28 + 21 = 49',
-        hintStep: 'Top row: 28 + 21 = 49',
-        slots: [{"slot":0,"row":0,"column":0,"answer":28},{"slot":1,"row":0,"column":2,"answer":21},{"slot":2,"row":2,"column":2,"answer":16},{"slot":3,"row":4,"column":0,"answer":50},{"slot":4,"row":2,"column":4,"answer":38}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '49'],
-        ['+', null, '+', null, '+'],
-        ['22', '+', { slot: 2 }, '=', { slot: 4 }],
-        ['=', null, '=', null, '='],
-        [{ slot: 3 }, '+', '37', '=', '87']
-        ],
-        numbers: [28,21,16,50,38,55],
-      },
-      {
-        id: 18,
-        cols: 5,
-        solvedText: '24 + 19 = 43',
-        hintStep: 'Top row: 24 + 19 = 43',
-        slots: [{"slot":0,"row":0,"column":0,"answer":24},{"slot":1,"row":0,"column":2,"answer":19},{"slot":2,"row":2,"column":0,"answer":15},{"slot":3,"row":2,"column":4,"answer":19},{"slot":4,"row":4,"column":2,"answer":23}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '43'],
-        ['+', null, null, null, '+'],
-        [{ slot: 2 }, null, null, null, { slot: 3 }],
-        ['=', null, null, null, '='],
-        ['39', '+', { slot: 4 }, '=', '62']
-        ],
-        numbers: [24,19,15,23,31,44],
-      },
-      {
-        id: 19,
-        cols: 5,
-        solvedText: '32 + 24 = 56',
-        hintStep: 'Top row: 32 + 24 = 56',
-        slots: [{"slot":0,"row":0,"column":0,"answer":32},{"slot":1,"row":0,"column":2,"answer":24},{"slot":2,"row":2,"column":0,"answer":25},{"slot":3,"row":2,"column":4,"answer":44},{"slot":4,"row":4,"column":2,"answer":43}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '56'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '+', '19', '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        ['57', '+', { slot: 4 }, '=', '100']
-        ],
-        numbers: [32,24,25,44,43,60],
-      },
-      {
-        id: 20,
-        cols: 5,
-        solvedText: '35 + 27 = 62',
-        hintStep: 'Top row: 35 + 27 = 62',
-        slots: [{"slot":0,"row":0,"column":0,"answer":35},{"slot":1,"row":0,"column":2,"answer":27},{"slot":2,"row":2,"column":2,"answer":21},{"slot":3,"row":4,"column":0,"answer":63},{"slot":4,"row":4,"column":4,"answer":111}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '62'],
-        ['+', null, '+', null, '+'],
-        ['28', '+', { slot: 2 }, '=', '49'],
-        ['=', null, '=', null, '='],
-        [{ slot: 3 }, '+', '48', '=', { slot: 4 }]
-        ],
-        numbers: [35,27,21,63,111,75],
-      },
-      {
-        id: 21,
-        cols: 5,
-        solvedText: '30 + 26 = 56',
-        hintStep: 'Top row: 30 + 26 = 56',
-        slots: [{"slot":0,"row":0,"column":0,"answer":30},{"slot":1,"row":0,"column":2,"answer":26},{"slot":2,"row":2,"column":0,"answer":20},{"slot":3,"row":2,"column":4,"answer":22},{"slot":4,"row":4,"column":2,"answer":28}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '56'],
-        ['+', null, null, null, '+'],
-        [{ slot: 2 }, null, null, null, { slot: 3 }],
-        ['=', null, null, null, '='],
-        ['50', '+', { slot: 4 }, '=', '78']
-        ],
-        numbers: [30,26,20,22,28,52],
-      },
-      {
-        id: 22,
-        cols: 5,
-        solvedText: '40 + 31 = 71',
-        hintStep: 'Top row: 40 + 31 = 71',
-        slots: [{"slot":0,"row":0,"column":0,"answer":40},{"slot":1,"row":0,"column":2,"answer":31},{"slot":2,"row":2,"column":0,"answer":32},{"slot":3,"row":2,"column":4,"answer":56},{"slot":4,"row":4,"column":2,"answer":55}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '71'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '+', '24', '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        ['72', '+', { slot: 4 }, '=', '127']
-        ],
-        numbers: [40,31,32,56,55,78],
-      },
-      {
-        id: 23,
-        cols: 5,
-        solvedText: '45 + 35 = 80',
-        hintStep: 'Top row: 45 + 35 = 80',
-        slots: [{"slot":0,"row":0,"column":0,"answer":45},{"slot":1,"row":0,"column":2,"answer":35},{"slot":2,"row":2,"column":2,"answer":28},{"slot":3,"row":4,"column":0,"answer":81},{"slot":4,"row":4,"column":2,"answer":63}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '80'],
-        ['+', null, '+', null, '+'],
-        ['36', '+', { slot: 2 }, '=', '64'],
-        ['=', null, '=', null, '='],
-        [{ slot: 3 }, '+', { slot: 4 }, '=', '144']
-        ],
-        numbers: [45,35,28,81,63,99],
-      },
-      {
-        id: 24,
-        cols: 5,
-        solvedText: '50 + 42 = 92',
-        hintStep: 'Top row: 50 + 42 = 92',
-        slots: [{"slot":0,"row":0,"column":0,"answer":50},{"slot":1,"row":0,"column":2,"answer":42},{"slot":2,"row":2,"column":0,"answer":40},{"slot":3,"row":2,"column":4,"answer":73},{"slot":4,"row":4,"column":0,"answer":90},{"slot":5,"row":4,"column":2,"answer":75}],
-        rows: [
-        [{ slot: 0 }, '+', { slot: 1 }, '=', '92'],
-        ['+', null, '+', null, '+'],
-        [{ slot: 2 }, '+', '33', '=', { slot: 3 }],
-        ['=', null, '=', null, '='],
-        [{ slot: 4 }, '+', { slot: 5 }, '=', '165']
-        ],
-        numbers: [50,42,40,73,90,75],
+        "slot": 3,
+        "row": 4,
+        "column": 2,
+        "answer": 7
       }
-    ];
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "+",
+        {
+          "slot": 1
+        },
+        "=",
+        "8"
+      ],
+      [
+        "+",
+        null,
+        "+",
+        null,
+        "+"
+      ],
+      [
+        "4",
+        "+",
+        "2",
+        "=",
+        {
+          "slot": 2
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "7",
+        "+",
+        {
+          "slot": 3
+        },
+        "=",
+        "14"
+      ]
+    ],
+    "numbers": [
+      3,
+      5,
+      6,
+      7,
+      9,
+      12
+    ]
+  },
+  {
+    "id": 1,
+    "cols": 5,
+    "solvedText": "6 + 9 = 15",
+    "hintStep": "Top row: 6 + 9 = 15",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 6
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 9
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 4,
+        "answer": 8
+      },
+      {
+        "slot": 3,
+        "row": 4,
+        "column": 2,
+        "answer": 12
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "+",
+        {
+          "slot": 1
+        },
+        "=",
+        "15"
+      ],
+      [
+        "+",
+        null,
+        "+",
+        null,
+        "+"
+      ],
+      [
+        "5",
+        "+",
+        "3",
+        "=",
+        {
+          "slot": 2
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "11",
+        "+",
+        {
+          "slot": 3
+        },
+        "=",
+        "23"
+      ]
+    ],
+    "numbers": [
+      6,
+      8,
+      9,
+      10,
+      12,
+      14
+    ]
+  },
+  {
+    "id": 2,
+    "cols": 5,
+    "solvedText": "14 − 6 = 8",
+    "hintStep": "Top row: 14 − 6 = 8",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 14
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 6
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 9
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 5
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 10
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "−",
+        {
+          "slot": 1
+        },
+        "=",
+        "8"
+      ],
+      [
+        "+",
+        null,
+        "+",
+        null,
+        "+"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "−",
+        "4",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "23",
+        "−",
+        {
+          "slot": 4
+        },
+        "=",
+        "13"
+      ]
+    ],
+    "numbers": [
+      5,
+      6,
+      7,
+      9,
+      10,
+      14,
+      15
+    ]
+  },
+  {
+    "id": 3,
+    "cols": 5,
+    "solvedText": "16 − 7 = 9",
+    "hintStep": "Top row: 16 − 7 = 9",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 16
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 7
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 5
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 0,
+        "answer": 24
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "−",
+        {
+          "slot": 1
+        },
+        "=",
+        "9"
+      ],
+      [
+        "+",
+        null,
+        "+",
+        null,
+        "+"
+      ],
+      [
+        "8",
+        "−",
+        {
+          "slot": 2
+        },
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        {
+          "slot": 4
+        },
+        "−",
+        "10",
+        "=",
+        "14"
+      ]
+    ],
+    "numbers": [
+      3,
+      5,
+      7,
+      11,
+      16,
+      18,
+      24
+    ]
+  },
+  {
+    "id": 4,
+    "cols": 5,
+    "solvedText": "11 + 7 = 18",
+    "hintStep": "Top row: 11 + 7 = 18",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 11
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 7
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 6
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 5
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "+",
+        {
+          "slot": 1
+        },
+        "=",
+        "18"
+      ],
+      [
+        "−",
+        null,
+        "−",
+        null,
+        "−"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "+",
+        "2",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "7",
+        "+",
+        {
+          "slot": 4
+        },
+        "=",
+        "12"
+      ]
+    ],
+    "numbers": [
+      4,
+      5,
+      6,
+      7,
+      9,
+      11,
+      15
+    ]
+  },
+  {
+    "id": 5,
+    "cols": 5,
+    "solvedText": "20 − 8 = 12",
+    "hintStep": "Top row: 20 − 8 = 12",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 20
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 8
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 7
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 4,
+        "answer": 8
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "−",
+        {
+          "slot": 1
+        },
+        "=",
+        "12"
+      ],
+      [
+        "−",
+        null,
+        "−",
+        null,
+        "−"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "−",
+        {
+          "slot": 3
+        },
+        "=",
+        "4"
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "13",
+        "−",
+        "5",
+        "=",
+        {
+          "slot": 4
+        }
+      ]
+    ],
+    "numbers": [
+      3,
+      7,
+      8,
+      8,
+      10,
+      16,
+      20
+    ]
+  },
+  {
+    "id": 6,
+    "cols": 5,
+    "solvedText": "2 × 3 = 6",
+    "hintStep": "Top row: 2 × 3 = 6",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 2
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 6
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "6"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        {
+          "slot": 3
+        },
+        "=",
+        "8"
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "8",
+        "×",
+        {
+          "slot": 4
+        },
+        "=",
+        "48"
+      ]
+    ],
+    "numbers": [
+      2,
+      2,
+      3,
+      4,
+      5,
+      6,
+      12
+    ]
+  },
+  {
+    "id": 7,
+    "cols": 5,
+    "solvedText": "3 × 2 = 6",
+    "hintStep": "Top row: 3 × 2 = 6",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 3
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 3
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 12
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 0,
+        "answer": 9
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "6"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        "4",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        {
+          "slot": 4
+        },
+        "×",
+        "8",
+        "=",
+        "72"
+      ]
+    ],
+    "numbers": [
+      2,
+      3,
+      3,
+      7,
+      9,
+      12,
+      15
+    ]
+  },
+  {
+    "id": 8,
+    "cols": 5,
+    "solvedText": "4 × 3 = 12",
+    "hintStep": "Top row: 4 × 3 = 12",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 6
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 9
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "12"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        "2",
+        "×",
+        {
+          "slot": 2
+        },
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "8",
+        "×",
+        {
+          "slot": 4
+        },
+        "=",
+        "72"
+      ]
+    ],
+    "numbers": [
+      3,
+      3,
+      4,
+      6,
+      9,
+      10,
+      16
+    ]
+  },
+  {
+    "id": 9,
+    "cols": 5,
+    "solvedText": "5 × 2 = 10",
+    "hintStep": "Top row: 5 × 2 = 10",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 5
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 2
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 8
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 0,
+        "answer": 10
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "10"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        "4",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        {
+          "slot": 4
+        },
+        "×",
+        "8",
+        "=",
+        "80"
+      ]
+    ],
+    "numbers": [
+      2,
+      2,
+      5,
+      6,
+      8,
+      10,
+      14
+    ]
+  },
+  {
+    "id": 10,
+    "cols": 5,
+    "solvedText": "36 ÷ 6 = 6",
+    "hintStep": "Top row: 36 ÷ 6 = 6",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 36
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 6
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 4,
+        "answer": 3
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "6"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "÷",
+        {
+          "slot": 3
+        },
+        "=",
+        "2"
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "9",
+        "÷",
+        "3",
+        "=",
+        {
+          "slot": 4
+        }
+      ]
+    ],
+    "numbers": [
+      2,
+      3,
+      4,
+      6,
+      8,
+      12,
+      36
+    ]
+  },
+  {
+    "id": 11,
+    "cols": 5,
+    "solvedText": "48 ÷ 4 = 12",
+    "hintStep": "Top row: 48 ÷ 4 = 12",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 48
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 4
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 3
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 0,
+        "answer": 8
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "12"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        "6",
+        "÷",
+        {
+          "slot": 2
+        },
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        {
+          "slot": 4
+        },
+        "÷",
+        "2",
+        "=",
+        "4"
+      ]
+    ],
+    "numbers": [
+      2,
+      3,
+      4,
+      5,
+      8,
+      14,
+      48
+    ]
+  },
+  {
+    "id": 12,
+    "cols": 5,
+    "solvedText": "72 ÷ 8 = 9",
+    "hintStep": "Top row: 72 ÷ 8 = 9",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 72
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 8
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 6
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 3
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 4
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "9"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "÷",
+        "2",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "12",
+        "÷",
+        {
+          "slot": 4
+        },
+        "=",
+        "3"
+      ]
+    ],
+    "numbers": [
+      3,
+      4,
+      6,
+      7,
+      8,
+      15,
+      72
+    ]
+  },
+  {
+    "id": 13,
+    "cols": 5,
+    "solvedText": "6 × 4 = 24",
+    "hintStep": "Top row: 6 × 4 = 24",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 6
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 4
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 2
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 4
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 2
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "24"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        "2",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "3",
+        "×",
+        {
+          "slot": 4
+        },
+        "=",
+        "6"
+      ]
+    ],
+    "numbers": [
+      2,
+      2,
+      4,
+      4,
+      5,
+      6,
+      10
+    ]
+  },
+  {
+    "id": 14,
+    "cols": 5,
+    "solvedText": "18 ÷ 3 = 6",
+    "hintStep": "Top row: 18 ÷ 3 = 6",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 18
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 2
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 0,
+        "answer": 72
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "6"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        "4",
+        "÷",
+        {
+          "slot": 2
+        },
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        {
+          "slot": 4
+        },
+        "÷",
+        "6",
+        "=",
+        "12"
+      ]
+    ],
+    "numbers": [
+      2,
+      2,
+      3,
+      8,
+      16,
+      18,
+      72
+    ]
+  },
+  {
+    "id": 15,
+    "cols": 5,
+    "solvedText": "5 × 4 = 20",
+    "hintStep": "Top row: 5 × 4 = 20",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 5
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 4
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 3
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 6
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 8
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "20"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        "2",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "15",
+        "×",
+        {
+          "slot": 4
+        },
+        "=",
+        "120"
+      ]
+    ],
+    "numbers": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      18
+    ]
+  },
+  {
+    "id": 16,
+    "cols": 5,
+    "solvedText": "96 ÷ 8 = 12",
+    "hintStep": "Top row: 96 ÷ 8 = 12",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 96
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 8
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 6
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 4,
+        "answer": 4
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "12"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "÷",
+        {
+          "slot": 3
+        },
+        "=",
+        "3"
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "16",
+        "÷",
+        "4",
+        "=",
+        {
+          "slot": 4
+        }
+      ]
+    ],
+    "numbers": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      20,
+      96
+    ]
+  },
+  {
+    "id": 17,
+    "cols": 5,
+    "solvedText": "7 × 3 = 21",
+    "hintStep": "Top row: 7 × 3 = 21",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 7
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 4,
+        "row": 2,
+        "column": 4,
+        "answer": 12
+      },
+      {
+        "slot": 5,
+        "row": 4,
+        "column": 0,
+        "answer": 28
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "21"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        {
+          "slot": 3
+        },
+        "=",
+        {
+          "slot": 4
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        {
+          "slot": 5
+        },
+        "×",
+        "9",
+        "=",
+        "252"
+      ]
+    ],
+    "numbers": [
+      3,
+      3,
+      4,
+      7,
+      11,
+      12,
+      25,
+      28
+    ]
+  },
+  {
+    "id": 18,
+    "cols": 5,
+    "solvedText": "144 ÷ 12 = 12",
+    "hintStep": "Top row: 144 ÷ 12 = 12",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 144
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 12
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 8
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 4
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 6
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "12"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "÷",
+        "2",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "18",
+        "÷",
+        {
+          "slot": 4
+        },
+        "=",
+        "3"
+      ]
+    ],
+    "numbers": [
+      4,
+      6,
+      8,
+      12,
+      15,
+      24,
+      144
+    ]
+  },
+  {
+    "id": 19,
+    "cols": 5,
+    "solvedText": "24 × 6 = 144",
+    "hintStep": "Top row: 24 × 6 = 144",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 24
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 6
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 3
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 4,
+        "answer": 24
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "144"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        {
+          "slot": 3
+        },
+        "=",
+        "6"
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "8",
+        "×",
+        "3",
+        "=",
+        {
+          "slot": 4
+        }
+      ]
+    ],
+    "numbers": [
+      2,
+      3,
+      6,
+      12,
+      24,
+      24,
+      30
+    ]
+  },
+  {
+    "id": 20,
+    "cols": 5,
+    "solvedText": "30 ÷ 5 = 6",
+    "hintStep": "Top row: 30 ÷ 5 = 6",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 30
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 5
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 2
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 10
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "6"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "÷",
+        "2",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "120",
+        "÷",
+        {
+          "slot": 4
+        },
+        "=",
+        "12"
+      ]
+    ],
+    "numbers": [
+      2,
+      4,
+      5,
+      10,
+      15,
+      30,
+      35
+    ]
+  },
+  {
+    "id": 21,
+    "cols": 5,
+    "solvedText": "8 × 5 = 40",
+    "hintStep": "Top row: 8 × 5 = 40",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 8
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 5
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 3
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 4,
+        "answer": 360
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "40"
+      ],
+      [
+        "×",
+        null,
+        "×",
+        null,
+        "×"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        {
+          "slot": 3
+        },
+        "=",
+        "9"
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "24",
+        "×",
+        "15",
+        "=",
+        {
+          "slot": 4
+        }
+      ]
+    ],
+    "numbers": [
+      3,
+      3,
+      5,
+      8,
+      18,
+      45,
+      360
+    ]
+  },
+  {
+    "id": 22,
+    "cols": 5,
+    "solvedText": "180 ÷ 10 = 18",
+    "hintStep": "Top row: 180 ÷ 10 = 18",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 180
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 10
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 6
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 4,
+        "answer": 3
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 2,
+        "answer": 5
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "÷",
+        {
+          "slot": 1
+        },
+        "=",
+        "18"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "÷",
+        "2",
+        "=",
+        {
+          "slot": 3
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "30",
+        "÷",
+        {
+          "slot": 4
+        },
+        "=",
+        "6"
+      ]
+    ],
+    "numbers": [
+      3,
+      5,
+      6,
+      10,
+      20,
+      40,
+      180
+    ]
+  },
+  {
+    "id": 23,
+    "cols": 5,
+    "solvedText": "36 × 4 = 144",
+    "hintStep": "Top row: 36 × 4 = 144",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 36
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 4
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 2
+      },
+      {
+        "slot": 4,
+        "row": 4,
+        "column": 4,
+        "answer": 18
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "144"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        {
+          "slot": 3
+        },
+        "=",
+        "8"
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        "9",
+        "×",
+        "2",
+        "=",
+        {
+          "slot": 4
+        }
+      ]
+    ],
+    "numbers": [
+      2,
+      4,
+      4,
+      18,
+      22,
+      36,
+      50
+    ]
+  },
+  {
+    "id": 24,
+    "cols": 5,
+    "solvedText": "48 × 6 = 288",
+    "hintStep": "Top row: 48 × 6 = 288",
+    "slots": [
+      {
+        "slot": 0,
+        "row": 0,
+        "column": 0,
+        "answer": 48
+      },
+      {
+        "slot": 1,
+        "row": 0,
+        "column": 2,
+        "answer": 6
+      },
+      {
+        "slot": 2,
+        "row": 2,
+        "column": 0,
+        "answer": 4
+      },
+      {
+        "slot": 3,
+        "row": 2,
+        "column": 2,
+        "answer": 3
+      },
+      {
+        "slot": 4,
+        "row": 2,
+        "column": 4,
+        "answer": 12
+      },
+      {
+        "slot": 5,
+        "row": 4,
+        "column": 0,
+        "answer": 12
+      }
+    ],
+    "rows": [
+      [
+        {
+          "slot": 0
+        },
+        "×",
+        {
+          "slot": 1
+        },
+        "=",
+        "288"
+      ],
+      [
+        "÷",
+        null,
+        "÷",
+        null,
+        "÷"
+      ],
+      [
+        {
+          "slot": 2
+        },
+        "×",
+        {
+          "slot": 3
+        },
+        "=",
+        {
+          "slot": 4
+        }
+      ],
+      [
+        "=",
+        null,
+        "=",
+        null,
+        "="
+      ],
+      [
+        {
+          "slot": 5
+        },
+        "×",
+        "2",
+        "=",
+        "24"
+      ]
+    ],
+    "numbers": [
+      3,
+      4,
+      6,
+      12,
+      12,
+      25,
+      48,
+      60
+    ]
+  }
+];
 
     // ==========================================
     // LEVEL ENTRY COST PROGRESSION CHAIN
@@ -847,8 +2822,9 @@ import './index.css';
     ];
 
     // ==========================================
-    // PROCEDURAL CROSS-MATH GENERATOR
-    // Generates 100% verified, unique, attractive 5x5 puzzles with new numbers
+    // ==========================================
+    // PROCEDURAL CROSS-MATH GENERATOR (+, −, ×, ÷)
+    // Generates 100% verified, attractive 5x5 puzzles gradually scaling from Easy to Hard
     // ==========================================
     function generateCrossMathPuzzle(levelNum, seed = 0) {
       if (seed === 0) {
@@ -863,102 +2839,148 @@ import './index.css';
         return Math.floor(min + r * (max - min + 1));
       };
 
-      const isHard = levelNum >= 18;
-      const isMedium = levelNum >= 9 && levelNum < 18;
-      const useSubtraction = (levelNum % 4 === 0) || (seed % 3 === 1);
-
-      const minVal = isHard ? 12 : isMedium ? 6 : 2;
-      const maxVal = isHard ? 30 : isMedium ? 16 : 9;
-
-      let X, Y, A, B, Z, C, D, E, F, opR = '+';
-
-      for (let attempt = 0; attempt < 250; attempt++) {
-        if (useSubtraction) {
-          opR = '-';
-          Y = rnd(minVal, maxVal);
-          Z = rnd(minVal, maxVal);
-          X = Y + Z;
-
-          B = rnd(minVal, maxVal);
-          C = rnd(minVal, maxVal);
-          A = B + C;
-
-          D = X + A;
-          E = Y + B;
-          F = Z + C;
-        } else {
-          opR = '+';
-          X = rnd(minVal, maxVal);
-          Y = rnd(minVal, maxVal);
-          A = rnd(minVal, maxVal);
-          B = rnd(minVal, maxVal);
-
-          Z = X + Y;
-          C = A + B;
-          D = X + A;
-          E = Y + B;
-          F = Z + C;
-        }
-
-        const allNums = [X, Y, Z, A, B, C, D, E, F];
-        if (new Set(allNums).size === 9) {
-          const valMap = {
-            '0,0': X, '0,2': Y, '0,4': Z,
-            '2,0': A, '2,2': B, '2,4': C,
-            '4,0': D, '4,2': E, '4,4': F
-          };
-
-          const blankCandidates = ['0,0', '0,2', '2,0', '2,2', '2,4', '4,0', '4,2'];
-          blankCandidates.sort(() => (rnd(0, 10) > 5 ? 1 : -1));
-          const blankCount = isHard ? 5 : 4;
-          const blankKeys = blankCandidates.slice(0, blankCount);
-
-          const slots = [];
-          const slotIndices = {};
-          blankKeys.forEach((key, idx) => {
-            const [r, c] = key.split(',').map(Number);
-            slots.push({ slot: idx, row: r, column: c, answer: valMap[key] });
-            slotIndices[key] = idx;
-          });
-
-          const getCell = (r, c) => {
-            const key = `${r},${c}`;
-            if (key in slotIndices) return { slot: slotIndices[key] };
-            return String(valMap[key]);
-          };
-
-          const rows = [
-            [getCell(0,0), opR, getCell(0,2), '=', getCell(0,4)],
-            ['+', null, '+', null, '+'],
-            [getCell(2,0), opR, getCell(2,2), '=', getCell(2,4)],
-            ['=', null, '=', null, '='],
-            [getCell(4,0), opR, getCell(4,2), '=', getCell(4,4)],
-          ];
-
-          const answers = slots.map(sl => sl.answer);
-          const distractors = [rnd(minVal, maxVal + 6), rnd(minVal, maxVal + 14)];
-          const numbers = [...new Set([...answers, ...distractors])];
-          while (numbers.length < 6) {
-            numbers.push(rnd(minVal, maxVal + 20));
-          }
-          numbers.sort(() => (rnd(0, 10) > 5 ? 1 : -1));
-
-          return {
-            cols: 5,
-            solvedText: `${X} ${opR} ${Y} = ${Z}`,
-            hintStep: `Top row: ${X} ${opR} ${Y} = ${Z}`,
-            slots,
-            rows,
-            numbers: numbers.slice(0, 6),
-          };
-        }
+      // Determine operator mode based on gradual level progression:
+      // Levels 1-4: addition (+) and subtraction (−)
+      // Levels 5-10: addition (+), subtraction (−), and multiplication (×)
+      // Levels 11-17: full operations including clean integer division (÷)
+      // Levels 18-25: master multi-operator cross math
+      let mode;
+      if (levelNum <= 2) {
+        mode = 'add';
+      } else if (levelNum <= 6) {
+        mode = (seed % 2 === 0) ? 'add' : 'sub';
+      } else if (levelNum <= 10) {
+        const m = (seed + levelNum) % 3;
+        mode = m === 0 ? 'mul' : m === 1 ? 'add' : 'sub';
+      } else {
+        const m = (seed + levelNum) % 4;
+        mode = m === 0 ? 'div' : m === 1 ? 'mul' : m === 2 ? 'sub' : 'add';
       }
 
-      const idx = (Math.max(1, levelNum) - 1) % PUZZLE_TEMPLATES.length;
-      return PUZZLE_TEMPLATES[idx];
+      let X, Y, Z, A, B, C, D, E, F;
+      let opH = '+', opV = '+';
+
+      if (mode === 'mul') {
+        opH = '×'; opV = '×';
+        const isHard = levelNum >= 18;
+        const minM = isHard ? 3 : 2;
+        const maxM = isHard ? 7 : 4;
+        X = rnd(minM, maxM);
+        Y = rnd(minM, maxM);
+        A = rnd(minM, maxM);
+        B = rnd(minM, maxM);
+        Z = X * Y;
+        C = A * B;
+        D = X * A;
+        E = Y * B;
+        F = Z * C;
+      } else if (mode === 'div') {
+        opH = '÷'; opV = '÷';
+        const B_val = rnd(2, 3);
+        const C_val = rnd(2, 3);
+        const E_val = rnd(2, 4);
+        const F_val = rnd(2, 3);
+
+        B = B_val;
+        C = C_val;
+        A = B * C;
+
+        E = E_val;
+        F = F_val;
+        D = E * F;
+
+        Z = C * F;
+        Y = B * E;
+        X = A * D;
+      } else if (mode === 'sub') {
+        opH = '−'; opV = '+';
+        const isHard = levelNum >= 18;
+        const minS = isHard ? 10 : 3;
+        const maxS = isHard ? 25 : 9;
+        Y = rnd(minS, maxS);
+        Z = rnd(minS, maxS);
+        X = Y + Z;
+
+        B = rnd(minS, maxS);
+        C = rnd(minS, maxS);
+        A = B + C;
+
+        D = X + A;
+        E = Y + B;
+        F = Z + C;
+      } else {
+        opH = '+'; opV = '+';
+        const isHard = levelNum >= 18;
+        const minA = isHard ? 12 : 2;
+        const maxA = isHard ? 30 : 9;
+        X = rnd(minA, maxA);
+        Y = rnd(minA, maxA);
+        A = rnd(minA, maxA);
+        B = rnd(minA, maxA);
+        Z = X + Y;
+        C = A + B;
+        D = X + A;
+        E = Y + B;
+        F = Z + C;
+      }
+
+      const valMap = {
+        '0,0': X, '0,2': Y, '0,4': Z,
+        '2,0': A, '2,2': B, '2,4': C,
+        '4,0': D, '4,2': E, '4,4': F
+      };
+
+      const blankCandidates = ['0,0', '0,2', '2,0', '2,2', '2,4', '4,0', '4,2'];
+      blankCandidates.sort(() => (rnd(0, 10) > 5 ? 1 : -1));
+      const blankCount = (levelNum >= 18) ? 5 : 4;
+      const blankKeys = blankCandidates.slice(0, blankCount);
+
+      const slots = [];
+      const slotIndices = {};
+      blankKeys.forEach((key, idx) => {
+        const [r, c] = key.split(',').map(Number);
+        slots.push({ slot: idx, row: r, column: c, answer: valMap[key] });
+        slotIndices[key] = idx;
+      });
+
+      const getCell = (r, c) => {
+        const key = `${r},${c}`;
+        if (slotIndices[key] !== undefined) {
+          return { slot: slotIndices[key] };
+        }
+        return String(valMap[key]);
+      };
+
+      const rows = [
+        [getCell(0, 0), opH, getCell(0, 2), '=', getCell(0, 4)],
+        [opV, null, opV, null, opV],
+        [getCell(2, 0), opH, getCell(2, 2), '=', getCell(2, 4)],
+        ['=', null, '=', null, '='],
+        [getCell(4, 0), opH, getCell(4, 2), '=', getCell(4, 4)]
+      ];
+
+      const answers = slots.map(s => s.answer);
+      const distractors = [
+        Math.max(1, answers[0] + rnd(-3, 3) || 1),
+        Math.max(1, answers[1] + rnd(1, 4))
+      ];
+      const numbers = [...new Set([...answers, ...distractors])];
+      while (numbers.length < 6) {
+        numbers.push(rnd(1, 40));
+      }
+      numbers.sort(() => (rnd(0, 10) > 5 ? 1 : -1));
+
+      return {
+        id: seed,
+        cols: 5,
+        solvedText: `${X} ${opH} ${Y} = ${Z}`,
+        hintStep: `Top row: ${X} ${opH} ${Y} = ${Z}`,
+        slots,
+        rows,
+        numbers: numbers.slice(0, 6)
+      };
     }
 
-    // Fast memoization cache for procedural cross-math generation
     const puzzleCache = new Map();
     function getMemoizedPuzzle(levelNum, seed = 0) {
       const key = `${levelNum}_${seed}`;
