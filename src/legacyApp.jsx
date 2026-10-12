@@ -3213,7 +3213,7 @@ import './index.css';
 
               {/* Cross-Math 9x9 Puzzle Grid */}
               <div className="relative z-10 flex justify-center pb-3 pt-3">
-                <div className="w-full max-w-[340px] p-2.5 sm:p-3 rounded-2xl bg-gradient-to-b from-[#0c204d]/75 to-[#07173b]/85 border border-cyan-400/30 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(4,16,44,0.5),0_6px_16px_rgba(2,10,32,0.3)]">
+                <div className="w-full max-w-[340px] p-1 sm:p-1.5">
                   <div 
                     className="grid gap-1.5 sm:gap-2 w-full" 
                     style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
