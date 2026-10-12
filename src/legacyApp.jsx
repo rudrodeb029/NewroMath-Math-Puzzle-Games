@@ -3049,8 +3049,8 @@ import './index.css';
 
                       {/* Bottom Row: Specs Pills & Capsule Play Button */}
                       <div className="flex items-center justify-between gap-1 mt-auto pt-1.5 border-t border-white/5">
-                        {/* Specs Pills: Puzzles, Timer, Coins */}
-                        <div className="flex items-center gap-1 flex-wrap min-w-0">
+                        {/* Specs Pills: Puzzles & Timer */}
+                        <div className="flex items-center gap-1 shrink-0">
                           {/* Puzzles Count */}
                           <span
                             className="flex items-center gap-0.5 text-[9px] text-slate-200 font-mono font-bold bg-[#0b1633]/90 px-1.5 py-0.5 rounded border border-cyan-400/25"
@@ -3066,18 +3066,6 @@ import './index.css';
                           >
                             <span>⏱️</span>
                             <span>{getLevelTimer(lvl.num)}s</span>
-                          </span>
-                          {/* Entry Fee (Coins) */}
-                          <span
-                            className="flex items-center gap-0.5 text-[9px] text-amber-300 font-mono font-bold bg-[#1a1405]/90 px-1.5 py-0.5 rounded border border-amber-400/30"
-                            title="Entry Fee"
-                          >
-                            <img
-                              src="/assets/icon_gold_coin_3d_clean.png"
-                              alt="Coins"
-                              className="w-3 h-3 object-contain inline-block shrink-0"
-                            />
-                            <span>{cost.coins}</span>
                           </span>
                         </div>
 
