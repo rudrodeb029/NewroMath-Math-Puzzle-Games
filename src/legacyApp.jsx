@@ -1995,47 +1995,48 @@ import './index.css';
         <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
           {/* Main content container with smooth vertical flow and scroll clearance */}
           <div className="flex-1 overflow-y-auto no-scrollbar px-2.5 pt-0 pb-6 space-y-2 max-w-md mx-auto w-full">
-            {/* Top Bar Header */}
-            <div className="sticky top-0 z-20 -mx-2.5 scifi-header-bg border-b border-cyan-400/25 flex items-center justify-between gap-1 px-2.5 py-2 shrink-0 min-w-0 shadow-[0_4px_20px_rgba(0,0,0,0.6)] backdrop-blur-md">
+            {/* Top Bar Header (Fully Responsive across all Android screen sizes) */}
+            <div className="sticky top-0 z-20 -mx-2.5 scifi-header-bg border-b border-cyan-400/25 flex items-center justify-between gap-1 sm:gap-1.5 px-2 sm:px-2.5 pt-[max(8px,env(safe-area-inset-top))] pb-2 shrink-0 min-w-0 shadow-[0_4px_20px_rgba(0,0,0,0.6)] backdrop-blur-md">
               {/* Left: Modern Cyber-Arcade Profile & Level Capsule */}
               <div 
                 onClick={() => { sound.click(); navigateTo('profile'); }} 
-                className="group relative cursor-pointer select-none bg-gradient-to-r from-[#0e255a]/95 via-[#0a1a3e]/90 to-[#071330]/85 border border-cyan-400/40 hover:border-cyan-300/80 rounded-2xl p-1 pr-2.5 flex items-center gap-2 shadow-[0_4px_16px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md transition-all active:scale-95 shrink-0"
+                className="group relative cursor-pointer select-none bg-gradient-to-r from-[#0e255a]/95 via-[#0a1a3e]/90 to-[#071330]/85 border border-cyan-400/40 hover:border-cyan-300/80 rounded-2xl p-1 pr-1.5 sm:pr-2.5 flex items-center gap-1.5 sm:gap-2 shadow-[0_4px_16px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md transition-all active:scale-95 min-w-0 shrink"
                 title="Player Profile"
               >
                 {/* 3D Cyber Avatar Frame */}
-                <div className="relative shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-600 to-indigo-900 p-0.5 shadow-[0_0_10px_rgba(0,229,255,0.6)] group-hover:shadow-[0_0_14px_rgba(0,229,255,0.9)] transition-all">
+                <div className="relative shrink-0 w-[30px] h-[30px] sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-600 to-indigo-900 p-0.5 shadow-[0_0_10px_rgba(0,229,255,0.6)] group-hover:shadow-[0_0_14px_rgba(0,229,255,0.9)] transition-all">
                   <div className="w-full h-full rounded-[10px] bg-[#0c1a3a] overflow-hidden flex items-center justify-center">
                     <img 
                       src="/assets/icon_robot_3d.png" 
                       alt="Player Avatar" 
+                      decoding="async"
                       className="w-full h-full object-cover scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" 
                     />
                   </div>
                   {/* Golden Metallic LV. Badge */}
-                  <div className="absolute -bottom-1 -right-1 px-1 py-0.2 rounded-md bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 border border-amber-200 text-amber-950 font-black text-[7.5px] font-display shadow-md tracking-tighter leading-none">
+                  <div className="absolute -bottom-1 -right-1 px-1 py-0.2 rounded-md bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 border border-amber-200 text-amber-950 font-black text-[7px] sm:text-[7.5px] font-display shadow-md tracking-tighter leading-none">
                     LV.{activePlayerLevel}
                   </div>
                 </div>
 
                 {/* Level Title & XP Bar */}
                 <div className="flex flex-col justify-center min-w-0">
-                  <div className="flex items-center gap-1.5 leading-tight">
-                    <span className="text-white font-black text-[11px] font-display tracking-wider uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                  <div className="flex items-center gap-1 sm:gap-1.5 leading-tight">
+                    <span className="text-white font-black text-[10px] sm:text-[11px] font-display tracking-wide uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate">
                       Level {activePlayerLevel}
                     </span>
-                    <span className="px-1 py-0.2 rounded text-[7px] font-black uppercase tracking-wider bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 font-mono">
+                    <span className="home-hdr-pro-badge px-1 py-0.2 rounded text-[6.5px] sm:text-[7px] font-black uppercase tracking-wider bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 font-mono shrink-0">
                       PRO
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <div className="w-16 h-1.5 bg-[#050f24] border border-cyan-400/50 rounded-full overflow-hidden p-[1px] shadow-inner relative">
+                  <div className="flex items-center gap-1 sm:gap-1.5 mt-0.5 sm:mt-1 min-w-0">
+                    <div className="w-[44px] sm:w-[60px] h-1.5 bg-[#050f24] border border-cyan-400/50 rounded-full overflow-hidden p-[1px] shadow-inner relative shrink-0">
                       <div 
                         className="h-full bg-gradient-to-r from-cyan-400 via-sky-300 to-white rounded-full shadow-[0_0_8px_rgba(0,229,255,0.9)] transition-all duration-300" 
                         style={{ width: `${Math.min(100, Math.max(12, ((playerXp % 300) / 300) * 100))}%` }} 
                       />
                     </div>
-                    <span className="text-cyan-300 font-mono font-bold text-[7.5px] tracking-tight whitespace-nowrap drop-shadow">
+                    <span className="home-hdr-xp-text text-cyan-300 font-mono font-bold text-[7px] sm:text-[7.5px] tracking-tight whitespace-nowrap drop-shadow shrink-0">
                       {playerXp % 300}/300
                     </span>
                   </div>
@@ -2043,14 +2044,14 @@ import './index.css';
               </div>
 
               {/* Right: Modern 3D Tactile Currency Widgets & Cyber Buttons */}
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 {/* 3D Gold Coins Capsule */}
                 <div 
                   onClick={() => { sound.click(); navigateTo('rewards'); }}
-                  className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/50 hover:border-amber-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,230,130,0.25)] transition-all active:scale-95 cursor-pointer"
+                  className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/50 hover:border-amber-300 rounded-xl px-1.5 py-0.5 sm:py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,230,130,0.25)] transition-all active:scale-95 cursor-pointer shrink-0"
                   title="Coins - Tap to Open Rewards & Shop"
                 >
-                  <svg className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_6px_rgba(245,158,11,0.7)] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 drop-shadow-[0_2px_6px_rgba(245,158,11,0.7)] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                     <defs>
                       <radialGradient id="homeHdrCoinGrad" cx="35%" cy="35%" r="65%">
                         <stop offset="0%" stopColor="#fef08a" />
@@ -2066,10 +2067,10 @@ import './index.css';
                     <circle cx="12" cy="12" r="7.5" fill="none" stroke="#fde047" strokeWidth="0.8" opacity="0.6" />
                     <polygon points="12,6.5 13.6,9.8 17.2,10.3 14.6,12.7 15.2,16.2 12,14.5 8.8,16.2 9.4,12.7 6.8,10.3 10.4,9.8" fill="#fef08a" stroke="#d97706" strokeWidth="0.5" />
                   </svg>
-                  <span className="text-amber-300 font-black text-[10.5px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                  <span className="text-amber-300 font-black text-[9.5px] sm:text-[10.5px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] tabular-nums">
                     {Math.max(coins, 10).toLocaleString()}
                   </span>
-                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
+                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[7.5px] sm:text-[8px] flex items-center justify-center shadow-xs leading-none">
                     +
                   </span>
                 </div>
@@ -2077,10 +2078,10 @@ import './index.css';
                 {/* 3D Cyan Gems Capsule */}
                 <div 
                   onClick={() => { sound.click(); navigateTo('rewards'); }}
-                  className="group bg-gradient-to-r from-[#071d38]/90 via-[#0a2347]/90 to-[#051429]/90 border border-cyan-400/50 hover:border-cyan-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(186,230,253,0.25)] transition-all active:scale-95 cursor-pointer"
+                  className="group bg-gradient-to-r from-[#071d38]/90 via-[#0a2347]/90 to-[#051429]/90 border border-cyan-400/50 hover:border-cyan-300 rounded-xl px-1.5 py-0.5 sm:py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(186,230,253,0.25)] transition-all active:scale-95 cursor-pointer shrink-0"
                   title="Diamonds - Tap to Open Rewards & Shop"
                 >
-                  <svg className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_8px_rgba(0,229,255,0.8)] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 drop-shadow-[0_2px_8px_rgba(0,229,255,0.8)] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                     <defs>
                       <linearGradient id="homeHdrGemTop" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#e0f2fe" />
@@ -2100,10 +2101,10 @@ import './index.css';
                     <polygon points="15,9 22,9 12,21" fill="#0c4a6e" />
                     <circle cx="7" cy="6" r="0.8" fill="#ffffff" />
                   </svg>
-                  <span className="text-cyan-200 font-black text-[10.5px] font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.6)]">
+                  <span className="text-cyan-200 font-black text-[9.5px] sm:text-[10.5px] font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.6)] tabular-nums">
                     {gems.toLocaleString()}
                   </span>
-                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
+                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-[7.5px] sm:text-[8px] flex items-center justify-center shadow-xs leading-none">
                     +
                   </span>
                 </div>
@@ -2111,11 +2112,11 @@ import './index.css';
                 {/* Tactile Cyber Stats Button */}
                 <button 
                   onClick={() => { sound.click(); navigateTo('stats'); }}
-                  className="w-7 h-7 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                  className="w-[26px] h-[26px] sm:w-7 sm:h-7 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
                   title="Statistics"
                   aria-label="Statistics"
                 >
-                  <svg className="w-3.5 h-3.5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </button>
@@ -2123,11 +2124,11 @@ import './index.css';
                 {/* Tactile Cyber Settings Gear */}
                 <button 
                   onClick={() => { sound.click(); navigateTo('settings'); }}
-                  className="w-7 h-7 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                  className="w-[26px] h-[26px] sm:w-7 sm:h-7 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
                   title="Settings"
                   aria-label="Settings"
                 >
-                  <svg className="w-3.5 h-3.5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <circle cx="12" cy="12" r="3" strokeWidth="2.2" />
                   </svg>
