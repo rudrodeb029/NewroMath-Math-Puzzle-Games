@@ -3078,7 +3078,7 @@ import './index.css';
               </div>
 
               {/* Level Mission Pill */}
-              <div className="flex items-center bg-black/40 border border-cyan-400/40 rounded-full px-2.5 py-1 shadow-inner shrink-0">
+              <div className="flex items-center bg-[#0d255a]/75 backdrop-blur-md border border-cyan-400/50 rounded-full px-2.5 py-1 shadow-inner shrink-0">
                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display">
                   Mission L{selectedLevelNum}
                 </span>
@@ -3138,7 +3138,7 @@ import './index.css';
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-xs font-bold text-slate-300 mb-2">Display Theme</h3>
-                    <div className="flex justify-around bg-black/30 p-2 rounded-2xl border border-cyan-400/20">
+                    <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
                       <button onClick={() => setIsDarkMode(false)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!isDarkMode ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
                         Default Sci-Fi
                       </button>
@@ -3149,7 +3149,7 @@ import './index.css';
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-slate-300 mb-2">Numeral Font Size</h3>
-                    <div className="flex justify-around bg-black/30 p-2 rounded-2xl border border-cyan-400/20">
+                    <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
                       {[true, false].map(isLarge => (
                         <button key={String(isLarge)} onClick={() => setLargeFontEnabled(isLarge)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${largeFontEnabled === isLarge ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
                           {isLarge ? 'Large Font' : 'Standard Font'}
@@ -3159,7 +3159,7 @@ import './index.css';
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-slate-300 mb-2">Division Notation</h3>
-                    <div className="flex justify-around bg-black/30 p-2 rounded-2xl border border-cyan-400/20">
+                    <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
                       {['÷', '/', ':'].map(symbol => (
                         <button key={symbol} onClick={() => setDivisionSymbol(symbol)} className={`w-10 h-10 rounded-xl text-base font-black transition-all ${divisionSymbol === symbol ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
                           {symbol}
@@ -3172,9 +3172,9 @@ import './index.css';
             )}
 
             {/* Mission Board Terminal */}
-            <section className="flex flex-col rounded-3xl p-3 sm:p-4 bg-gradient-to-b from-[#102761]/95 to-[#0b1c45]/95 border border-cyan-400/40 shadow-[0_12px_32px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.15)] relative overflow-hidden backdrop-blur-md">
+            <section className="flex flex-col rounded-3xl p-3 sm:p-4 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl">
               {/* Blueprint Grid Overlay */}
-              <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+              <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
 
               {/* Drafting Corner Crosses */}
               <span className="absolute top-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
@@ -3185,17 +3185,17 @@ import './index.css';
               {/* Mission HUD Header: Difficulty, Timer, and Pause */}
               <div className="relative z-10 flex items-center justify-between px-1 pb-3 text-xs font-bold border-b border-cyan-400/20">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-400/50 text-emerald-300">
+                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-900/60 border border-emerald-400/50 text-emerald-300 shadow-xs">
                     {profileDifficulty}
                   </span>
-                  <span className="text-[10px] text-cyan-300/70 font-mono">PUZZLE {stageNum}/{stageTotal}</span>
+                  <span className="text-[10px] text-cyan-200/80 font-mono font-bold">PUZZLE {stageNum}/{stageTotal}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <div ref={timerContainerRef} className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono font-black text-xs transition-colors ${
                     gameTimer <= 15
-                      ? 'animate-timer-warning text-red-300 bg-red-950/80 border border-red-500/80'
-                      : 'text-cyan-200 bg-cyan-950/70 border border-cyan-400/40'
+                      ? 'animate-timer-warning text-red-200 bg-red-950/80 border border-red-500/80'
+                      : 'text-cyan-200 bg-[#0d2861]/70 border border-cyan-400/50 shadow-inner'
                   }`}>
                     <span>⏱️</span>
                     <span ref={timerDisplayRef}>{formatTimer(gameTimer)}</span>
@@ -3204,7 +3204,7 @@ import './index.css';
                   <button 
                     onClick={() => { sound.click(); setIsGamePaused(v => !v); }} 
                     aria-label={isGamePaused ? 'Resume puzzle' : 'Pause puzzle'} 
-                    className="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 flex items-center justify-center text-xs font-black shadow-inner active:scale-95 cursor-pointer"
+                    className="w-7 h-7 rounded-lg bg-[#0d2861]/80 hover:bg-[#13357b] border border-cyan-400/50 text-cyan-300 flex items-center justify-center text-xs font-black shadow-inner active:scale-95 cursor-pointer transition-all"
                   >
                     {isGamePaused ? '▶' : '⏸'}
                   </button>
@@ -3213,7 +3213,7 @@ import './index.css';
 
               {/* Cross-Math 9x9 Puzzle Grid */}
               <div className="relative z-10 flex justify-center pb-3 pt-3">
-                <div className="w-full max-w-[340px] p-2.5 sm:p-3 rounded-2xl bg-[#081538]/70 border border-cyan-500/20 backdrop-blur-sm shadow-[inset_0_2px_8px_rgba(0,0,0,0.6)]">
+                <div className="w-full max-w-[340px] p-2.5 sm:p-3 rounded-2xl bg-gradient-to-b from-[#0c204d]/75 to-[#07173b]/85 border border-cyan-400/30 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(4,16,44,0.5),0_6px_16px_rgba(2,10,32,0.3)]">
                   <div 
                     className="grid gap-1.5 sm:gap-2 w-full" 
                     style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
@@ -3353,7 +3353,7 @@ import './index.css';
                 className={`relative grid h-[54px] w-[54px] place-items-center rounded-2xl transition-all ${
                   puzzleHistory.length > 0
                     ? 'bg-gradient-to-b from-[#0284c7] via-[#0369a1] to-[#075985] border-2 border-cyan-300 text-white shadow-[0_4px_0_#082f49,0_8px_20px_rgba(14,165,233,0.55),inset_0_1px_2px_rgba(255,255,255,0.6)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#082f49] cursor-pointer'
-                    : 'bg-gradient-to-b from-[#142854] via-[#0f1f45] to-[#0a1533] border-2 border-cyan-700/60 shadow-[0_4px_0_#070f24] text-cyan-300/70 cursor-not-allowed'
+                    : 'bg-gradient-to-b from-[#1b3670]/80 via-[#152c5c]/85 to-[#0f2249]/90 border-2 border-cyan-500/30 shadow-[0_4px_0_#0b1a38] text-cyan-200/50 cursor-not-allowed opacity-75'
                 }`}
                 title="Undo Number"
               >
