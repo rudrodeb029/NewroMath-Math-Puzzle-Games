@@ -6235,18 +6235,27 @@ import './index.css';
               </div>
 
               {/* Right Currencies */}
-              <div className="flex items-center gap-2">
+              {/* Right Currencies */}
+              <div className="flex items-center gap-1.5 shrink-0">
                 {/* Coins */}
-                <div className="flex items-center gap-1 bg-[#0d2250]/80 border border-amber-400/50 rounded-full px-2 py-0.5 shadow-xs">
-                  <span className="text-xs">🪙</span>
-                  <span className="text-amber-300 font-black text-xs font-display">
+                <div className="flex items-center gap-1.5 bg-[#0a1f4d]/70 backdrop-blur-md border border-amber-400/50 rounded-xl px-2.5 py-1 shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]">
+                  <img 
+                    src="/assets/icon_gold_coin_3d_clean.png" 
+                    alt="Coins" 
+                    className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_2px_4px_rgba(245,158,11,0.6)]" 
+                  />
+                  <span className="text-amber-300 font-black text-xs font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                     {coins.toLocaleString()}
                   </span>
                 </div>
                 {/* Gems */}
-                <div className="flex items-center gap-1 bg-[#0d2250]/80 border border-cyan-400/50 rounded-full px-2 py-0.5 shadow-xs">
-                  <span className="text-xs">💎</span>
-                  <span className="text-cyan-200 font-black text-xs font-display">
+                <div className="flex items-center gap-1.5 bg-[#0a1f4d]/70 backdrop-blur-md border border-cyan-400/50 rounded-xl px-2.5 py-1 shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]">
+                  <img 
+                    src="/assets/icon_gem_3d_clean.png" 
+                    alt="Diamonds" 
+                    className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_2px_5px_rgba(6,182,212,0.6)]" 
+                  />
+                  <span className="text-cyan-200 font-black text-xs font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.5)]">
                     {gems.toLocaleString()}
                   </span>
                 </div>
@@ -6258,26 +6267,32 @@ import './index.css';
               
               {/* Toast Notification if present */}
               {rewardToast && (
-                <div className="sticky top-2 z-30 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 border border-emerald-300/80 rounded-xl p-2.5 text-center text-xs font-black shadow-[0_4px_20px_rgba(16,185,129,0.5)] animate-in slide-in-from-top duration-200">
+                <div className="sticky top-2 z-30 bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90 backdrop-blur-md border border-emerald-300/80 rounded-2xl p-2.5 text-center text-xs font-black shadow-[0_4px_20px_rgba(16,185,129,0.5)] animate-in slide-in-from-top duration-200">
                   {rewardToast}
                 </div>
               )}
 
-              {/* 1. Daily Free Gift Banner */}
-              <div className="relative rounded-2xl bg-gradient-to-r from-[#17307a] via-[#214399] to-[#122b6d] border border-cyan-400/40 p-3.5 shadow-[0_6px_20px_rgba(0,229,255,0.25)] flex items-center justify-between gap-3 overflow-hidden">
-                <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-amber-400/10 rounded-full blur-xl pointer-events-none"></div>
-                <div className="flex items-center gap-3">
+              {/* 1. Daily Free Gift Banner - Premium Glassmorphism */}
+              <div className="relative rounded-[26px] bg-gradient-to-br from-white/[0.12] via-[#15347a]/60 to-[#0c1f4d]/80 backdrop-blur-xl border border-white/25 p-3.5 shadow-[0_12px_32px_rgba(3,12,38,0.5),inset_0_1.5px_0_rgba(255,255,255,0.25)] flex items-center justify-between gap-3 overflow-hidden">
+                <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-amber-400/15 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="flex items-center gap-3 relative z-10">
                   <img 
                     src="/assets/reward_gift_dial_full.png" 
                     alt="Daily Reward" 
-                    className="w-14 h-14 object-contain shrink-0 drop-shadow-[0_0_12px_rgba(251,191,36,0.6)] animate-pulse" 
+                    className="w-14 h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)] animate-pulse" 
                   />
                   <div>
                     <span className="text-[10px] uppercase font-extrabold tracking-wider text-amber-300 block">Daily Free Bonus</span>
                     <h3 className="text-xs font-black text-white">Daily Mystery Chest</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] font-bold text-amber-300 flex items-center gap-0.5">🪙 +350</span>
-                      <span className="text-[10px] font-bold text-cyan-300 flex items-center gap-0.5">💎 +5</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] font-bold text-amber-300 flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 rounded-full px-2 py-0.5">
+                        <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coin" className="w-3 h-3 object-contain" />
+                        +350
+                      </span>
+                      <span className="text-[10px] font-bold text-cyan-200 flex items-center gap-1 bg-cyan-500/15 border border-cyan-400/30 rounded-full px-2 py-0.5">
+                        <img src="/assets/icon_gem_3d_clean.png" alt="Gem" className="w-3 h-3 object-contain" />
+                        +5
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -6285,7 +6300,7 @@ import './index.css';
                 <button
                   disabled={dailyGiftClaimed}
                   onClick={handleClaimDailyGift}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 shrink-0 ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 shrink-0 relative z-10 ${
                     dailyGiftClaimed
                       ? 'bg-slate-700/60 border border-slate-600/50 text-slate-400 cursor-not-allowed'
                       : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 border border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] cursor-pointer'
@@ -6309,33 +6324,33 @@ import './index.css';
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Ad Option 1: Gold Coins */}
-                  <div className="bg-gradient-to-b from-[#132c66] to-[#0d1d45] border border-amber-400/40 rounded-2xl p-3 flex flex-col justify-between items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/30 border border-amber-400/50 flex items-center justify-center text-xl shadow-[0_0_10px_rgba(245,158,11,0.3)] mb-1.5">
-                      🪙
+                <div className="grid grid-cols-2 gap-2.5">
+                  {/* Ad Option 1: Gold Coins - Glassmorphic Card */}
+                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/25 to-amber-600/35 border border-amber-400/60 flex items-center justify-center shadow-[0_0_14px_rgba(245,158,11,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] mb-1.5">
+                      <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-7 h-7 object-contain drop-shadow-[0_2px_6px_rgba(245,158,11,0.7)]" />
                     </div>
-                    <span className="text-xs font-black text-amber-300">+250 Coins</span>
-                    <span className="text-[9px] text-slate-300 mb-2">Instant Reward</span>
+                    <span className="text-xs font-black text-amber-300 font-display">+250 Coins</span>
+                    <span className="text-[9.5px] text-slate-300/80 mb-2.5 font-medium">Instant Reward</span>
                     <button
                       onClick={() => handleWatchAd('coins', 250, 'Coin Sponsor Video')}
-                      className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 font-black text-[11px] shadow-sm hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 font-black text-[11px] shadow-[0_3px_0_#b45309,0_6px_14px_rgba(245,158,11,0.35)] hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer border border-amber-200/80"
                     >
                       <span>▶</span>
                       <span>Watch Ad</span>
                     </button>
                   </div>
 
-                  {/* Ad Option 2: Diamonds */}
-                  <div className="bg-gradient-to-b from-[#132c66] to-[#0d1d45] border border-cyan-400/40 rounded-2xl p-3 flex flex-col justify-between items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400/20 to-blue-600/30 border border-cyan-400/50 flex items-center justify-center text-xl shadow-[0_0_10px_rgba(6,182,212,0.3)] mb-1.5">
-                      💎
+                  {/* Ad Option 2: Diamonds - Glassmorphic Card */}
+                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400/25 to-blue-600/35 border border-cyan-400/60 flex items-center justify-center shadow-[0_0_14px_rgba(6,182,212,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] mb-1.5">
+                      <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-7 h-7 object-contain drop-shadow-[0_2px_6px_rgba(6,182,212,0.7)]" />
                     </div>
-                    <span className="text-xs font-black text-cyan-200">+10 Diamonds</span>
-                    <span className="text-[9px] text-slate-300 mb-2">Instant Reward</span>
+                    <span className="text-xs font-black text-cyan-200 font-display">+10 Diamonds</span>
+                    <span className="text-[9.5px] text-slate-300/80 mb-2.5 font-medium">Instant Reward</span>
                     <button
                       onClick={() => handleWatchAd('gems', 10, 'Diamond Sponsor Video')}
-                      className="w-full py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[11px] shadow-sm hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[11px] shadow-[0_3px_0_#0284c7,0_6px_14px_rgba(6,182,212,0.35)] hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer border border-cyan-200/80"
                     >
                       <span>▶</span>
                       <span>Watch Ad</span>
@@ -6343,20 +6358,29 @@ import './index.css';
                   </div>
                 </div>
 
-                {/* Ad Option 3: Big Jackpot Chest Ad */}
-                <div className="bg-gradient-to-r from-[#173070] via-[#214399] to-[#12285a] border border-purple-400/40 rounded-2xl p-2.5 flex items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                {/* Ad Option 3: Big Jackpot Chest Ad - Glassmorphic Banner */}
+                <div className="rounded-[22px] bg-gradient-to-r from-white/[0.10] via-[#1c2c63]/60 to-[#12224d]/80 backdrop-blur-xl border border-white/20 p-2.5 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.4),inset_0_1.5px_0_rgba(255,255,255,0.2)]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-400/50 flex items-center justify-center text-lg">
+                    <div className="w-9 h-9 rounded-xl bg-purple-500/25 border border-purple-400/50 flex items-center justify-center text-lg shadow-[0_0_10px_rgba(168,85,247,0.35)]">
                       👑
                     </div>
                     <div>
                       <span className="text-xs font-black text-purple-200 block">Jackpot Ad Chest</span>
-                      <span className="text-[10px] text-amber-300 font-bold">🪙 +600 Coins & 💎 +15 Gems</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-amber-300 font-bold flex items-center gap-0.5">
+                          <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coin" className="w-3 h-3 object-contain" />
+                          +600
+                        </span>
+                        <span className="text-[10px] text-cyan-200 font-bold flex items-center gap-0.5">
+                          <img src="/assets/icon_gem_3d_clean.png" alt="Diamond" className="w-3 h-3 object-contain" />
+                          +15
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <button
                     onClick={() => handleWatchAd('jackpot', 600, 'Jackpot Mega Sponsor')}
-                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-[10px] border border-purple-300/70 shadow-sm active:scale-95 transition-all cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-[10px] border border-purple-300/70 shadow-[0_3px_0_#581c87,0_6px_14px_rgba(168,85,247,0.35)] active:scale-95 transition-all cursor-pointer"
                   >
                     ▶ Watch (15s)
                   </button>
@@ -6367,7 +6391,7 @@ import './index.css';
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-amber-400 text-xs">🪙</span>
+                    <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-4 h-4 object-contain" />
                     <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-amber-200">
                       Gold Coin Store
                     </h2>
@@ -6377,21 +6401,27 @@ import './index.css';
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   {[
-                    { id: 'c1', name: 'Handful of Gold', coins: 1500, gemsCost: 10, price: '$0.99', badge: null, icon: '🪙' },
+                    { id: 'c1', name: 'Handful of Gold', coins: 1500, gemsCost: 10, price: '$0.99', badge: null, customIcon: '/assets/icon_gold_coin_3d_clean.png', isCustomImg: true },
                     { id: 'c2', name: 'Pouch of Gold', coins: 5000, gemsCost: 25, price: '$1.99', badge: 'POPULAR', icon: '💰' },
                     { id: 'c3', name: 'Chest of Gold', coins: 15000, gemsCost: 65, price: '$4.99', badge: 'BEST VALUE', icon: '📦' },
                     { id: 'c4', name: 'Vault of Gold', coins: 45000, gemsCost: 160, price: '$9.99', badge: 'MEGA PACK', icon: '🏦' },
                   ].map((pack) => (
-                    <div key={pack.id} className="relative bg-gradient-to-b from-[#11295e] to-[#0a1a3e] border border-amber-400/30 rounded-2xl p-2.5 flex flex-col justify-between shadow-md">
+                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
                       {pack.badge && (
-                        <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-tight shadow-xs">
+                        <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-amber-200/70 z-10">
                           {pack.badge}
                         </span>
                       )}
                       <div className="text-center pt-1">
-                        <span className="text-2xl block mb-1">{pack.icon}</span>
+                        <div className="h-9 flex items-center justify-center mb-1">
+                          {pack.isCustomImg ? (
+                            <img src={pack.customIcon} alt={pack.name} className="w-8 h-8 object-contain drop-shadow-[0_2px_6px_rgba(245,158,11,0.7)]" />
+                          ) : (
+                            <span className="text-2xl block">{pack.icon}</span>
+                          )}
+                        </div>
                         <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
                         <span className="text-xs font-black text-amber-300 font-display block mt-0.5">
                           +{pack.coins.toLocaleString()}
@@ -6401,15 +6431,15 @@ import './index.css';
                       <div className="space-y-1 mt-2.5">
                         <button
                           onClick={() => handleExchangeCoins(pack.gemsCost, pack.coins)}
-                          className="w-full py-1 rounded-lg bg-[#0e275c] hover:bg-[#163a82] border border-cyan-400/50 text-[10px] font-bold text-cyan-200 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer shadow-xs"
+                          className="w-full py-1.5 rounded-xl bg-gradient-to-r from-[#0c245c] to-[#123075] hover:brightness-110 border border-cyan-400/50 text-[10px] font-bold text-cyan-200 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer shadow-xs"
                           title="Exchange with Gems"
                         >
-                          <span>💎</span>
+                          <img src="/assets/icon_gem_3d_clean.png" alt="Gem" className="w-3 h-3 object-contain" />
                           <span>{pack.gemsCost} Gems</span>
                         </button>
                         <button
                           onClick={() => handleBuyPackage('coins', pack.coins, pack.price)}
-                          className="w-full py-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-xs"
+                          className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#b45309] border border-amber-200/80"
                         >
                           {pack.price}
                         </button>
@@ -6423,7 +6453,7 @@ import './index.css';
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-cyan-400 text-xs">💎</span>
+                    <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-4 h-4 object-contain" />
                     <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-cyan-200">
                       Diamond Store
                     </h2>
@@ -6433,21 +6463,27 @@ import './index.css';
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   {[
-                    { id: 'g1', name: 'Pile of Gems', gems: 50, price: '$0.99', badge: null, icon: '💎' },
+                    { id: 'g1', name: 'Pile of Gems', gems: 50, price: '$0.99', badge: null, customIcon: '/assets/icon_gem_3d_clean.png', isCustomImg: true },
                     { id: 'g2', name: 'Crystal Casket', gems: 200, price: '$2.99', badge: 'HOT', icon: '✨' },
                     { id: 'g3', name: 'Crown of Gems', gems: 600, price: '$6.99', badge: 'POPULAR', icon: '👑' },
                     { id: 'g4', name: 'Diamond Mountain', gems: 2000, price: '$19.99', badge: 'BEST DEAL', icon: '🏔️' },
                   ].map((pack) => (
-                    <div key={pack.id} className="relative bg-gradient-to-b from-[#11295e] to-[#0a1a3e] border border-cyan-400/40 rounded-2xl p-2.5 flex flex-col justify-between shadow-md">
+                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
                       {pack.badge && (
-                        <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-tight shadow-xs">
+                        <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-cyan-200/70 z-10">
                           {pack.badge}
                         </span>
                       )}
                       <div className="text-center pt-1">
-                        <span className="text-2xl block mb-1">{pack.icon}</span>
+                        <div className="h-9 flex items-center justify-center mb-1">
+                          {pack.isCustomImg ? (
+                            <img src={pack.customIcon} alt={pack.name} className="w-8 h-8 object-contain drop-shadow-[0_2px_6px_rgba(6,182,212,0.7)]" />
+                          ) : (
+                            <span className="text-2xl block">{pack.icon}</span>
+                          )}
+                        </div>
                         <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
                         <span className="text-xs font-black text-cyan-200 font-display block mt-0.5">
                           +{pack.gems.toLocaleString()}
@@ -6456,7 +6492,7 @@ import './index.css';
 
                       <button
                         onClick={() => handleBuyPackage('gems', pack.gems, pack.price)}
-                        className="w-full mt-2.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 hover:brightness-110 text-white text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-xs border border-cyan-300/40"
+                        className="w-full mt-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 hover:brightness-110 text-white text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#0284c7] border border-cyan-300/40"
                       >
                         {pack.price}
                       </button>
