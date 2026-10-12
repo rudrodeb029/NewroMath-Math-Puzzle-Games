@@ -3057,8 +3057,7 @@ import './index.css';
               </div>
 
               {/* Level Mission Pill */}
-              <div className="flex items-center gap-1.5 bg-black/40 border border-cyan-400/40 rounded-full px-2.5 py-1 shadow-inner shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <div className="flex items-center bg-black/40 border border-cyan-400/40 rounded-full px-2.5 py-1 shadow-inner shrink-0">
                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display">
                   Mission L{selectedLevelNum}
                 </span>
