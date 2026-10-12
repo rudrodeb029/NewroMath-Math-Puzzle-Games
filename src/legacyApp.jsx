@@ -3024,10 +3024,10 @@ import './index.css';
                           {lvl.title}
                         </h4>
                         <span
-                          className={`text-[8.5px] sm:text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shrink-0 shadow-xs ${theme.badge}`}
+                          className={`text-[8.5px] sm:text-[9px] font-black uppercase px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 shadow-xs ${theme.badge}`}
                         >
                           <span>{isLocked ? '🔒' : '★'}</span>
-                          <span>{lvl.diff}</span>
+                          <span>Level {lvl.num}</span>
                         </span>
                       </div>
 
