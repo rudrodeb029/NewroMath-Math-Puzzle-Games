@@ -604,11 +604,46 @@
       background: radial-gradient(circle, rgba(52, 211, 153, 0.45) 0%, rgba(0, 229, 255, 0.3) 50%, transparent 80%);
       pointer-events: none;
     }
+
+    /* ===== NewroMath Sliding-Tile Loader =====
+       7 tiles move around 8 slots of a 45° rotated 3x3 grid (one gap = sliding-puzzle motion).
+       Only becomes visible after a short delay, so fast loads never flash a loader. */
+    @keyframes nmTileSlide{0%{transform:translate(0px,70px);animation-timing-function:cubic-bezier(.65,0,.35,1)}1.125%{transform:translate(0px,35px);animation-timing-function:linear}12.5%{transform:translate(0px,35px);animation-timing-function:cubic-bezier(.65,0,.35,1)}13.625%{transform:translate(0px,0px);animation-timing-function:linear}25%{transform:translate(0px,0px);animation-timing-function:cubic-bezier(.65,0,.35,1)}26.125%{transform:translate(35px,0px);animation-timing-function:linear}37.5%{transform:translate(35px,0px);animation-timing-function:cubic-bezier(.65,0,.35,1)}38.625%{transform:translate(70px,0px);animation-timing-function:linear}50%{transform:translate(70px,0px);animation-timing-function:cubic-bezier(.65,0,.35,1)}51.125%{transform:translate(70px,35px);animation-timing-function:linear}62.5%{transform:translate(70px,35px);animation-timing-function:cubic-bezier(.65,0,.35,1)}63.625%{transform:translate(35px,35px);animation-timing-function:linear}75%{transform:translate(35px,35px);animation-timing-function:cubic-bezier(.65,0,.35,1)}76.125%{transform:translate(35px,70px);animation-timing-function:linear}87.5%{transform:translate(35px,70px);animation-timing-function:cubic-bezier(.65,0,.35,1)}88.625%{transform:translate(0px,70px);animation-timing-function:linear}100%{transform:translate(0px,70px)}}
+    .nm-loader .rect{
+      animation:nmTileSlide 11.52s infinite;
+      will-change:transform;
+      stroke:rgba(255,255,255,.22);
+      stroke-width:0.75px;
+      filter:drop-shadow(0 3px 6px rgba(0,0,0,.45));
+    }
+    .nm-loader .nm-r1{animation-delay:-10.44s}
+    .nm-loader .nm-r2{animation-delay:-0.54s}
+    .nm-loader .nm-r3{animation-delay:-2.16s}
+    .nm-loader .nm-r4{animation-delay:-3.78s}
+    .nm-loader .nm-r5{animation-delay:-5.40s}
+    .nm-loader .nm-r6{animation-delay:-7.02s}
+    .nm-loader .nm-r7{animation-delay:-8.64s}
+    .nm-loader-overlay{
+      position:absolute; inset:0; z-index:10000;
+      display:flex; align-items:center; justify-content:center;
+      background:transparent;
+      animation:nmLoaderFade .18s ease-out both;
+      pointer-events:none;
+    }
+    .nm-loader-overlay.nm-boot{ background:transparent; animation:nmLoaderFade .2s ease-out .35s both; }
+    .nm-loader-card{
+      width:auto; height:auto; border-radius:0;
+      background:transparent; display:flex; align-items:center; justify-content:center;
+      box-shadow:none; border:none;
+    }
+    .nm-loader-card svg{ width:100px; height:80px; overflow:visible; }
+    @keyframes nmLoaderFade{ from{opacity:0} to{opacity:1} }
+    @media (prefers-reduced-motion: reduce){ .nm-loader .rect{ animation-duration:23s; } }
   </style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-0 sm:p-4 bg-gradient-to-br from-[#0e1d47] via-[#14285e] to-[#0d1a40] text-slate-100">
 
-  <div id="root" class="w-full max-w-[430px] h-[100dvh] sm:h-[890px] bg-[#183278] sm:rounded-[44px] sm:shadow-[0_25px_60px_-15px_rgba(20,50,130,0.6)] overflow-hidden flex flex-col relative border-0 sm:border-[8px] sm:border-[#224896]"></div>
+  <div id="root" class="w-full max-w-[430px] h-[100dvh] sm:h-[890px] bg-[#183278] sm:rounded-[44px] sm:shadow-[0_25px_60px_-15px_rgba(20,50,130,0.6)] overflow-hidden flex flex-col relative border-0 sm:border-[8px] sm:border-[#224896]"><div class="nm-loader-overlay nm-boot" role="status" aria-label="Loading"><div class="nm-loader-card"><svg class="nm-loader" viewBox="0 0 100 80"><g transform="translate(50 0) scale(0.707 0.707) rotate(45 0 0)"><rect class="rect nm-r1" width="30" height="30" rx="2" ry="2" fill="red"/><rect class="rect nm-r2" width="30" height="30" rx="2" ry="2" fill="green"/><rect class="rect nm-r3" width="30" height="30" rx="2" ry="2" fill="blue"/><rect class="rect nm-r4" width="30" height="30" rx="2" ry="2" fill="black"/><rect class="rect nm-r5" width="30" height="30" rx="2" ry="2" fill="orange"/><rect class="rect nm-r6" width="30" height="30" rx="2" ry="2" fill="teal"/><rect class="rect nm-r7" width="30" height="30" rx="2" ry="2" fill="gold"/></g></svg></div></div></div>
 
   <script type="module" src="/src/legacyApp.jsx"></script>
 </body>

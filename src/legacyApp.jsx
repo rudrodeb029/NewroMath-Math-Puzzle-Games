@@ -211,6 +211,88 @@ import './index.css';
     }
 
     // ==========================================
+    // SLIDING-TILE LOADER (7 tiles / 8 slots, styles in index.html)
+    // ==========================================
+    const LOADER_TILE_COLORS = ['red', 'green', 'blue', 'black', 'orange', 'teal', 'gold'];
+    function SlidingTileLoader() {
+      return (
+        <div className="nm-loader-overlay bg-transparent" role="status" aria-label="Loading">
+          <div className="nm-loader-card bg-transparent shadow-none border-none">
+            <svg className="nm-loader" viewBox="0 0 100 80">
+              <g transform="translate(50 0) scale(0.707 0.707) rotate(45 0 0)">
+                {LOADER_TILE_COLORS.map((fill, i) => (
+                  <rect key={fill} className={`rect nm-r${i + 1}`} width="30" height="30" rx="2" ry="2" fill={fill} />
+                ))}
+              </g>
+            </svg>
+          </div>
+        </div>
+      );
+    }
+
+    // Warm the image cache in idle time so later pages open instantly (no loader needed)
+    const PREFETCH_ASSETS = [
+      '/assets/icon_brain_3d.png', '/assets/icon_chest_3d.png', '/assets/icon_gamepad_3d.png',
+      '/assets/icon_gem_3d_clean.png', '/assets/icon_gold_coin_3d_clean.png', '/assets/icon_star_3d.png',
+      '/assets/icon_stopwatch_3d.png', '/assets/icon_target_3d.png', '/assets/icon_trophy_3d.png',
+      '/assets/reward_gift_dial_full.png'
+    ];
+    function prefetchAssetsWhenIdle() {
+      const run = () => PREFETCH_ASSETS.forEach(src => { const img = new Image(); img.decoding = 'async'; img.src = src; });
+      if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 2500 });
+      else setTimeout(run, 1200);
+    }
+
+    // Shows the loader ONLY when the newly opened page is genuinely slow
+    // (its visible images still loading after `delayMs`). Fast pages open instantly, no loader flash.
+    function useSmartPageLoader(screenKey, delayMs = 260, maxMs = 6000) {
+      const [visible, setVisible] = useState(false);
+      useEffect(() => {
+        let cancelled = false;
+        let showTimer = null;
+        let maxTimer = null;
+        const cleanups = [];
+        const finish = () => {
+          if (cancelled) return;
+          cancelled = true;
+          clearTimeout(showTimer);
+          clearTimeout(maxTimer);
+          cleanups.forEach(fn => fn());
+          setVisible(false);
+        };
+        const raf = requestAnimationFrame(() => {
+          if (cancelled) return;
+          const layer = document.querySelector('.page-transition-current');
+          if (!layer) return;
+          const pending = Array.from(layer.querySelectorAll('img'))
+            .filter(img => img.getAttribute('loading') !== 'lazy' && !img.complete);
+          if (pending.length === 0) return; // everything ready -> instant, no loader
+          let remaining = pending.length;
+          const onDone = () => { remaining -= 1; if (remaining <= 0) finish(); };
+          pending.forEach(img => {
+            img.addEventListener('load', onDone, { once: true });
+            img.addEventListener('error', onDone, { once: true });
+            cleanups.push(() => {
+              img.removeEventListener('load', onDone);
+              img.removeEventListener('error', onDone);
+            });
+          });
+          showTimer = setTimeout(() => { if (!cancelled) setVisible(true); }, delayMs);
+          maxTimer = setTimeout(finish, maxMs);
+        });
+        return () => {
+          cancelled = true;
+          cancelAnimationFrame(raf);
+          clearTimeout(showTimer);
+          clearTimeout(maxTimer);
+          cleanups.forEach(fn => fn());
+          setVisible(false);
+        };
+      }, [screenKey]);
+      return visible;
+    }
+
+    // ==========================================
     // 3D CYBER-ARCADE FLYING TILE ANIMATOR
     // ==========================================
     function FlyingTileItem({ tile, onFinish, largeFontEnabled }) {
@@ -896,6 +978,10 @@ import './index.css';
       const [transitionDirection, setTransitionDirection] = useState('forward');
       const navigationStackRef = useRef([initialScreen]);
       const [showScreenPicker, setShowScreenPicker] = useState(false);
+
+      // Sliding-tile loader: appears only when a page takes noticeably long to load
+      const isPageLoading = useSmartPageLoader(currentScreen);
+      useEffect(() => { prefetchAssetsWhenIdle(); }, []);
 
       // Gameplay State & Level Progression (Loaded from URL or LocalStorage)
       const queryParamLevel = (typeof window !== 'undefined' && parseInt(new URLSearchParams(window.location.search).get('level') || '', 10)) || null;
@@ -5930,6 +6016,8 @@ import './index.css';
           <PageTransition screenKey={currentScreen} direction={transitionDirection}>
             {renderActiveScreen()}
           </PageTransition>
+
+          {isPageLoading && <SlidingTileLoader />}
 
           {/* 3D Cyber-Arcade Flying Number Tiles Layer */}
           {flyingTiles.length > 0 && (
