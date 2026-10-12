@@ -3372,15 +3372,13 @@ import './index.css';
             </div>
           </div>
 
-          {/* Modern Attractive Cyber Timeout Banner Modal (Icon-Only Edition) */}
+          {/* 3D Glassmorphic "Time Out" Banner Modal (Matching Reference Design) */}
           {isTimeOver && (
-            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
-              <div className="relative rounded-[32px] p-6 bg-gradient-to-b from-[#181333]/98 via-[#0f152d]/98 to-[#070b1c]/98 border-2 border-rose-500/70 shadow-[0_0_50px_rgba(244,63,94,0.35),0_24px_60px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.2)] max-w-[290px] sm:max-w-[320px] w-full text-center overflow-hidden">
-                {/* Holographic Blueprint Grid */}
-                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-rose-500/15 blur-3xl pointer-events-none" />
+            <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+              {/* Glassmorphic Popup Card */}
+              <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible">
 
-                {/* Dismiss / Close Icon */}
+                {/* Top Close Button (Top-Right) */}
                 <button
                   onClick={() => {
                     sound.click();
@@ -3389,110 +3387,164 @@ import './index.css';
                   }}
                   aria-label="Close"
                   title="Close"
-                  className="absolute top-3.5 right-3.5 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-slate-300 hover:text-white flex items-center justify-center active:scale-90 transition-all cursor-pointer shadow-sm"
+                  className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
 
-                {/* Glowing 3D Chronometer Hero Badge */}
-                <div className="relative z-10 mx-auto w-20 h-20 mt-1 mb-4 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-rose-500/30 via-pink-600/20 to-red-600/30 border border-rose-400/40 rotate-6" />
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#260f28] to-[#12071e] border border-rose-400/50 -rotate-3 shadow-[0_0_30px_rgba(244,63,94,0.5)] flex items-center justify-center">
-                    <svg className="w-10 h-10 text-rose-400 drop-shadow-[0_0_12px_rgba(244,63,94,0.9)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="13" r="8" fill="rgba(244,63,94,0.18)" />
-                      <path d="M12 9v4l2.5 1.5" stroke="#ffffff" strokeWidth="2.5" />
-                      <path d="M5 3L2 6" />
-                      <path d="M22 6L19 3" />
-                      <path d="M10 2h4" />
-                    </svg>
-                  </div>
-                  {/* Warning Indicator Pip */}
-                  <span className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-full bg-gradient-to-br from-rose-400 to-red-600 border-2 border-[#12071e] flex items-center justify-center shadow-[0_0_14px_rgba(244,63,94,0.9)]">
-                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                      <path d="M12 8v5M12 16h.01" />
-                    </svg>
-                  </span>
-                </div>
+                {/* 3D Hourglass Hero + Halo + Arched Banner (Floating Overflow) */}
+                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                  {/* Cloud base & Splash petals behind hourglass */}
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
-                {/* Status Meter Bar (All-Icon Minimalist Strip) */}
-                <div className="relative z-10 mb-5 p-2 rounded-2xl bg-black/45 border border-white/10 flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shrink-0">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="9" />
-                      <path d="M12 7v5l3 3" />
+                    {/* Left Splashes */}
+                    <svg className="absolute -left-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    <svg className="absolute -left-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+
+                    {/* Right Splashes */}
+                    <svg className="absolute -right-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    <svg className="absolute -right-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+
+                    {/* Sparkle Stars */}
+                    <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
+                    <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
+
+                    {/* 3D Hourglass SVG Graphic */}
+                    <svg className="w-24 h-24 drop-shadow-[0_8px_16px_rgba(14,165,233,0.45)]" viewBox="0 0 100 100" fill="none">
+                      <ellipse cx="50" cy="18" rx="22" ry="7" fill="url(#timeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
+                      <ellipse cx="50" cy="16" rx="19" ry="5" fill="#7dd3fc" />
+                      <ellipse cx="50" cy="82" rx="22" ry="7" fill="url(#timeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
+                      <ellipse cx="50" cy="80" rx="19" ry="5" fill="#0284c7" />
+                      <path d="M33 20 C33 42, 46 48, 46 50 C46 52, 33 58, 33 80 L67 80 C67 58, 54 52, 54 50 C54 48, 67 42, 67 20 Z" fill="rgba(224, 242, 254, 0.45)" stroke="#38bdf8" strokeWidth="2.5" />
+                      <path d="M36 24 C36 38, 46 44, 46 50 C46 56, 36 62, 36 76" stroke="rgba(255,255,255,0.85)" strokeWidth="2.5" strokeLinecap="round" />
+                      <path d="M38 32 C38 43, 47 47, 50 49 C53 47, 62 43, 62 32 Z" fill="url(#timeOutHgGold)" />
+                      <ellipse cx="50" cy="32" rx="12" ry="3" fill="#fde047" />
+                      <line x1="50" y1="49" x2="50" y2="68" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 2" />
+                      <path d="M36 78 C38 68, 46 64, 50 64 C54 64, 62 68, 64 78 Z" fill="url(#timeOutHgGold)" />
+                      <defs>
+                        <linearGradient id="timeOutHgBlue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#38bdf8" />
+                          <stop offset="50%" stopColor="#0284c7" />
+                          <stop offset="100%" stopColor="#0369a1" />
+                        </linearGradient>
+                        <linearGradient id="timeOutHgGold" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#fef08a" />
+                          <stop offset="40%" stopColor="#f59e0b" />
+                          <stop offset="100%" stopColor="#d97706" />
+                        </linearGradient>
+                      </defs>
                     </svg>
                   </div>
-                  <div className="flex-1">
-                    <div className="h-2 w-full rounded-full bg-slate-800/80 overflow-hidden border border-rose-500/30 p-0.5">
-                      <div className="h-full w-full rounded-full bg-gradient-to-r from-rose-600 to-red-500 shadow-[0_0_8px_rgba(244,63,94,0.8)] animate-pulse" />
+
+                  {/* Arched 3D Banner "Time Out" */}
+                  <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(29,78,216,0.5)]">
+                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                      <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
+                      <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
+                      <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#1e40af" />
+                      <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#172554" />
+                      <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#timeOutRibbonGrad)" stroke="#60a5fa" strokeWidth="2" />
+                      <defs>
+                        <linearGradient id="timeOutRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#3b82f6" />
+                          <stop offset="50%" stopColor="#2563eb" />
+                          <stop offset="100%" stopColor="#1d4ed8" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
+                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                        Time <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Out</span>
+                      </span>
+                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shrink-0">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 22h14" />
-                      <path d="M5 2h14" />
-                      <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
-                      <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
-                    </svg>
-                  </div>
                 </div>
 
-                {/* Action Buttons (All-Icon Architecture) */}
-                <div className="relative z-10 space-y-2.5">
-                  {/* Two Buttons in the Same Row */}
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {/* Primary: Replay / Restart Level */}
-                    <button
-                      onClick={restartLevelAfterTimeout}
-                      aria-label="Restart Level"
-                      title="Restart"
-                      className="h-14 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:brightness-110 text-emerald-950 shadow-[0_6px_20px_rgba(16,185,129,0.45)] active:scale-95 transition-all border border-emerald-200 cursor-pointer flex items-center justify-center"
-                    >
-                      <svg className="w-7 h-7 text-emerald-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                        <path d="M3 3v5h5" />
-                      </svg>
-                    </button>
+                {/* Clock Divider */}
+                <div className="flex items-center justify-center gap-3 my-3">
+                  <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" />
+                    </svg>
+                  </div>
+                  <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                </div>
 
-                    {/* Secondary: Extra Time Ad (Video + Boost) */}
+                {/* Headline & Description */}
+                <h2 className="text-[#152a55] font-black text-xl tracking-tight font-display mb-1">
+                  Take a short break!
+                </h2>
+                <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-6">
+                  You can continue the game anytime you're ready.
+                </p>
+
+                {/* Action Controls */}
+                <div className="space-y-3">
+                  {/* Primary 3D Restart Button */}
+                  <button
+                    onClick={restartLevelAfterTimeout}
+                    aria-label="Restart Level"
+                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#1e40af,0_10px_25px_rgba(37,99,235,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
+                  >
+                    <svg className="w-5 h-5 text-white stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                      <path d="M3 3v5h5" />
+                    </svg>
+                    <span>Restart</span>
+                  </button>
+
+                  {/* Secondary Options: +30s Extra Time (Ad) & Level Select */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       onClick={() => handleWatchAd('time', 30, 'Chronometer Extender Sponsor')}
-                      aria-label="Extra Time (Watch Ad)"
-                      title="Extra Time"
-                      className="h-14 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-110 text-amber-950 shadow-[0_6px_20px_rgba(245,158,11,0.45)] active:scale-95 transition-all border border-amber-200 cursor-pointer flex items-center justify-center gap-1.5"
+                      aria-label="Extra Time (+30s)"
+                      className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#b45309,0_6px_16px_rgba(245,158,11,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
                     >
-                      {/* Video Camera / Play icon */}
-                      <svg className="w-6 h-6 fill-amber-950 text-amber-950 shrink-0" viewBox="0 0 24 24">
-                        <path d="M4 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2.5l4.24 2.54A1 1 0 0 0 22 18.2V5.8a1 1 0 0 0-1.76-.84L16 7.5V7a2 2 0 0 0-2-2H4Z" />
-                      </svg>
-                      {/* Lightning / Boost icon */}
-                      <svg className="w-5 h-5 fill-amber-950 text-amber-950 shrink-0" viewBox="0 0 24 24">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                      </svg>
+                      <span>⚡</span>
+                      <span>+30s Time</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setIsTimeOver(false);
+                        navigateTo('levels');
+                      }}
+                      aria-label="Levels"
+                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                    >
+                      <span>⊞</span>
+                      <span>Missions</span>
                     </button>
                   </div>
-
-                  {/* Exit to Level Select (Grid Icon) */}
-                  <button
-                    onClick={() => {
-                      sound.click();
-                      setIsTimeOver(false);
-                      navigateTo('levels');
-                    }}
-                    aria-label="Level Select"
-                    title="Levels"
-                    className="w-full h-11 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 text-slate-300 hover:text-white border border-white/15 flex items-center justify-center transition-all cursor-pointer shadow-sm"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect width="7" height="7" x="3" y="3" rx="1.5" />
-                      <rect width="7" height="7" x="14" y="3" rx="1.5" />
-                      <rect width="7" height="7" x="14" y="14" rx="1.5" />
-                      <rect width="7" height="7" x="3" y="14" rx="1.5" />
-                    </svg>
-                  </button>
                 </div>
+
+                {/* Corner Water Droplets Decorations */}
+                <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
+                  <svg className="w-6 h-6 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                  </svg>
+                </div>
+                <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
+                  <svg className="w-6 h-6 text-sky-400 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                  </svg>
+                </div>
+
               </div>
             </div>
           )}
