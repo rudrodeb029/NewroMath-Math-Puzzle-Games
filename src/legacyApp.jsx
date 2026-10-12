@@ -2737,8 +2737,8 @@ import './index.css';
           if (isLocked) {
             return {
               cardBorder: 'border-[2px] border-slate-700/60 shadow-[0_4px_16px_rgba(0,0,0,0.5)]',
-              cardBg: 'bg-gradient-to-b from-[#0a1128] via-[#060b1c] to-[#030610]',
-              badge: 'border border-slate-600/60 bg-slate-800/60 text-slate-400',
+              cardBg: 'bg-gradient-to-b from-[#131a33] via-[#0d1226] to-[#080c1a]',
+              badge: 'border border-slate-500/60 bg-slate-800/80 text-slate-300',
               btnBg: 'bg-slate-800/80 text-slate-400 border border-slate-700/80',
             };
           }
@@ -2747,46 +2747,46 @@ import './index.css';
           switch (themeIdx) {
             case 0: // Emerald / Teal (Warm-Up Ignition)
               return {
-                cardBorder: 'border-[2px] border-[#00f5b4] shadow-[0_0_18px_rgba(0,245,180,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
-                cardBg: 'bg-gradient-to-b from-[#061e2a] via-[#041622] to-[#020b12]',
-                badge: 'border border-emerald-400/70 bg-emerald-950/70 text-emerald-300',
-                btnBg: 'bg-gradient-to-r from-[#0066ff] via-[#0099ff] to-[#00f5b4] text-white shadow-[0_4px_12px_rgba(0,153,255,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+                cardBorder: 'border-[2px] border-[#00f5b4] shadow-[0_0_20px_rgba(0,245,180,0.45),inset_0_1px_2px_rgba(255,255,255,0.25)]',
+                cardBg: 'bg-gradient-to-b from-[#0e4459] via-[#093041] to-[#05202c]',
+                badge: 'border border-emerald-300/80 bg-emerald-900/80 text-emerald-200 font-black shadow-[0_0_8px_rgba(16,185,129,0.5)]',
+                btnBg: 'bg-gradient-to-r from-[#0066ff] via-[#0099ff] to-[#00f5b4] text-white shadow-[0_4px_14px_rgba(0,153,255,0.6),inset_0_1px_1px_rgba(255,255,255,0.7)]',
               };
             case 1: // Electric Cyan / Blue (Addition Circuit)
               return {
-                cardBorder: 'border-[2px] border-[#00d4ff] shadow-[0_0_18px_rgba(0,212,255,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
-                cardBg: 'bg-gradient-to-b from-[#08183d] via-[#05112f] to-[#03091c]',
-                badge: 'border border-cyan-400/70 bg-cyan-950/70 text-cyan-300',
-                btnBg: 'bg-gradient-to-r from-[#0055ff] via-[#0088ff] to-[#00d4ff] text-white shadow-[0_4px_12px_rgba(0,136,255,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+                cardBorder: 'border-[2px] border-[#00d4ff] shadow-[0_0_20px_rgba(0,212,255,0.45),inset_0_1px_2px_rgba(255,255,255,0.25)]',
+                cardBg: 'bg-gradient-to-b from-[#14479e] via-[#0e3375] to-[#092254]',
+                badge: 'border border-cyan-300/80 bg-cyan-900/80 text-cyan-200 font-black shadow-[0_0_8px_rgba(6,182,212,0.5)]',
+                btnBg: 'bg-gradient-to-r from-[#0055ff] via-[#0088ff] to-[#00d4ff] text-white shadow-[0_4px_14px_rgba(0,136,255,0.6),inset_0_1px_1px_rgba(255,255,255,0.7)]',
               };
             case 2: // Neon Magenta / Purple (Cross Pulse)
               return {
-                cardBorder: 'border-[2px] border-[#d946ef] shadow-[0_0_18px_rgba(217,70,239,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
-                cardBg: 'bg-gradient-to-b from-[#210936] via-[#160624] to-[#0a0212]',
-                badge: 'border border-fuchsia-400/70 bg-fuchsia-950/70 text-fuchsia-300',
-                btnBg: 'bg-gradient-to-r from-[#9333ea] via-[#c084fc] to-[#e879f9] text-white shadow-[0_4px_12px_rgba(147,51,234,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+                cardBorder: 'border-[2px] border-[#d946ef] shadow-[0_0_20px_rgba(217,70,239,0.45),inset_0_1px_2px_rgba(255,255,255,0.25)]',
+                cardBg: 'bg-gradient-to-b from-[#561585] via-[#3e0d61] to-[#290742]',
+                badge: 'border border-fuchsia-300/80 bg-fuchsia-900/80 text-fuchsia-200 font-black shadow-[0_0_8px_rgba(217,70,239,0.5)]',
+                btnBg: 'bg-gradient-to-r from-[#9333ea] via-[#c084fc] to-[#e879f9] text-white shadow-[0_4px_14px_rgba(147,51,234,0.6),inset_0_1px_1px_rgba(255,255,255,0.7)]',
               };
             case 3: // Cyber Teal / Cyan (Binary Junction)
               return {
-                cardBorder: 'border-[2px] border-[#06b6d4] shadow-[0_0_18px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
-                cardBg: 'bg-gradient-to-b from-[#061d30] via-[#041422] to-[#020b12]',
-                badge: 'border border-teal-400/70 bg-teal-950/70 text-teal-300',
-                btnBg: 'bg-gradient-to-r from-[#0284c7] via-[#06b6d4] to-[#14b8a6] text-white shadow-[0_4px_12px_rgba(6,182,212,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+                cardBorder: 'border-[2px] border-[#06b6d4] shadow-[0_0_20px_rgba(6,182,212,0.45),inset_0_1px_2px_rgba(255,255,255,0.25)]',
+                cardBg: 'bg-gradient-to-b from-[#0c4e5e] via-[#083845] to-[#052731]',
+                badge: 'border border-teal-300/80 bg-teal-900/80 text-teal-200 font-black shadow-[0_0_8px_rgba(20,184,166,0.5)]',
+                btnBg: 'bg-gradient-to-r from-[#0284c7] via-[#06b6d4] to-[#14b8a6] text-white shadow-[0_4px_14px_rgba(6,182,212,0.6),inset_0_1px_1px_rgba(255,255,255,0.7)]',
               };
             case 4: // Radiant Gold / Amber (Equation Dash)
               return {
-                cardBorder: 'border-[2px] border-[#f59e0b] shadow-[0_0_18px_rgba(245,158,11,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
-                cardBg: 'bg-gradient-to-b from-[#2e1903] via-[#1f1002] to-[#0e0701]',
-                badge: 'border border-amber-400/70 bg-amber-950/70 text-amber-300',
-                btnBg: 'bg-gradient-to-r from-[#f59e0b] via-[#fbbf24] to-[#fde047] text-amber-950 shadow-[0_4px_12px_rgba(245,158,11,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)] font-black',
+                cardBorder: 'border-[2px] border-[#f59e0b] shadow-[0_0_20px_rgba(245,158,11,0.45),inset_0_1px_2px_rgba(255,255,255,0.25)]',
+                cardBg: 'bg-gradient-to-b from-[#783c07] via-[#572903] to-[#3b1a01]',
+                badge: 'border border-amber-300/80 bg-amber-900/80 text-amber-200 font-black shadow-[0_0_8px_rgba(245,158,11,0.5)]',
+                btnBg: 'bg-gradient-to-r from-[#f59e0b] via-[#fbbf24] to-[#fde047] text-amber-950 shadow-[0_4px_14px_rgba(245,158,11,0.6),inset_0_1px_1px_rgba(255,255,255,0.7)] font-black',
               };
             case 5: // Deep Indigo / Cobalt (Number Quest)
             default:
               return {
-                cardBorder: 'border-[2px] border-[#6366f1] shadow-[0_0_18px_rgba(99,102,241,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
-                cardBg: 'bg-gradient-to-b from-[#10133d] via-[#0b0c2a] to-[#050616]',
-                badge: 'border border-indigo-400/70 bg-indigo-950/70 text-indigo-300',
-                btnBg: 'bg-gradient-to-r from-[#4f46e5] via-[#6366f1] to-[#38bdf8] text-white shadow-[0_4px_12px_rgba(99,102,241,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+                cardBorder: 'border-[2px] border-[#6366f1] shadow-[0_0_20px_rgba(99,102,241,0.45),inset_0_1px_2px_rgba(255,255,255,0.25)]',
+                cardBg: 'bg-gradient-to-b from-[#2e3299] via-[#1f226e] to-[#151750]',
+                badge: 'border border-indigo-300/80 bg-indigo-900/80 text-indigo-200 font-black shadow-[0_0_8px_rgba(99,102,241,0.5)]',
+                btnBg: 'bg-gradient-to-r from-[#4f46e5] via-[#6366f1] to-[#38bdf8] text-white shadow-[0_4px_14px_rgba(99,102,241,0.6),inset_0_1px_1px_rgba(255,255,255,0.7)]',
               };
           }
         };
@@ -3053,7 +3053,7 @@ import './index.css';
                         <div className="flex items-center gap-1 shrink-0">
                           {/* Puzzles Count */}
                           <span
-                            className="flex items-center gap-0.5 text-[9px] text-slate-200 font-mono font-bold bg-[#0b1633]/90 px-1.5 py-0.5 rounded border border-cyan-400/25"
+                            className="flex items-center gap-0.5 text-[9px] text-white font-mono font-bold bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/25 shadow-xs"
                             title="Puzzles in this level"
                           >
                             <span>🎮</span>
@@ -3061,7 +3061,7 @@ import './index.css';
                           </span>
                           {/* Timer */}
                           <span
-                            className="flex items-center gap-0.5 text-[9px] text-slate-200 font-mono font-bold bg-[#0b1633]/90 px-1.5 py-0.5 rounded border border-cyan-400/25"
+                            className="flex items-center gap-0.5 text-[9px] text-white font-mono font-bold bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/25 shadow-xs"
                             title="Time limit"
                           >
                             <span>⏱️</span>
