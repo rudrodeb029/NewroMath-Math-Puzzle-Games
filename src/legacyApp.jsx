@@ -6160,7 +6160,7 @@ import './index.css';
             </div>
           )}
 
-          {/* Insufficient Resources — icon-only modal */}
+          {/* Insufficient Resources — 3D Glassmorphism Banner Modal */}
           {insufficientFundsModal.isOpen && (() => {
             const need = insufficientFundsModal.cost;
             const rows = [
@@ -6173,62 +6173,156 @@ import './index.css';
             };
             return (
               <div
-                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-5 animate-in fade-in duration-200"
+                className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200"
                 onClick={closeModal}
               >
+                {/* Glassmorphic Popup Card */}
                 <div
-                  className="relative w-full max-w-[300px] rounded-[28px] p-5 bg-gradient-to-b from-[#16306b] to-[#08122e] border border-cyan-300/30 shadow-[0_24px_60px_rgba(0,0,0,0.7),0_0_40px_rgba(0,229,255,0.18),inset_0_1px_0_rgba(255,255,255,0.18)] overflow-hidden"
+                  className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
-                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-amber-400/15 blur-3xl pointer-events-none" />
-
-                  {/* Close (icon) */}
+                  {/* Top Close Button (Top-Right) */}
                   <button
                     onClick={closeModal}
                     aria-label="Close"
                     title="Close"
-                    className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 flex items-center justify-center active:scale-90 transition-all cursor-pointer"
+                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
                   </button>
 
-                  {/* Hero: wallet icon with alert badge */}
-                  <div className="relative z-10 mx-auto w-20 h-20 mt-1 mb-4 flex items-center justify-center">
-                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-amber-400/25 to-cyan-400/15 border border-amber-300/40 rotate-6" />
-                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#1d3a80] to-[#0c1d4a] border border-cyan-300/40 -rotate-3 shadow-[0_0_24px_rgba(0,229,255,0.35)]" />
-                    <img src="/assets/icon_gold_coin_3d_clean.png" alt="" className="relative w-10 h-10 object-contain -translate-x-1.5 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
-                    <img src="/assets/icon_gem_3d_clean.png" alt="" className="absolute w-7 h-7 object-contain translate-x-5 translate-y-3 drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
-                    <span className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-full bg-gradient-to-br from-rose-400 to-red-600 border-2 border-[#0c1d4a] flex items-center justify-center shadow-[0_0_14px_rgba(244,63,94,0.7)]">
-                      <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 7v6M12 17h.01" /></svg>
-                    </span>
+                  {/* 3D Floating Hero: Glowing Coin & Diamond Pod + Splash Petals + Arched 3D Banner */}
+                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                    {/* Cloud base & Splash petals behind hero */}
+                    <div className="relative flex items-center justify-center">
+                      <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                      {/* Left Splashes */}
+                      <svg className="absolute -left-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+                      <svg className="absolute -left-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+
+                      {/* Right Splashes */}
+                      <svg className="absolute -right-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+                      <svg className="absolute -right-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+
+                      {/* Sparkle Stars */}
+                      <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
+                      <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
+
+                      {/* 3D Circular Gloss Pod for Coin & Gem */}
+                      <div className="relative w-20 h-20 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-white/90 shadow-[0_8px_20px_rgba(14,165,233,0.45),inset_0_2px_4px_rgba(255,255,255,0.7)] flex items-center justify-center">
+                        <div className="absolute inset-1 rounded-full bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
+                        <img src="/assets/icon_gold_coin_3d_clean.png" alt="" className="w-10 h-10 object-contain -translate-x-1.5 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
+                        <img src="/assets/icon_gem_3d_clean.png" alt="" className="absolute w-8 h-8 object-contain translate-x-4 translate-y-3 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
+                        {/* Exclamation badge */}
+                        <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white flex items-center justify-center shadow-md">
+                          <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                            <path d="M12 7v6M12 17h.01" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Arched 3D Banner "Need Funds" */}
+                    <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(29,78,216,0.5)]">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                        <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
+                        <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
+                        <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#1e40af" />
+                        <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#172554" />
+                        <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#fundsRibbonGrad)" stroke="#60a5fa" strokeWidth="2" />
+                        <defs>
+                          <linearGradient id="fundsRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="50%" stopColor="#2563eb" />
+                            <stop offset="100%" stopColor="#1d4ed8" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
+                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                        <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                          Need <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Funds</span>
+                        </span>
+                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Have / Need meters */}
-                  <div className="relative z-10 space-y-2.5">
+                  {/* Coin / Diamond Divider */}
+                  <div className="flex items-center justify-center gap-3 my-3">
+                    <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                    <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 6v12M8 10h8" />
+                      </svg>
+                    </div>
+                    <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  </div>
+
+                  {/* Headline & Description */}
+                  <h2 className="text-[#152a55] font-black text-xl tracking-tight font-display mb-1">
+                    Get More Resources!
+                  </h2>
+                  <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-4">
+                    Claim free rewards or visit the shop to unlock this stage.
+                  </p>
+
+                  {/* Have / Need meters with Glassmorphism styling */}
+                  <div className="space-y-2 mb-4 text-left">
                     {rows.map(r => {
                       const ok = r.have >= r.need;
                       const pct = Math.min(100, Math.round((r.have / Math.max(1, r.need)) * 100));
                       return (
-                        <div key={r.key} className={`flex items-center gap-2.5 rounded-2xl px-3 py-2.5 border ${ok ? 'bg-emerald-500/10 border-emerald-400/40' : 'bg-rose-500/10 border-rose-400/50'}`}>
-                          <img src={r.icon} alt={r.key} className="w-7 h-7 object-contain shrink-0" />
+                        <div
+                          key={r.key}
+                          className={`flex items-center gap-2.5 rounded-2xl px-3 py-2 border shadow-sm ${
+                            ok
+                              ? 'bg-emerald-50/90 border-emerald-300/80'
+                              : 'bg-rose-50/90 border-rose-300/80'
+                          }`}
+                        >
+                          <img src={r.icon} alt={r.key} className="w-7 h-7 object-contain shrink-0 drop-shadow-sm" />
                           <div className="flex-1 min-w-0">
-                            <div className="h-2 rounded-full bg-black/50 overflow-hidden border border-white/10">
+                            <div className="h-2 rounded-full bg-slate-200 overflow-hidden border border-slate-300/60">
                               <div
-                                className={`h-full rounded-full transition-all duration-500 ${ok ? 'bg-gradient-to-r from-emerald-400 to-teal-400' : 'bg-gradient-to-r from-rose-500 to-orange-400'}`}
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  ok
+                                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500'
+                                    : 'bg-gradient-to-r from-rose-500 to-amber-500'
+                                }`}
                                 style={{ width: `${Math.max(6, pct)}%` }}
                               />
                             </div>
                             <div className="mt-1 flex items-center justify-between font-mono font-black text-[11px] leading-none">
-                              <span className={ok ? 'text-emerald-300' : 'text-rose-300'}>{r.have.toLocaleString()}</span>
-                              <span className="text-slate-400">/ {r.need.toLocaleString()}</span>
+                              <span className={ok ? 'text-emerald-700' : 'text-rose-700'}>{r.have.toLocaleString()}</span>
+                              <span className="text-slate-500">/ {r.need.toLocaleString()}</span>
                             </div>
                           </div>
-                          <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${ok ? 'bg-emerald-500/90 text-white' : 'bg-rose-500/90 text-white'}`}>
+                          <span
+                            className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
+                              ok ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
+                            }`}
+                          >
                             {ok ? (
-                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M5 12.5l4.5 4.5L19 7.5" />
+                              </svg>
                             ) : (
-                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round">
+                                <path d="M6 6l12 12M18 6L6 18" />
+                              </svg>
                             )}
                           </span>
                         </div>
@@ -6236,9 +6330,9 @@ import './index.css';
                     })}
                   </div>
 
-                  {/* Icon actions */}
-                  <div className="relative z-10 mt-4 flex items-stretch gap-3">
-                    {/* Watch ad: free coins + gems */}
+                  {/* Action Controls */}
+                  <div className="flex items-stretch gap-2.5 pt-1">
+                    {/* Watch ad: free coins + gems (Glossy 3D Green pill) */}
                     <button
                       aria-label="Watch ad for free coins and gems"
                       title="Watch ad: +350 coins, +15 gems"
@@ -6257,13 +6351,13 @@ import './index.css';
                           }
                         });
                       }}
-                      className="flex-1 rounded-2xl py-3 bg-gradient-to-b from-emerald-300 via-emerald-400 to-teal-600 hover:brightness-110 border border-emerald-200 shadow-[0_8px_22px_rgba(16,185,129,0.5),inset_0_1px_0_rgba(255,255,255,0.5)] active:scale-95 transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5"
+                      className="flex-1 rounded-2xl py-2.5 bg-gradient-to-b from-emerald-400 via-emerald-500 to-teal-600 border-2 border-emerald-200/90 shadow-[0_4px_0_#065f46,0_8px_20px_rgba(16,185,129,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all cursor-pointer flex flex-col items-center justify-center gap-1 text-white"
                     >
-                      <svg className="w-8 h-8 text-emerald-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg className="w-6 h-6 text-white stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2.5" y="5" width="19" height="14" rx="3.5" />
                         <path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor" />
                       </svg>
-                      <span className="flex items-center gap-1.5 font-mono font-black text-[11px] text-emerald-950 leading-none">
+                      <span className="flex items-center gap-1 font-mono font-black text-[11px] leading-none drop-shadow-sm">
                         <span>+350</span>
                         <img src="/assets/icon_gold_coin_3d_clean.png" alt="" className="w-3.5 h-3.5 object-contain" />
                         <span>+15</span>
@@ -6271,7 +6365,7 @@ import './index.css';
                       </span>
                     </button>
 
-                    {/* Store */}
+                    {/* Store (Glossy 3D Blue pill) */}
                     <button
                       aria-label="Open store"
                       title="Open store"
@@ -6280,14 +6374,26 @@ import './index.css';
                         setInsufficientFundsModal(prev => ({ ...prev, isOpen: false }));
                         navigateTo('rewards');
                       }}
-                      className="w-[72px] rounded-2xl bg-gradient-to-b from-[#2d63e8] to-[#1b3b9c] hover:brightness-110 border border-cyan-300/50 shadow-[0_8px_20px_rgba(37,99,235,0.45),inset_0_1px_0_rgba(255,255,255,0.35)] active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                      className="w-[72px] rounded-2xl bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 shadow-[0_4px_0_#1e40af,0_8px_20px_rgba(37,99,235,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer flex items-center justify-center text-white"
                     >
-                      <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg className="w-7 h-7 text-white stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2" />
                         <circle cx="9.5" cy="19.2" r="1.4" fill="currentColor" />
                         <circle cx="16.5" cy="19.2" r="1.4" fill="currentColor" />
                       </svg>
                     </button>
+                  </div>
+
+                  {/* Corner Water Droplets Decorations */}
+                  <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
+                    <svg className="w-6 h-6 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                    </svg>
+                  </div>
+                  <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
+                    <svg className="w-6 h-6 text-sky-400 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                    </svg>
                   </div>
                 </div>
               </div>
