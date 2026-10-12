@@ -1124,6 +1124,8 @@ import './index.css';
         missingGems: 0
       });
       const [isTimeOver, setIsTimeOver] = useState(false);
+      const [isWrongModalOpen, setIsWrongModalOpen] = useState(false);
+      const [isCorrectModalOpen, setIsCorrectModalOpen] = useState(false);
 
       // Multi-puzzle level progress: which puzzle (stage) of the level the player is on
       const [stageNum, setStageNum] = useState(1);
@@ -1333,6 +1335,7 @@ import './index.css';
       // Move on to the next puzzle inside the current level (no extra entry fee)
       const continueToNextStage = () => {
         sound.click();
+        setIsCorrectModalOpen(false);
         resetPuzzle(selectedLevelNum);
         navigateTo('game');
       };
@@ -1340,6 +1343,7 @@ import './index.css';
       // Retry the same puzzle after a wrong answer (progress in the level is kept)
       const retryCurrentStage = () => {
         sound.click();
+        setIsWrongModalOpen(false);
         resetPuzzle(selectedLevelNum);
         navigateTo('game');
       };
@@ -1350,6 +1354,14 @@ import './index.css';
         sound.wrong();
       };
       window.__resetTimeout = restartLevelAfterTimeout;
+      window.__triggerWrongModal = () => {
+        setIsWrongModalOpen(true);
+        sound.wrong();
+      };
+      window.__triggerCorrectModal = () => {
+        setIsCorrectModalOpen(true);
+        sound.correct();
+      };
       window.__solvePuzzle = () => {
         const solved = {};
         puzzleSlots.forEach(({ slot, answer }) => { solved[slot] = answer; });
@@ -1670,11 +1682,11 @@ import './index.css';
             return totalXp;
           });
 
-          setTimeout(() => navigateTo('correct', true), 300);
+          setTimeout(() => setIsCorrectModalOpen(true), 250);
         } else {
           sound.wrong();
           setLives(l => Math.max(0, l - 1));
-          setTimeout(() => navigateTo('wrong', true), 300);
+          setTimeout(() => setIsWrongModalOpen(true), 250);
         }
       };
 
@@ -3540,6 +3552,372 @@ import './index.css';
                 </div>
                 <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
                   <svg className="w-6 h-6 text-sky-400 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                  </svg>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* 3D Glassmorphic "Calculation Error / Try Again" Banner Modal */}
+          {isWrongModalOpen && (
+            <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+              {/* Glassmorphic Popup Card */}
+              <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(244,63,94,0.2)] text-center overflow-visible">
+
+                {/* Top Close Button (Top-Right) */}
+                <button
+                  onClick={() => {
+                    sound.click();
+                    setIsWrongModalOpen(false);
+                  }}
+                  aria-label="Close"
+                  title="Close"
+                  className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-rose-100/90 hover:bg-rose-200 border border-white text-rose-800 flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* 3D Hero Pod + Halo + Arched Banner (Floating Overflow) */}
+                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                  {/* Cloud base & Splash petals behind icon */}
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#fecdd3] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                    {/* Left Splashes */}
+                    <svg className="absolute -left-1 top-2 w-9 h-9 text-[#fb7185] drop-shadow-[0_2px_6px_rgba(251,113,133,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    <svg className="absolute -left-4 top-8 w-6 h-6 text-[#f43f5e] drop-shadow-[0_2px_4px_rgba(244,63,94,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+
+                    {/* Right Splashes */}
+                    <svg className="absolute -right-1 top-2 w-9 h-9 text-[#fb7185] drop-shadow-[0_2px_6px_rgba(251,113,133,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    <svg className="absolute -right-4 top-8 w-6 h-6 text-[#f43f5e] drop-shadow-[0_2px_4px_rgba(244,63,94,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+
+                    {/* Sparkle Stars */}
+                    <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
+                    <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
+
+                    {/* 3D Red Alert Sphere Hero */}
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#fb7185] via-[#f43f5e] to-[#be123c] border-4 border-white/90 text-white flex items-center justify-center text-4xl font-black shadow-[0_10px_25px_rgba(225,29,72,0.55),inset_0_3px_5px_rgba(255,255,255,0.8),inset_0_-4px_6px_rgba(159,18,57,0.7)] drop-shadow-[0_8px_16px_rgba(244,63,94,0.45)]">
+                      <span className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] select-none">✕</span>
+                    </div>
+                  </div>
+
+                  {/* Arched 3D Banner "Try Again" */}
+                  <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(190,18,60,0.5)]">
+                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                      <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#9f1239" />
+                      <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#4c0519" />
+                      <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#9f1239" />
+                      <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#4c0519" />
+                      <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#wrongRibbonGrad)" stroke="#fda4af" strokeWidth="2" />
+                      <defs>
+                        <linearGradient id="wrongRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#f43f5e" />
+                          <stop offset="50%" stopColor="#e11d48" />
+                          <stop offset="100%" stopColor="#be123c" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
+                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                        Try <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Again</span>
+                      </span>
+                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Alert Divider */}
+                <div className="flex items-center justify-center gap-3 my-3">
+                  <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-rose-300 to-rose-400 rounded-full" />
+                  <div className="w-7 h-7 rounded-full bg-rose-100 border-2 border-rose-300 flex items-center justify-center text-rose-600 shadow-inner">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="9" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                  </div>
+                  <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-rose-300 to-rose-400 rounded-full" />
+                </div>
+
+                {/* Headline & Description */}
+                <h2 className="text-[#4c0519] font-black text-xl tracking-tight font-display mb-1">
+                  Calculation Error!
+                </h2>
+                <p className="text-[#64748b] text-xs font-semibold px-2 leading-relaxed mb-3">
+                  One or more equations don't balance.
+                </p>
+
+                {/* Diagnostic Card */}
+                <div className="bg-rose-50/90 border border-rose-200/80 rounded-2xl p-3 mb-5 shadow-inner">
+                  <span className="text-[10px] font-mono text-rose-700/80 block uppercase tracking-wider font-bold">Diagnostic Analysis</span>
+                  <span className="text-xs font-black text-rose-800">Check number placements & signs</span>
+                </div>
+
+                {/* Action Controls */}
+                <div className="space-y-3">
+                  {/* Primary 3D Retry Button */}
+                  <button
+                    onClick={retryCurrentStage}
+                    aria-label="Retry Puzzle"
+                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#f43f5e] via-[#e11d48] to-[#be123c] border-2 border-rose-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#9f1239,0_10px_25px_rgba(225,29,72,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#9f1239] transition-all cursor-pointer"
+                  >
+                    <svg className="w-5 h-5 text-white stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                      <path d="M3 3v5h5" />
+                    </svg>
+                    <span>Retry Puzzle ({stageNum}/{stageTotal})</span>
+                  </button>
+
+                  {/* Secondary Options: Hint & Mission Select */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setIsWrongModalOpen(false);
+                        navigateTo('hint');
+                      }}
+                      aria-label="View Hint"
+                      className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#b45309,0_6px_16px_rgba(245,158,11,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
+                    >
+                      <span>💡</span>
+                      <span>View Hint</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setIsWrongModalOpen(false);
+                        navigateTo('levels');
+                      }}
+                      aria-label="Missions"
+                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                    >
+                      <span>⊞</span>
+                      <span>Missions</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Corner Water Droplets Decorations */}
+                <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
+                  <svg className="w-6 h-6 text-rose-300" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                  </svg>
+                </div>
+                <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
+                  <svg className="w-6 h-6 text-rose-300 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                  </svg>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* 3D Glassmorphic "Puzzle Solved / Accomplished" Success Banner Modal */}
+          {isCorrectModalOpen && (
+            <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+              {/* Glassmorphic Popup Card */}
+              <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0fdf4]/95 to-[#dcfce7]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(34,197,94,0.2)] text-center overflow-visible">
+
+                {/* Top Close Button (Top-Right) */}
+                <button
+                  onClick={() => {
+                    sound.click();
+                    setIsCorrectModalOpen(false);
+                  }}
+                  aria-label="Close"
+                  title="Close"
+                  className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-emerald-100/90 hover:bg-emerald-200 border border-white text-emerald-800 flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* 3D Hero Pod + Halo + Arched Banner (Floating Overflow) */}
+                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                  {/* Cloud base & Splash petals behind icon */}
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bbf7d0] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                    {/* Left Splashes */}
+                    <svg className="absolute -left-1 top-2 w-9 h-9 text-[#4ade80] drop-shadow-[0_2px_6px_rgba(74,222,128,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    <svg className="absolute -left-4 top-8 w-6 h-6 text-[#22c55e] drop-shadow-[0_2px_4px_rgba(34,197,94,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+
+                    {/* Right Splashes */}
+                    <svg className="absolute -right-1 top-2 w-9 h-9 text-[#4ade80] drop-shadow-[0_2px_6px_rgba(74,222,128,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+                    <svg className="absolute -right-4 top-8 w-6 h-6 text-[#22c55e] drop-shadow-[0_2px_4px_rgba(34,197,94,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                    </svg>
+
+                    {/* Sparkle Stars */}
+                    <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
+                    <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
+
+                    {/* 3D Emerald Checkmark Sphere Hero */}
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#4ade80] via-[#22c55e] to-[#15803d] border-4 border-white/90 text-white flex items-center justify-center text-4xl font-black shadow-[0_10px_25px_rgba(34,197,94,0.55),inset_0_3px_5px_rgba(255,255,255,0.8),inset_0_-4px_6px_rgba(21,128,61,0.7)] drop-shadow-[0_8px_16px_rgba(34,197,94,0.45)]">
+                      <span className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] select-none">✓</span>
+                    </div>
+                  </div>
+
+                  {/* Arched 3D Banner "Solved!" or "Cleared!" */}
+                  <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(21,128,61,0.5)]">
+                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                      <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#14532d" />
+                      <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#052e16" />
+                      <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#14532d" />
+                      <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#052e16" />
+                      <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#correctRibbonGrad)" stroke="#86efac" strokeWidth="2" />
+                      <defs>
+                        <linearGradient id="correctRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#22c55e" />
+                          <stop offset="50%" stopColor="#16a34a" />
+                          <stop offset="100%" stopColor="#15803d" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
+                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                        {lastResult.levelCleared ? (
+                          <>Level <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Cleared</span></>
+                        ) : (
+                          <>Puzzle <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Solved</span></>
+                        )}
+                      </span>
+                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Success Divider */}
+                <div className="flex items-center justify-center gap-3 my-3">
+                  <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-emerald-300 to-emerald-400 rounded-full" />
+                  <div className="w-7 h-7 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center text-emerald-600 shadow-inner">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-emerald-300 to-emerald-400 rounded-full" />
+                </div>
+
+                {/* Headline & Description */}
+                <h2 className="text-[#052e16] font-black text-xl tracking-tight font-display mb-1">
+                  {lastResult.levelCleared ? 'Mission Accomplished!' : 'Puzzle Solved!'}
+                </h2>
+                <p className="text-[#334155] text-xs font-semibold px-2 leading-relaxed mb-3">
+                  {lastResult.levelCleared
+                    ? `Level ${lastResult.level} Cleared • All ${lastResult.total} Puzzles Done!`
+                    : `Level ${lastResult.level} • Puzzle ${lastResult.stage} of ${lastResult.total} Complete`}
+                </p>
+
+                {/* Solved Math Box */}
+                {lastResult.solvedText && (
+                  <div className="bg-emerald-50/90 border border-emerald-200/80 rounded-2xl p-2.5 mb-3 shadow-inner">
+                    <span className="text-[10px] font-mono text-emerald-700/80 block uppercase tracking-wider font-bold">Solved Equation</span>
+                    <span className="text-lg font-black font-mono text-emerald-900">{lastResult.solvedText}</span>
+                  </div>
+                )}
+
+                {/* Rewards Capsules */}
+                <div className="flex items-center gap-2 flex-wrap justify-center mb-5">
+                  <div className="bg-white/90 border border-emerald-300 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
+                    <span className="text-amber-500">⭐</span>
+                    <span className="text-emerald-950 font-black text-xs">+{lastResult.xp} XP</span>
+                  </div>
+                  <div className="bg-white/90 border border-amber-300 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
+                    <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-4 h-4 object-contain" />
+                    <span className="text-amber-950 font-black text-xs">+{lastResult.coins} Coins</span>
+                  </div>
+                  {lastResult.gems > 0 && (
+                    <div className="bg-white/90 border border-sky-300 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
+                      <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-4 h-4 object-contain" />
+                      <span className="text-sky-950 font-black text-xs">+{lastResult.gems} Gems</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Controls */}
+                <div className="space-y-3">
+                  {/* Primary 3D Next Button */}
+                  {lastResult.levelCleared ? (
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setIsCorrectModalOpen(false);
+                        attemptStartLevel(Math.min(25, selectedLevelNum));
+                      }}
+                      aria-label="Next Mission"
+                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#15803d] border-2 border-emerald-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#14532d,0_10px_25px_rgba(34,197,94,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#14532d] transition-all cursor-pointer"
+                    >
+                      <span>Next Mission (Level {selectedLevelNum}) →</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={continueToNextStage}
+                      aria-label="Next Puzzle"
+                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#15803d] border-2 border-emerald-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#14532d,0_10px_25px_rgba(34,197,94,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#14532d] transition-all cursor-pointer"
+                    >
+                      <span>Next Puzzle ({stageNum}/{stageTotal}) →</span>
+                    </button>
+                  )}
+
+                  {/* Secondary Options: Missions & Home */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setIsCorrectModalOpen(false);
+                        navigateTo('levels');
+                      }}
+                      aria-label="Missions"
+                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                    >
+                      <span>⊞</span>
+                      <span>Missions</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setIsCorrectModalOpen(false);
+                        navigateTo('home');
+                      }}
+                      aria-label="Return to Home"
+                      className="h-10 rounded-2xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-300 text-slate-800 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#cbd5e1] active:translate-y-0.5 active:shadow-[0_1px_0_#cbd5e1] transition-all cursor-pointer"
+                    >
+                      <span>🏠</span>
+                      <span>Home</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Corner Water Droplets Decorations */}
+                <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
+                  <svg className="w-6 h-6 text-emerald-300" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
+                  </svg>
+                </div>
+                <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
+                  <svg className="w-6 h-6 text-emerald-300 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
                   </svg>
                 </div>
