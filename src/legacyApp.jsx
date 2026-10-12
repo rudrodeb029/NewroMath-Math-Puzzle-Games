@@ -2797,36 +2797,34 @@ import './index.css';
                 </div>
               </div>
 
-              {/* Campaign Progress Card - Premium Glassmorphism */}
-              <div className="relative rounded-[26px] bg-gradient-to-br from-white/[0.12] via-[#102b66]/65 to-[#091a42]/85 backdrop-blur-xl border border-white/20 p-3.5 shadow-[0_12px_32px_rgba(3,12,38,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] overflow-hidden">
-                <div className="absolute inset-0 math-blueprint-grid opacity-10 pointer-events-none" />
+              {/* Campaign Progress Card */}
+              <div className="bg-gradient-to-r from-[#0d2254] via-[#153473] to-[#0c1f4a] border border-cyan-400/40 rounded-2xl p-3 shadow-lg relative overflow-hidden">
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
                 <div className="relative z-10 flex items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-base shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-                      🏆
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🏆</span>
                     <div>
                       <span className="text-xs font-black font-display text-white">Campaign Progress</span>
-                      <span className="text-[10px] font-mono text-cyan-200/90 block">
+                      <span className="text-[10px] font-mono text-cyan-300 block">
                         {clearedCount} of 25 Missions Completed
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 bg-[#061838]/80 border border-cyan-400/50 px-2.5 py-0.5 rounded-full shadow-inner">
+                  <div className="flex items-center gap-1 bg-cyan-950/80 border border-cyan-400/50 px-2 py-0.5 rounded-full">
                     <span className="text-xs font-black font-mono text-cyan-300">{progressPct}%</span>
                   </div>
                 </div>
                 {/* Progress Bar */}
-                <div className="relative z-10 w-full h-2.5 bg-[#05112c]/90 border border-cyan-500/35 rounded-full overflow-hidden p-0.5 shadow-inner">
+                <div className="relative z-10 w-full h-2 bg-[#081533] border border-cyan-500/40 rounded-full overflow-hidden p-0.5">
                   <div 
-                    className="h-full bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 rounded-full shadow-[0_0_12px_rgba(0,229,255,0.8)] transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 rounded-full shadow-[0_0_10px_rgba(0,229,255,0.8)] transition-all duration-500"
                     style={{ width: `${Math.max(4, progressPct)}%` }}
                   />
                 </div>
               </div>
 
-              {/* Difficulty World Filter Tabs - Glassmorphic Pill */}
-              <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/[0.07] backdrop-blur-xl border border-white/15 shadow-[0_6px_20px_rgba(2,10,32,0.35),inset_0_1px_0_rgba(255,255,255,0.15)]">
+              {/* Difficulty World Filter Tabs */}
+              <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-cyan-400/30 rounded-xl">
                 {filterTabs.map(tab => {
                   const isActive = levelFilterTab === tab.id;
                   return (
@@ -2836,15 +2834,15 @@ import './index.css';
                         sound.click();
                         setLevelFilterTab(tab.id);
                       }}
-                      className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
                         isActive
-                          ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border border-cyan-200 shadow-[0_4px_14px_rgba(0,229,255,0.45)] scale-[1.02]'
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border border-cyan-300 shadow-[0_0_12px_rgba(0,229,255,0.4)] scale-[1.02]'
                           : 'bg-transparent text-cyan-200/70 hover:text-white border border-transparent'
                       }`}
                     >
                       <span>{tab.label}</span>
-                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full ${
-                        isActive ? 'bg-cyan-950/80 text-cyan-200' : 'bg-slate-800/80 text-slate-300'
+                      <span className={`text-[9px] font-mono px-1 py-0.2 rounded ${
+                        isActive ? 'bg-cyan-950/80 text-cyan-200' : 'bg-slate-800/80 text-slate-400'
                       }`}>
                         {tab.count}
                       </span>
@@ -2897,7 +2895,7 @@ import './index.css';
                 </div>
               </div>
 
-              {/* Mission Levels List (Filtered) - Glassmorphism Cards */}
+              {/* Mission Levels List (Filtered) */}
               <div className="space-y-2.5 pb-2">
                 {filteredLevels.map((lvl) => {
                   const isSelected = selectedLevelNum === lvl.num;
@@ -2917,26 +2915,26 @@ import './index.css';
                         setSelectedLevelNum(lvl.num);
                         attemptStartLevel(lvl.num);
                       }}
-                      className={`relative rounded-[24px] p-3.5 flex items-center justify-between transition-all cursor-pointer overflow-hidden backdrop-blur-xl ${
+                      className={`math-arch-card relative rounded-2xl p-3.5 flex items-center justify-between transition-all cursor-pointer overflow-hidden ${
                         isSelected
-                          ? 'bg-gradient-to-r from-white/[0.14] via-[#1a4094]/75 to-[#122e70]/85 border-2 border-cyan-300 shadow-[0_12px_32px_rgba(0,229,255,0.35),inset_0_1.5px_0_rgba(255,255,255,0.3)] animate-level-selected'
+                          ? 'bg-gradient-to-r from-[#173a87] via-[#1d47a3] to-[#143274] border-2 border-cyan-300 shadow-[0_0_20px_rgba(0,229,255,0.45)] animate-level-selected'
                           : isCompleted
-                          ? 'bg-gradient-to-r from-white/[0.09] via-[#0b244d]/70 to-[#07193a]/80 border border-white/20 hover:border-emerald-400/60 shadow-[0_10px_28px_rgba(2,10,32,0.4),inset_0_1.5px_0_rgba(255,255,255,0.18)]'
+                          ? 'bg-gradient-to-r from-[#0d2a54] via-[#133568] to-[#0c2244] border-[1.5px] border-emerald-400/60 shadow-[0_4px_14px_rgba(0,0,0,0.4)] hover:border-emerald-300'
                           : isLocked
-                          ? 'bg-gradient-to-r from-white/[0.03] via-[#091530]/50 to-[#060e22]/60 border border-white/10 opacity-55 cursor-not-allowed shadow-none'
-                          : 'bg-gradient-to-r from-white/[0.10] via-[#0f285e]/70 to-[#0a1c45]/80 border border-white/20 hover:border-cyan-300 shadow-[0_10px_28px_rgba(2,10,32,0.4),inset_0_1.5px_0_rgba(255,255,255,0.2)]'
+                          ? 'bg-gradient-to-r from-[#0d1c3e]/70 via-[#10224d]/70 to-[#0b1733]/70 border border-slate-700/50 opacity-60 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-[#132c66] via-[#1a3880] to-[#112759] border-[1.5px] border-cyan-400/50 hover:border-cyan-300 shadow-[0_4px_14px_rgba(0,0,0,0.4)]'
                       }`}
                     >
-                      {/* Blueprint Grid subtle overlay */}
-                      <div className="absolute inset-0 math-blueprint-grid opacity-10 pointer-events-none" />
+                      {/* Blueprint Grid */}
+                      <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
 
                       <div className="relative z-10 flex items-center gap-3.5 min-w-0">
                         {/* 3D Level Keycap */}
-                        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm shrink-0 border shadow-md ${
+                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-black text-sm shrink-0 border shadow-md ${
                           isCompleted
-                            ? 'bg-gradient-to-br from-emerald-500 to-teal-700 border-emerald-300 text-white shadow-[0_0_12px_rgba(16,185,129,0.5),inset_0_1px_0_rgba(255,255,255,0.4)]'
+                            ? 'bg-gradient-to-br from-emerald-500 to-teal-700 border-emerald-300 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]'
                             : isSelected || isUnlocked
-                            ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 border-cyan-200 text-white shadow-[0_0_16px_rgba(0,229,255,0.65),inset_0_1px_0_rgba(255,255,255,0.4)]'
+                            ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 border-cyan-200 text-white shadow-[0_0_14px_rgba(0,229,255,0.6)]'
                             : 'bg-slate-800/80 border-slate-600 text-slate-400'
                         }`}>
                           {isCompleted ? '✓' : isLocked ? '🔒' : lvl.num}
@@ -2957,23 +2955,23 @@ import './index.css';
                             return (
                               <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                                 {/* Puzzles in this level */}
-                                <span className="flex items-center gap-1 text-[10px] text-emerald-200 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded-lg border border-emerald-400/30 shadow-xs" title="Puzzles in this level">
+                                <span className="flex items-center gap-1 text-[10px] text-emerald-200 font-mono font-bold bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-400/30" title="Puzzles in this level">
                                   <span>🎮</span>
                                   <span>{getStageCount(lvl.num)}</span>
                                 </span>
                                 {/* Timer */}
-                                <span className="flex items-center gap-1 text-[10px] text-cyan-200/90 font-mono font-bold bg-cyan-950/60 px-2 py-0.5 rounded-lg border border-cyan-400/30 shadow-xs">
+                                <span className="flex items-center gap-1 text-[10px] text-cyan-200/90 font-mono font-bold bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-400/30">
                                   <span>⏱️</span>
                                   <span>{getLevelTimer(lvl.num)}s</span>
                                 </span>
                                 {/* Fee: Gold Coins */}
-                                <span className="flex items-center gap-1 text-[10px] text-amber-300 font-extrabold font-mono bg-amber-950/70 px-2 py-0.5 rounded-lg border border-amber-400/40 shadow-xs" title="Entry Coins">
-                                  <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-3.5 h-3.5 object-contain inline-block shrink-0 drop-shadow-[0_1px_3px_rgba(245,158,11,0.6)]" />
+                                <span className="flex items-center gap-1 text-[10px] text-amber-300 font-extrabold font-mono bg-amber-950/70 px-1.5 py-0.5 rounded border border-amber-400/40 shadow-xs" title="Entry Coins">
+                                  <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
                                   <span>{cost.coins}</span>
                                 </span>
                                 {/* Fee: Diamonds */}
-                                <span className="flex items-center gap-1 text-[10px] text-cyan-200 font-extrabold font-mono bg-sky-950/70 px-2 py-0.5 rounded-lg border border-cyan-400/40 shadow-xs" title="Entry Diamonds">
-                                  <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-3.5 h-3.5 object-contain inline-block shrink-0 drop-shadow-[0_1px_3px_rgba(6,182,212,0.6)]" />
+                                <span className="flex items-center gap-1 text-[10px] text-cyan-200 font-extrabold font-mono bg-sky-950/70 px-1.5 py-0.5 rounded border border-cyan-400/40 shadow-xs" title="Entry Diamonds">
+                                  <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
                                   <span>{cost.gems}</span>
                                 </span>
                               </div>
@@ -2995,7 +2993,7 @@ import './index.css';
                           </div>
                         ) : isUnlocked ? (
                           <div className="flex items-center gap-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-cyan-400 text-blue-950 shadow-[0_0_12px_rgba(0,229,255,0.6)] animate-pulse">
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-400 text-blue-950 shadow-sm animate-pulse">
                               PLAY ▶
                             </span>
                           </div>
