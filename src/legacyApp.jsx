@@ -819,8 +819,8 @@ import './index.css';
       { num: 2, title: 'Addition Circuit', diff: 'Easy', range: '51 - 100', xp: 20, coins: 12, tag: 'CIRCUIT', tier: 'easy', cost: getLevelEntryCost(2) },
       { num: 3, title: 'Cross Pulse', diff: 'Easy', range: '101 - 150', xp: 25, coins: 14, tag: 'CURRENT', tier: 'easy', cost: getLevelEntryCost(3) },
       { num: 4, title: 'Binary Junction', diff: 'Easy', range: '151 - 200', xp: 25, coins: 16, tag: 'LOGIC', tier: 'easy', cost: getLevelEntryCost(4) },
-      { num: 5, title: 'Logic Step', diff: 'Easy', range: '201 - 250', xp: 30, coins: 18, tag: 'GATE', tier: 'easy', cost: getLevelEntryCost(5) },
-      { num: 6, title: 'Sub-Zero Drift', diff: 'Easy', range: '251 - 300', xp: 30, coins: 20, tag: 'DRIFT', tier: 'easy', cost: getLevelEntryCost(6) },
+      { num: 5, title: 'Equation Dash', diff: 'Easy', range: '201 - 250', xp: 30, coins: 18, tag: 'EQUATION', tier: 'easy', cost: getLevelEntryCost(5) },
+      { num: 6, title: 'Number Quest', diff: 'Easy', range: '251 - 300', xp: 30, coins: 20, tag: 'QUEST', tier: 'easy', cost: getLevelEntryCost(6) },
       { num: 7, title: 'Cipher Key', diff: 'Easy', range: '301 - 350', xp: 35, coins: 22, tag: 'CIPHER', tier: 'easy', cost: getLevelEntryCost(7) },
       { num: 8, title: 'Milestone Arena', diff: 'Easy', range: '351 - 400', xp: 35, coins: 25, tag: 'ARENA', tier: 'easy', cost: getLevelEntryCost(8) },
 
@@ -2732,6 +2732,64 @@ import './index.css';
           if (levelFilterTab === 'hard') return lvl.tier === 'hard';
           return true;
         });
+
+        const getLevelCardTheme = (levelNum, diff, isLocked) => {
+          if (isLocked) {
+            return {
+              cardBorder: 'border-[2px] border-slate-700/60 shadow-[0_4px_16px_rgba(0,0,0,0.5)]',
+              cardBg: 'bg-gradient-to-b from-[#0a1128] via-[#060b1c] to-[#030610]',
+              badge: 'border border-slate-600/60 bg-slate-800/60 text-slate-400',
+              btnBg: 'bg-slate-800/80 text-slate-400 border border-slate-700/80',
+            };
+          }
+
+          const themeIdx = (levelNum - 1) % 6;
+          switch (themeIdx) {
+            case 0: // Emerald / Teal (Warm-Up Ignition)
+              return {
+                cardBorder: 'border-[2px] border-[#00f5b4] shadow-[0_0_18px_rgba(0,245,180,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+                cardBg: 'bg-gradient-to-b from-[#061e2a] via-[#041622] to-[#020b12]',
+                badge: 'border border-emerald-400/70 bg-emerald-950/70 text-emerald-300',
+                btnBg: 'bg-gradient-to-r from-[#0066ff] via-[#0099ff] to-[#00f5b4] text-white shadow-[0_4px_12px_rgba(0,153,255,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+              };
+            case 1: // Electric Cyan / Blue (Addition Circuit)
+              return {
+                cardBorder: 'border-[2px] border-[#00d4ff] shadow-[0_0_18px_rgba(0,212,255,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+                cardBg: 'bg-gradient-to-b from-[#08183d] via-[#05112f] to-[#03091c]',
+                badge: 'border border-cyan-400/70 bg-cyan-950/70 text-cyan-300',
+                btnBg: 'bg-gradient-to-r from-[#0055ff] via-[#0088ff] to-[#00d4ff] text-white shadow-[0_4px_12px_rgba(0,136,255,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+              };
+            case 2: // Neon Magenta / Purple (Cross Pulse)
+              return {
+                cardBorder: 'border-[2px] border-[#d946ef] shadow-[0_0_18px_rgba(217,70,239,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+                cardBg: 'bg-gradient-to-b from-[#210936] via-[#160624] to-[#0a0212]',
+                badge: 'border border-fuchsia-400/70 bg-fuchsia-950/70 text-fuchsia-300',
+                btnBg: 'bg-gradient-to-r from-[#9333ea] via-[#c084fc] to-[#e879f9] text-white shadow-[0_4px_12px_rgba(147,51,234,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+              };
+            case 3: // Cyber Teal / Cyan (Binary Junction)
+              return {
+                cardBorder: 'border-[2px] border-[#06b6d4] shadow-[0_0_18px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+                cardBg: 'bg-gradient-to-b from-[#061d30] via-[#041422] to-[#020b12]',
+                badge: 'border border-teal-400/70 bg-teal-950/70 text-teal-300',
+                btnBg: 'bg-gradient-to-r from-[#0284c7] via-[#06b6d4] to-[#14b8a6] text-white shadow-[0_4px_12px_rgba(6,182,212,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+              };
+            case 4: // Radiant Gold / Amber (Equation Dash)
+              return {
+                cardBorder: 'border-[2px] border-[#f59e0b] shadow-[0_0_18px_rgba(245,158,11,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+                cardBg: 'bg-gradient-to-b from-[#2e1903] via-[#1f1002] to-[#0e0701]',
+                badge: 'border border-amber-400/70 bg-amber-950/70 text-amber-300',
+                btnBg: 'bg-gradient-to-r from-[#f59e0b] via-[#fbbf24] to-[#fde047] text-amber-950 shadow-[0_4px_12px_rgba(245,158,11,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)] font-black',
+              };
+            case 5: // Deep Indigo / Cobalt (Number Quest)
+            default:
+              return {
+                cardBorder: 'border-[2px] border-[#6366f1] shadow-[0_0_18px_rgba(99,102,241,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+                cardBg: 'bg-gradient-to-b from-[#10133d] via-[#0b0c2a] to-[#050616]',
+                badge: 'border border-indigo-400/70 bg-indigo-950/70 text-indigo-300',
+                btnBg: 'bg-gradient-to-r from-[#4f46e5] via-[#6366f1] to-[#38bdf8] text-white shadow-[0_4px_12px_rgba(99,102,241,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)]',
+              };
+          }
+        };
         return (
           <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
             <div 
@@ -2895,13 +2953,17 @@ import './index.css';
                 </div>
               </div>
 
-              {/* Mission Levels List (Filtered) */}
-              <div className="space-y-2.5 pb-2">
+              {/* Mission Levels 2-Column Grid (Modern 3D Gaming Card Style) */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 pb-3">
                 {filteredLevels.map((lvl) => {
                   const isSelected = selectedLevelNum === lvl.num;
                   const isCompleted = lvl.num < unlockedLevelMax;
                   const isUnlocked = lvl.num <= unlockedLevelMax;
                   const isLocked = lvl.num > unlockedLevelMax;
+                  const cost = getLevelEntryCost(lvl.num);
+                  const theme = getLevelCardTheme(lvl.num, lvl.diff, isLocked);
+                  const artIdx = ((lvl.num - 1) % 6) + 1;
+                  const artUrl = `/assets/levels/level_art_${artIdx}.png`;
 
                   return (
                     <div
@@ -2915,94 +2977,129 @@ import './index.css';
                         setSelectedLevelNum(lvl.num);
                         attemptStartLevel(lvl.num);
                       }}
-                      className={`math-arch-card relative rounded-2xl p-3.5 flex items-center justify-between transition-all cursor-pointer overflow-hidden ${
+                      className={`group relative rounded-[20px] sm:rounded-[22px] p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-200 cursor-pointer overflow-hidden ${
+                        theme.cardBorder
+                      } ${theme.cardBg} ${
                         isSelected
-                          ? 'bg-gradient-to-r from-[#173a87] via-[#1d47a3] to-[#143274] border-2 border-cyan-300 shadow-[0_0_20px_rgba(0,229,255,0.45)] animate-level-selected'
-                          : isCompleted
-                          ? 'bg-gradient-to-r from-[#0d2a54] via-[#133568] to-[#0c2244] border-[1.5px] border-emerald-400/60 shadow-[0_4px_14px_rgba(0,0,0,0.4)] hover:border-emerald-300'
-                          : isLocked
-                          ? 'bg-gradient-to-r from-[#0d1c3e]/70 via-[#10224d]/70 to-[#0b1733]/70 border border-slate-700/50 opacity-60 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-[#132c66] via-[#1a3880] to-[#112759] border-[1.5px] border-cyan-400/50 hover:border-cyan-300 shadow-[0_4px_14px_rgba(0,0,0,0.4)]'
-                      }`}
+                          ? 'scale-[1.02] ring-2 ring-white/80 shadow-[0_0_22px_rgba(0,229,255,0.6)] z-10'
+                          : 'hover:scale-[1.01]'
+                      } ${isLocked ? 'cursor-not-allowed opacity-65' : ''}`}
                     >
-                      {/* Blueprint Grid */}
-                      <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+                      {/* Top 3D Artwork Banner */}
+                      <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-2 bg-[#020617] border border-white/10 shrink-0 shadow-inner">
+                        <img
+                          src={artUrl}
+                          alt={lvl.title}
+                          className={`w-full h-full object-cover select-none transition-transform duration-300 ${
+                            isLocked ? 'grayscale brightness-65' : 'group-hover:scale-105'
+                          }`}
+                          loading="lazy"
+                        />
+                        {/* Subtle glossy sheen */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-white/10 pointer-events-none" />
 
-                      <div className="relative z-10 flex items-center gap-3.5 min-w-0">
-                        {/* 3D Level Keycap */}
-                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-black text-sm shrink-0 border shadow-md ${
-                          isCompleted
-                            ? 'bg-gradient-to-br from-emerald-500 to-teal-700 border-emerald-300 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]'
-                            : isSelected || isUnlocked
-                            ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 border-cyan-200 text-white shadow-[0_0_14px_rgba(0,229,255,0.6)]'
-                            : 'bg-slate-800/80 border-slate-600 text-slate-400'
-                        }`}>
-                          {isCompleted ? '✓' : isLocked ? '🔒' : lvl.num}
-                        </div>
-
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-black text-white font-display">
-                              Level {lvl.num}
-                            </span>
-                            <span className="text-xs text-cyan-200/90 font-bold truncate max-w-[130px]">
-                              {lvl.title}
-                            </span>
-                          </div>
-                          {/* Essential Mission Requirements */}
-                          {(() => {
-                            const cost = getLevelEntryCost(lvl.num);
-                            return (
-                              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                                {/* Puzzles in this level */}
-                                <span className="flex items-center gap-1 text-[10px] text-emerald-200 font-mono font-bold bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-400/30" title="Puzzles in this level">
-                                  <span>🎮</span>
-                                  <span>{getStageCount(lvl.num)}</span>
-                                </span>
-                                {/* Timer */}
-                                <span className="flex items-center gap-1 text-[10px] text-cyan-200/90 font-mono font-bold bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-400/30">
-                                  <span>⏱️</span>
-                                  <span>{getLevelTimer(lvl.num)}s</span>
-                                </span>
-                                {/* Fee: Gold Coins */}
-                                <span className="flex items-center gap-1 text-[10px] text-amber-300 font-extrabold font-mono bg-amber-950/70 px-1.5 py-0.5 rounded border border-amber-400/40 shadow-xs" title="Entry Coins">
-                                  <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
-                                  <span>{cost.coins}</span>
-                                </span>
-                                {/* Fee: Diamonds */}
-                                <span className="flex items-center gap-1 text-[10px] text-cyan-200 font-extrabold font-mono bg-sky-950/70 px-1.5 py-0.5 rounded border border-cyan-400/40 shadow-xs" title="Entry Diamonds">
-                                  <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
-                                  <span>{cost.gems}</span>
-                                </span>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-
-                      {/* Right Status Badge */}
-                      <div className="relative z-10 flex items-center gap-2 shrink-0">
-                        {isCompleted ? (
-                          <div className="flex items-center gap-1.5">
-                            <div className="flex text-amber-300 text-xs">
-                              ⭐⭐⭐
+                        {/* Locked Frost Overlay */}
+                        {isLocked && (
+                          <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-slate-900/90 border border-slate-600/80 flex items-center justify-center text-slate-300 shadow-lg text-xs font-bold">
+                              🔒
                             </div>
-                            <div className="w-6 h-6 rounded-full bg-emerald-500 border border-emerald-300 text-white flex items-center justify-center text-xs font-black shadow-[0_0_10px_rgba(16,185,129,0.5)]">
-                              ✓
-                            </div>
-                          </div>
-                        ) : isUnlocked ? (
-                          <div className="flex items-center gap-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-400 text-blue-950 shadow-sm animate-pulse">
-                              PLAY ▶
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1 bg-slate-900/80 border border-slate-700/60 rounded-full px-2 py-0.5">
-                            <span className="text-slate-400 text-xs">🔒</span>
-                            <span className="text-[9px] text-slate-400 font-mono">Lvl {lvl.num - 1}</span>
                           </div>
                         )}
+
+                        {/* Completed Checkmark Badge */}
+                        {isCompleted && (
+                          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-emerald-500 border border-emerald-300 text-white flex items-center justify-center text-[10px] font-black shadow-[0_0_10px_rgba(16,185,129,0.8)]">
+                            ✓
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Title & Difficulty Badge */}
+                      <div className="flex items-center justify-between gap-1 mb-1 min-w-0">
+                        <h4
+                          className="text-[11.5px] sm:text-[13px] font-black text-white truncate font-display tracking-tight leading-tight"
+                          title={`Level ${lvl.num}: ${lvl.title}`}
+                        >
+                          {lvl.title}
+                        </h4>
+                        <span
+                          className={`text-[8.5px] sm:text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shrink-0 shadow-xs ${theme.badge}`}
+                        >
+                          <span>{isLocked ? '🔒' : '★'}</span>
+                          <span>{lvl.diff}</span>
+                        </span>
+                      </div>
+
+                      {/* 3 Stars Rating */}
+                      <div className="flex items-center gap-0.5 mb-2">
+                        {[1, 2, 3].map((starIdx) => (
+                          <span
+                            key={starIdx}
+                            className={`text-xs ${
+                              isCompleted
+                                ? 'text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.9)]'
+                                : 'text-slate-600'
+                            }`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Bottom Row: Specs Pills & Capsule Play Button */}
+                      <div className="flex items-center justify-between gap-1 mt-auto pt-1.5 border-t border-white/5">
+                        {/* Specs Pills: Puzzles, Timer, Coins */}
+                        <div className="flex items-center gap-1 flex-wrap min-w-0">
+                          {/* Puzzles Count */}
+                          <span
+                            className="flex items-center gap-0.5 text-[9px] text-slate-200 font-mono font-bold bg-[#0b1633]/90 px-1.5 py-0.5 rounded border border-cyan-400/25"
+                            title="Puzzles in this level"
+                          >
+                            <span>🎮</span>
+                            <span>{getStageCount(lvl.num)}</span>
+                          </span>
+                          {/* Timer */}
+                          <span
+                            className="flex items-center gap-0.5 text-[9px] text-slate-200 font-mono font-bold bg-[#0b1633]/90 px-1.5 py-0.5 rounded border border-cyan-400/25"
+                            title="Time limit"
+                          >
+                            <span>⏱️</span>
+                            <span>{getLevelTimer(lvl.num)}s</span>
+                          </span>
+                          {/* Entry Fee (Coins) */}
+                          <span
+                            className="flex items-center gap-0.5 text-[9px] text-amber-300 font-mono font-bold bg-[#1a1405]/90 px-1.5 py-0.5 rounded border border-amber-400/30"
+                            title="Entry Fee"
+                          >
+                            <img
+                              src="/assets/icon_gold_coin_3d_clean.png"
+                              alt="Coins"
+                              className="w-3 h-3 object-contain inline-block shrink-0"
+                            />
+                            <span>{cost.coins}</span>
+                          </span>
+                        </div>
+
+                        {/* 3D Capsule Play Button */}
+                        <button
+                          type="button"
+                          disabled={isLocked}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isLocked) {
+                              sound.wrong();
+                              return;
+                            }
+                            sound.click();
+                            setSelectedLevelNum(lvl.num);
+                            attemptStartLevel(lvl.num);
+                          }}
+                          className={`shrink-0 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10.5px] sm:text-xs font-black flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer ${theme.btnBg}`}
+                        >
+                          <span>{isLocked ? '🔒' : '▶'}</span>
+                          <span>{isLocked ? 'Lock' : 'Play'}</span>
+                        </button>
                       </div>
                     </div>
                   );
