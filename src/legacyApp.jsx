@@ -2720,10 +2720,12 @@ import './index.css';
           if (levelFilterTab === 'hard') return lvl.tier === 'hard';
           return true;
         });
-
         return (
           <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
-            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 pb-6 space-y-3 max-w-md mx-auto w-full">
+            <div 
+              className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 space-y-3 max-w-md mx-auto w-full"
+              style={{ paddingBottom: 'max(3.5rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem))' }}
+            >
               {/* Sticky Top Header */}
               <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2.5 pb-2 shrink-0">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -3004,7 +3006,7 @@ import './index.css';
                       sound.click();
                       attemptStartLevel(selectedLevelNum);
                     }}
-                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black text-base shadow-[0_6px_22px_rgba(245,158,11,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] active:scale-[0.98] transition-all flex flex-col items-center justify-center border border-amber-200 cursor-pointer mb-4"
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black text-base shadow-[0_6px_22px_rgba(245,158,11,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] active:scale-[0.98] transition-all flex flex-col items-center justify-center border border-amber-200 cursor-pointer mb-8 sm:mb-6"
                   >
                     <div className="flex items-center gap-2">
                       <span>🚀</span>
@@ -3026,10 +3028,12 @@ import './index.css';
 
       // ========================================================
       // 6. PUZZLE GAMEPLAY (Modern Sci-Fi Arcade Edition)
-      // ========================================================
       const renderGameScreen = () => (
         <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
-          <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 pb-4 space-y-2.5 max-w-md mx-auto w-full">
+          <div 
+            className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 space-y-2.5 max-w-md mx-auto w-full"
+            style={{ paddingBottom: 'max(3.5rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem))' }}
+          >
             {/* Top Navigation & HUD Header */}
             <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2.5 pb-2 shrink-0">
               <div className="flex items-center gap-2">
@@ -3277,7 +3281,10 @@ import './index.css';
             </section>
 
             {/* Bottom Action Controls (Modern 3D Cyber Arcade) */}
-            <div className="flex items-center justify-around px-4 pt-3 pb-2">
+            <div 
+              className="flex items-center justify-around px-4 pt-3 pb-8 sm:pb-6"
+              style={{ paddingBottom: 'max(2.25rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))' }}
+            >
               {/* 1. History & Mission Records Button */}
               <button 
                 onClick={() => { sound.click(); navigateTo('history'); }} 
