@@ -2757,10 +2757,9 @@ import './index.css';
     // Level 1 starts at 100 Gold Coins & 10 Diamond Coins (Gems).
     // The economy chain progressively scales as missions become harder.
     // ==========================================
-    // Each level is a series of puzzles: 10 on Level 1, growing steadily to 20 on Level 25.
+    // Each level is 1 complete cross-math puzzle challenge
     function getStageCount(levelNum) {
-      const lvl = Math.max(1, Math.min(25, Number(levelNum) || 1));
-      return Math.round(10 + ((lvl - 1) * 10) / 24);
+      return 1;
     }
 
     function getLevelEntryCost(levelNum) {
@@ -2820,6 +2819,12 @@ import './index.css';
       { num: 24, title: 'Omega Frontier', diff: 'Hard', range: '1401 - 1490', xp: 95, coins: 80, tag: 'OMEGA', tier: 'hard', cost: getLevelEntryCost(24) },
       { num: 25, title: 'Apex Boss Stage', diff: 'Hard', range: '1491 - 1600', xp: 100, coins: 100, tag: 'APEX BOSS', tier: 'hard', cost: getLevelEntryCost(25) },
     ];
+
+    function getLevelTargetXp(levelNum) {
+      const lvl = Math.max(1, Math.min(25, Number(levelNum) || 1));
+      const lvlObj = ALL_LEVELS.find(l => l.num === lvl);
+      return lvlObj ? lvlObj.xp * 10 : 300;
+    }
 
     // ==========================================
     // ==========================================
@@ -2997,22 +3002,170 @@ import './index.css';
     const levelStageSeedsCache = new Map();
     function getStageSeedsForLevel(levelNum) {
       if (levelStageSeedsCache.has(levelNum)) return levelStageSeedsCache.get(levelNum);
-      const total = getStageCount(levelNum);
-      const seen = new Set();
-      const seeds = [];
-      for (let st = 0; st < total; st++) {
-        let seed = st * 101;
-        let guard = 0;
-        while (guard < 40) {
-          const text = getMemoizedPuzzle(levelNum, seed).solvedText;
-          if (!seen.has(text)) { seen.add(text); break; }
-          seed += 1;
-          guard += 1;
-        }
-        seeds.push(seed);
-      }
+      const seeds = [0];
       levelStageSeedsCache.set(levelNum, seeds);
       return seeds;
+    }
+
+    function evalDailyRow(rowConfig, x, y, z) {
+      if (x === undefined || y === undefined || z === undefined || !rowConfig) return null;
+      let intermediate = 0;
+      if (rowConfig.op1 === '+') intermediate = x + y;
+      else if (rowConfig.op1 === '−' || rowConfig.op1 === '-') intermediate = x - y;
+      else if (rowConfig.op1 === '×' || rowConfig.op1 === '*') intermediate = x * y;
+      else if (rowConfig.op1 === '÷' || rowConfig.op1 === '/') intermediate = Math.floor(x / y);
+
+      let result = 0;
+      if (rowConfig.op2 === '+') result = intermediate + z;
+      else if (rowConfig.op2 === '−' || rowConfig.op2 === '-') result = intermediate - z;
+      else if (rowConfig.op2 === '×' || rowConfig.op2 === '*') result = intermediate * z;
+      else if (rowConfig.op2 === '÷' || rowConfig.op2 === '/') result = Math.floor(intermediate / z);
+
+      return result;
+    }
+
+    function evalDailyCol(linkConfig, x, y, z) {
+      if (x === undefined || y === undefined || z === undefined || !linkConfig) return null;
+      let intermediate = 0;
+      if (linkConfig.op1 === '+') intermediate = x + y;
+      else if (linkConfig.op1 === '−' || linkConfig.op1 === '-') intermediate = x - y;
+      else if (linkConfig.op1 === '×' || linkConfig.op1 === '*') intermediate = x * y;
+
+      let result = 0;
+      if (linkConfig.op2 === '+') result = intermediate + z;
+      else if (linkConfig.op2 === '−' || linkConfig.op2 === '-') result = intermediate - z;
+      else if (linkConfig.op2 === '×' || linkConfig.op2 === '*') result = intermediate * z;
+
+      return result;
+    }
+
+    function generateDailyChallengePuzzle(year, month, day) {
+      let seed = ((year * 10000 + month * 100 + day) * 2654435761) >>> 0;
+      const rnd = (min, max) => {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        return min + (seed % (max - min + 1));
+      };
+
+      const availableRowTemplates = [
+        { id: 'mul_add', op1: '×', op2: '+', eval: (x, y, z) => (x * y) + z },
+        { id: 'add_mul', op1: '+', op2: '×', eval: (x, y, z) => (x + y) * z },
+        { id: 'mul_sub', op1: '×', op2: '−', eval: (x, y, z) => (x * y) - z },
+        { id: 'sub_mul', op1: '−', op2: '×', eval: (x, y, z) => (x - y) * z },
+        { id: 'add_add', op1: '+', op2: '+', eval: (x, y, z) => (x + y) + z },
+        { id: 'add_sub', op1: '+', op2: '−', eval: (x, y, z) => (x + y) - z }
+      ];
+
+      // Procedurally vary templates based on calendar date
+      const idx1 = (day * 2 + month) % availableRowTemplates.length;
+      const idx2 = (idx1 + 2) % availableRowTemplates.length;
+      const idx3 = (idx1 + 4) % availableRowTemplates.length;
+
+      const rowAlpha = availableRowTemplates[idx1];
+      const rowBeta = availableRowTemplates[idx2];
+      const rowGamma = availableRowTemplates[idx3];
+
+      // Pick 9 unique numbers across all 3 rows
+      const used = new Set();
+      const pickUnique = (min, max) => {
+        for (let attempt = 0; attempt < 50; attempt++) {
+          const val = rnd(min, max);
+          if (!used.has(val)) {
+            used.add(val);
+            return val;
+          }
+        }
+        for (let v = min; v <= 35; v++) {
+          if (!used.has(v)) {
+            used.add(v);
+            return v;
+          }
+        }
+        return 1;
+      };
+
+      const genTriplet = (tmpl) => {
+        let x, y, z;
+        if (tmpl.id === 'mul_add') {
+          x = pickUnique(2, 9);
+          y = pickUnique(2, 8);
+          z = pickUnique(1, 14);
+        } else if (tmpl.id === 'add_mul') {
+          x = pickUnique(2, 8);
+          y = pickUnique(2, 7);
+          z = pickUnique(2, 6);
+        } else if (tmpl.id === 'mul_sub') {
+          x = pickUnique(3, 9);
+          y = pickUnique(3, 8);
+          z = pickUnique(1, Math.min(12, Math.max(2, (x * y) - 3)));
+        } else if (tmpl.id === 'sub_mul') {
+          x = pickUnique(5, 14);
+          y = pickUnique(1, Math.max(2, x - 2));
+          if (x < y) { const tmp = x; x = y; y = tmp; }
+          z = pickUnique(2, 6);
+        } else if (tmpl.id === 'add_add') {
+          x = pickUnique(3, 14);
+          y = pickUnique(2, 12);
+          z = pickUnique(2, 11);
+        } else {
+          x = pickUnique(4, 14);
+          y = pickUnique(3, 12);
+          z = pickUnique(1, Math.min(10, Math.max(2, (x + y) - 3)));
+        }
+        return [x, y, z];
+      };
+
+      const [A, B, C] = genTriplet(rowAlpha);
+      const [D, E, F] = genTriplet(rowBeta);
+      const [G, H, I] = genTriplet(rowGamma);
+
+      const targetAlpha = rowAlpha.eval(A, B, C);
+      const targetBeta = rowBeta.eval(D, E, F);
+      const targetGamma = rowGamma.eval(G, H, I);
+
+      // Connected resonance column: B, E, H (middle column)
+      let linkTemplates = [];
+      if (B + E > H) linkTemplates.push({ op1: '+', op2: '−', eval: (b, e, h) => b + e - h });
+      if (B > E) linkTemplates.push({ op1: '−', op2: '+', eval: (b, e, h) => b - e + h });
+      linkTemplates.push({ op1: '+', op2: '+', eval: (b, e, h) => b + e + h });
+      if (B * E > H && B * E <= 35) linkTemplates.push({ op1: '×', op2: '−', eval: (b, e, h) => b * e - h });
+      if (B * E + H <= 45) linkTemplates.push({ op1: '×', op2: '+', eval: (b, e, h) => b * e + h });
+
+      const colLink = linkTemplates[(day * 3 + month) % linkTemplates.length];
+      const targetLink = colLink.eval(B, E, H);
+
+      // 9 interactive receptor slots across 3 rows
+      const answers = { 0: A, 1: B, 2: C, 3: D, 4: E, 5: F, 6: G, 7: H, 8: I };
+
+      // Distractors for the number tray
+      const distractors = [
+        A + rnd(1, 3),
+        Math.max(1, D + (rnd(0, 1) ? 2 : -2)),
+        Math.max(1, G + (rnd(0, 1) ? 1 : -1))
+      ];
+
+      const trayPool = [...new Set([A, B, C, D, E, F, G, H, I, ...distractors])];
+      while (trayPool.length < 11) {
+        trayPool.push(rnd(1, 30));
+      }
+      const trayNumbers = [...new Set(trayPool.slice(0, 12))].sort((x, y) => x - y);
+
+      return {
+        year,
+        month,
+        day,
+        protocolId: 274 + day,
+        difficulty: 'TACTICAL ⚡',
+        rowAlpha,
+        rowBeta,
+        rowGamma,
+        colLink,
+        targetAlpha,
+        targetBeta,
+        targetGamma,
+        targetLink,
+        answers,
+        trayNumbers
+      };
     }
 
     // ==========================================
@@ -3093,7 +3246,51 @@ import './index.css';
           return 3;
         }
       });
-      const [streakDays, setStreakDays] = useState(5);
+      // Dynamic Calendar & Daily Challenge System
+      const calendarDate = useMemo(() => new Date(), []);
+      const currentCalendarYear = calendarDate.getFullYear();
+      const currentCalendarMonth = calendarDate.getMonth(); // 0-indexed
+      const currentSeasonNum = currentCalendarMonth + 1; // 1-12
+      const currentMonthName = useMemo(() => calendarDate.toLocaleString('en-US', { month: 'long' }), [calendarDate]);
+      const currentMonthShort = useMemo(() => calendarDate.toLocaleString('en-US', { month: 'short' }), [calendarDate]);
+      const daysInCurrentMonth = useMemo(() => new Date(currentCalendarYear, currentCalendarMonth + 1, 0).getDate(), [currentCalendarYear, currentCalendarMonth]);
+      const firstDayOfWeek = useMemo(() => new Date(currentCalendarYear, currentCalendarMonth, 1).getDay(), [currentCalendarYear, currentCalendarMonth]);
+      const todayCalendarDay = calendarDate.getDate();
+
+      // Persistent Completed Daily Challenge Days for Current Season
+      const [completedDailyDays, setCompletedDailyDays] = useState(() => {
+        try {
+          const key = `newromath_daily_completed_${currentCalendarYear}_${currentSeasonNum}`;
+          const saved = localStorage.getItem(key);
+          if (saved) return JSON.parse(saved);
+          const initial = [];
+          for (let i = 1; i < todayCalendarDay; i++) {
+            initial.push(i);
+          }
+          return initial;
+        } catch (e) {
+          return [1, 2, 3, 4, 5, 6, 7, 8];
+        }
+      });
+
+      useEffect(() => {
+        try {
+          const key = `newromath_daily_completed_${currentCalendarYear}_${currentSeasonNum}`;
+          localStorage.setItem(key, JSON.stringify(completedDailyDays));
+        } catch (e) {}
+      }, [completedDailyDays, currentCalendarYear, currentSeasonNum]);
+
+      // Real-time Streak Calculation
+      const streakDays = useMemo(() => {
+        let count = 0;
+        let check = completedDailyDays.includes(todayCalendarDay) ? todayCalendarDay : todayCalendarDay - 1;
+        while (check >= 1 && completedDailyDays.includes(check)) {
+          count++;
+          check--;
+        }
+        return Math.max(1, count);
+      }, [completedDailyDays, todayCalendarDay]);
+
       const [lives, setLives] = useState(3);
       const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -3122,8 +3319,23 @@ import './index.css';
         try { localStorage.setItem('newromath_selected_level', selectedLevelNum.toString()); } catch (e) {}
       }, [selectedLevelNum]);
 
-      // Active player level dynamically reflects the highest attained level
-      const activePlayerLevel = Math.max(unlockedLevelMax, playerLevel, selectedLevelNum);
+      // Active player level dynamically reflects the campaign unlocked level
+      const activePlayerLevel = Math.min(25, Math.max(1, unlockedLevelMax));
+      const completedLevelsCount = Math.min(25, Math.max(0, unlockedLevelMax - 1));
+      const dueLevelsCount = Math.max(0, 25 - completedLevelsCount);
+      const campaignProgressPct = Math.min(100, Math.round((completedLevelsCount / 25) * 100));
+      const todayFormattedDate = useMemo(() => {
+        return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }, []);
+
+      // Dynamic Level XP Target and Current Level Progress in Real-Time
+      const activeLevelTargetXp = useMemo(() => {
+        return getLevelTargetXp(activePlayerLevel);
+      }, [activePlayerLevel]);
+
+      const activeLevelCurrentXp = useMemo(() => {
+        return Math.min(activeLevelTargetXp, Math.max(0, playerXp % activeLevelTargetXp));
+      }, [playerXp, activeLevelTargetXp]);
 
       // Live leaderboard score & rank (reacts to level, XP and coin balance)
       const LEADERBOARD_BOT_SCORES = [2490680, 2385400, 2290150, 2250680, 2187730, 2128024, 2097730, 2053538];
@@ -3134,7 +3346,14 @@ import './index.css';
       const [adModalOpen, setAdModalOpen] = useState(false);
       const [adReward, setAdReward] = useState({ type: 'coins', amount: 250, title: 'Math Speed Boost Sponsor Ad', coinAmount: 250, gemAmount: 15, onComplete: null });
       const [adCountdown, setAdCountdown] = useState(3);
-      const [dailyGiftClaimed, setDailyGiftClaimed] = useState(false);
+      const todayCrateKey = `${currentCalendarYear}-${currentSeasonNum}-${todayCalendarDay}`;
+      const [dailyGiftClaimed, setDailyGiftClaimed] = useState(() => {
+        try {
+          return localStorage.getItem('newromath_daily_crate_last_claimed') === todayCrateKey;
+        } catch (e) {
+          return false;
+        }
+      });
       const [rewardToast, setRewardToast] = useState(null);
 
       // Level Entry Fee & Economy Modal States
@@ -3285,8 +3504,43 @@ import './index.css';
       const [largeFontEnabled, setLargeFontEnabled] = useState(true);
       const [divisionSymbol, setDivisionSymbol] = useState('÷');
 
-      // Daily Challenge State
-      const [activeDailyDay, setActiveDailyDay] = useState(9);
+      // Daily Challenge State & Trophy Modal
+      const [activeDailyDay, setActiveDailyDay] = useState(todayCalendarDay);
+      const [showTrophyModal, setShowTrophyModal] = useState(false);
+
+      // Dedicated Daily Challenge Game State (Completely separated from campaign)
+      const [dailyGameDay, setDailyGameDay] = useState(todayCalendarDay);
+      const [dailyGamePuzzle, setDailyGamePuzzle] = useState(() => generateDailyChallengePuzzle(currentCalendarYear, currentSeasonNum, todayCalendarDay));
+      const [dailyGameAnswers, setDailyGameAnswers] = useState({});
+      const [dailyGameHistory, setDailyGameHistory] = useState([]);
+      const [dailyGameSelectedSlot, setDailyGameSelectedSlot] = useState(0);
+      const [dailyGameTimer, setDailyGameTimer] = useState(90);
+      const [dailyGameLives, setDailyGameLives] = useState(3);
+      const [isDailyGamePaused, setIsDailyGamePaused] = useState(false);
+      const [dailyGameVictoryModal, setDailyGameVictoryModal] = useState(false);
+      const [dailyGameDefeatModal, setDailyGameDefeatModal] = useState(false);
+      const [dailyGameTimeOver, setDailyGameTimeOver] = useState(false);
+      const [dailyHintUsed, setDailyHintUsed] = useState(0);
+      const [showDailyInstructionsModal, setShowDailyInstructionsModal] = useState(false);
+
+      const startDailyChallenge = (dayNum = activeDailyDay) => {
+        sound.click();
+        const puzzle = generateDailyChallengePuzzle(currentCalendarYear, currentSeasonNum, dayNum);
+        setDailyGameDay(dayNum);
+        setDailyGamePuzzle(puzzle);
+        setDailyGameAnswers({});
+        setDailyGameHistory([]);
+        setDailyGameSelectedSlot(0);
+        setDailyGameTimer(90);
+        setDailyGameLives(3);
+        setIsDailyGamePaused(false);
+        setDailyGameVictoryModal(false);
+        setDailyGameDefeatModal(false);
+        setDailyGameTimeOver(false);
+        setShowDailyInstructionsModal(false);
+        setDailyHintUsed(0);
+        navigateTo('daily_game');
+      };
 
       // Leaderboard Tab
       const [leaderboardTab, setLeaderboardTab] = useState('global');
@@ -3311,6 +3565,24 @@ import './index.css';
         }
         return () => clearInterval(interval);
       }, [currentScreen, isGamePaused, isTimeOver]);
+
+      // Timer effect for Daily Challenge (Quantum Countdown with Timeout Trigger)
+      useEffect(() => {
+        let interval = null;
+        if (currentScreen === 'daily_game' && !isDailyGamePaused && !showDailyInstructionsModal && dailyGameTimer > 0 && !dailyGameVictoryModal && !dailyGameDefeatModal && !dailyGameTimeOver) {
+          interval = setInterval(() => {
+            setDailyGameTimer(prev => {
+              if (prev <= 1) {
+                sound.wrong();
+                setDailyGameTimeOver(true);
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        }
+        return () => clearInterval(interval);
+      }, [currentScreen, isDailyGamePaused, showDailyInstructionsModal, dailyGameTimer, dailyGameVictoryModal, dailyGameDefeatModal, dailyGameTimeOver]);
 
       // Level Entry Fee verification and launch flow
       const attemptStartLevel = (targetLvl = selectedLevelNum, bypassFee = false) => {
@@ -3390,6 +3662,24 @@ import './index.css';
         puzzleAnswersRef.current = solved;
         setPuzzleAnswers(solved);
         submitPuzzle(solved);
+      };
+      window.__setLevel = (targetLvl, customXp = null) => {
+        const lvl = Math.max(1, Math.min(25, Number(targetLvl) || 1));
+        setUnlockedLevelMax(lvl);
+        setPlayerLevel(lvl);
+        setSelectedLevelNum(lvl);
+        const targetXp = getLevelTargetXp(lvl);
+        const nextXp = customXp !== null ? Math.min(targetXp, Math.max(0, Number(customXp) || 0)) : Math.round(targetXp * 0.35);
+        setPlayerXp(nextXp);
+        try { localStorage.setItem('newromath_unlocked_level', lvl.toString()); } catch (e) {}
+        try { localStorage.setItem('newromath_player_level', lvl.toString()); } catch (e) {}
+        try { localStorage.setItem('newromath_selected_level', lvl.toString()); } catch (e) {}
+        try { localStorage.setItem('newromath_player_xp', nextXp.toString()); } catch (e) {}
+      };
+      window.__setXp = (amount) => {
+        const val = Math.max(0, Number(amount) || 0);
+        setPlayerXp(val);
+        try { localStorage.setItem('newromath_player_xp', val.toString()); } catch (e) {}
       };
       window.__triggerInsufficientFunds = () => {
         setInsufficientFundsModal({
@@ -3624,29 +3914,27 @@ import './index.css';
         if (correct) {
           sound.correct();
           confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
-          const lvlObj = ALL_LEVELS.find(l => l.num === selectedLevelNum) || { xp: 15, coins: 10 };
+          const lvlObj = ALL_LEVELS.find(l => l.num === selectedLevelNum) || { xp: 25, coins: 15 };
           const cost = getLevelEntryCost(selectedLevelNum);
-          const total = getStageCount(selectedLevelNum);
-          const isFinalStage = stageNum >= total;
-          const levelXp = lvlObj.xp || 20;
-
-          // Reward for this puzzle: small per-puzzle payout, full payout on the level's last puzzle
-          const earnedXp = isFinalStage ? levelXp : Math.max(1, Math.round(levelXp / total));
-          const earnedCoins = isFinalStage ? Math.round(cost.coins * 1.8) : Math.max(5, Math.round(cost.coins * 0.06));
-          const earnedGems = isFinalStage ? Math.round(cost.gems * 1.3) + 2 : 0;
+          const total = 1;
+          const isFinalStage = true;
+          const targetXp = getLevelTargetXp(selectedLevelNum);
+          const earnedXp = targetXp;
+          const earnedCoins = Math.round(cost.coins * 1.8);
+          const earnedGems = Math.round(cost.gems * 1.3) + 2;
 
           setLastResult({
             level: selectedLevelNum,
-            stage: stageNum,
-            total,
-            levelCleared: isFinalStage,
+            stage: 1,
+            total: 1,
+            levelCleared: true,
             solvedText: activePuzzle.solvedText,
             coins: earnedCoins,
             gems: earnedGems,
             xp: earnedXp
           });
 
-          // 1. Earn Coins & Diamond Coins
+          // 1. Earn Coins & Diamond Coins in real-time
           setCoins(c => {
             const nextCoins = c + earnedCoins;
             try { localStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
@@ -3660,46 +3948,31 @@ import './index.css';
             });
           }
 
-          // 2. Level Progression only when the final puzzle of the level is solved
-          const nextLvl = isFinalStage ? Math.min(25, selectedLevelNum + 1) : selectedLevelNum;
+          // 2. Level Progression: unlocking next level immediately in real-time
+          const nextUnlocked = Math.min(26, selectedLevelNum + 1);
+          const nextSelected = Math.min(25, selectedLevelNum + 1);
 
-          if (isFinalStage) {
-            // 3. Unlock Next Mission
-            setUnlockedLevelMax(prev => {
-              const nextVal = Math.max(prev, nextLvl);
-              try { localStorage.setItem('newromath_unlocked_level', nextVal.toString()); } catch (e) {}
-              return nextVal;
-            });
+          // 3. Unlock Next Mission
+          setUnlockedLevelMax(prev => {
+            const nextVal = Math.max(prev, nextUnlocked);
+            try { localStorage.setItem('newromath_unlocked_level', nextVal.toString()); } catch (e) {}
+            return nextVal;
+          });
 
-            // 4. Update Player Campaign Level
-            setPlayerLevel(prev => {
-              const nextVal = Math.max(prev, nextLvl);
-              try { localStorage.setItem('newromath_player_level', nextVal.toString()); } catch (e) {}
-              return nextVal;
-            });
+          // 4. Update Player Campaign Level
+          setPlayerLevel(prev => {
+            const nextVal = Math.min(25, Math.max(prev, nextSelected));
+            try { localStorage.setItem('newromath_player_level', nextVal.toString()); } catch (e) {}
+            return nextVal;
+          });
 
-            // 5. Select Next Mission
-            setSelectedLevelNum(nextLvl);
-            try { localStorage.setItem('newromath_selected_level', nextLvl.toString()); } catch (e) {}
-          } else {
-            // Queue up the next puzzle of this level (different puzzle each stage)
-            setStageNum(stageNum + 1);
-            setPuzzleSeed(stageSeeds[stageNum] !== undefined ? stageSeeds[stageNum] : stageNum * 101);
-          }
+          // 5. Select Next Mission
+          setSelectedLevelNum(nextSelected);
+          try { localStorage.setItem('newromath_selected_level', nextSelected.toString()); } catch (e) {}
 
-          // 6. Update Player XP & Level-up wrap
+          // 6. Update Player XP in real-time
           setPlayerXp(prevXp => {
             const totalXp = prevXp + earnedXp;
-            if (totalXp >= 300) {
-              setPlayerLevel(lvl => {
-                const upgradedLvl = Math.max(lvl + 1, nextLvl);
-                try { localStorage.setItem('newromath_player_level', upgradedLvl.toString()); } catch (e) {}
-                return upgradedLvl;
-              });
-              const remainingXp = totalXp % 300;
-              try { localStorage.setItem('newromath_player_xp', remainingXp.toString()); } catch (e) {}
-              return remainingXp;
-            }
             try { localStorage.setItem('newromath_player_xp', totalXp.toString()); } catch (e) {}
             return totalXp;
           });
@@ -3849,21 +4122,20 @@ import './index.css';
         { id: 'splash', name: '1. Splash Screen', icon: '🚀' },
         { id: 'onboarding', name: '2. Onboarding', icon: '💡' },
         { id: 'home', name: '3. Home Dashboard', icon: '🏠' },
-        { id: 'categories', name: '4. Categories', icon: '📑' },
-        { id: 'levels', name: '5. Level Selection', icon: '🎯' },
-        { id: 'game', name: '6. Puzzle Gameplay', icon: '🎮' },
-        { id: 'hint', name: '7. Hint Bottom Sheet', icon: '💡' },
-        { id: 'correct', name: '8. Correct Result', icon: '✅' },
-        { id: 'wrong', name: '9. Wrong Result', icon: '❌' },
-        { id: 'daily', name: '10. Daily Challenge', icon: '📅' },
-        { id: 'stats', name: '11. Statistics', icon: '📊' },
-        { id: 'achievements', name: '12. Achievements', icon: '🏆' },
-        { id: 'leaderboard', name: '13. Leaderboard', icon: '🏅' },
-        { id: 'history', name: '14. Puzzle History', icon: '📜' },
-        { id: 'profile', name: '15. Profile', icon: '👤' },
-        { id: 'settings', name: '16. Settings', icon: '⚙️' },
-        { id: 'help', name: '17. Help & Support', icon: '❓' },
-        { id: 'offline', name: '18. Offline Mode', icon: '📡' },
+        { id: 'levels', name: '4. Level Selection', icon: '🎯' },
+        { id: 'game', name: '5. Puzzle Gameplay', icon: '🎮' },
+        { id: 'hint', name: '6. Hint Bottom Sheet', icon: '💡' },
+        { id: 'correct', name: '7. Correct Result', icon: '✅' },
+        { id: 'wrong', name: '8. Wrong Result', icon: '❌' },
+        { id: 'daily', name: '9. Daily Challenge', icon: '📅' },
+        { id: 'stats', name: '10. Statistics', icon: '📊' },
+        { id: 'achievements', name: '11. Achievements', icon: '🏆' },
+        { id: 'leaderboard', name: '12. Leaderboard', icon: '🏅' },
+        { id: 'history', name: '13. Puzzle History', icon: '📜' },
+        { id: 'profile', name: '14. Profile', icon: '👤' },
+        { id: 'settings', name: '15. Settings', icon: '⚙️' },
+        { id: 'help', name: '16. Help & Support', icon: '❓' },
+        { id: 'offline', name: '17. Offline Mode', icon: '📡' },
       ];
 
       // ==========================================
@@ -3894,9 +4166,9 @@ import './index.css';
             ),
           },
           {
-            id: 'categories',
+            id: 'levels',
             label: 'Levels',
-            screen: 'categories',
+            screen: 'levels',
             badge: null,
             iconActive: (
               <svg className="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
@@ -4166,7 +4438,7 @@ import './index.css';
                   </div>
                 </div>
 
-                {/* Level Title & XP Bar */}
+                {/* Level Title & Campaign Progress (Completed & Due) */}
                 <div className="flex flex-col justify-center min-w-0">
                   <div className="flex items-center gap-1 sm:gap-1.5 leading-tight">
                     <span className="text-white font-black text-[10px] sm:text-[11px] font-display tracking-wide uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate">
@@ -4177,14 +4449,14 @@ import './index.css';
                     </span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 mt-0.5 sm:mt-1 min-w-0">
-                    <div className="w-[44px] sm:w-[60px] h-1.5 bg-[#050f24] border border-cyan-400/50 rounded-full overflow-hidden p-[1px] shadow-inner relative shrink-0">
+                    <div className="w-[44px] sm:w-[58px] h-1.5 bg-[#050f24] border border-cyan-400/50 rounded-full overflow-hidden p-[1px] shadow-inner relative shrink-0">
                       <div 
                         className="h-full bg-gradient-to-r from-cyan-400 via-sky-300 to-white rounded-full shadow-[0_0_8px_rgba(0,229,255,0.9)] transition-all duration-300" 
-                        style={{ width: `${Math.min(100, Math.max(12, ((playerXp % 300) / 300) * 100))}%` }} 
+                        style={{ width: `${Math.min(100, Math.max(8, campaignProgressPct))}%` }} 
                       />
                     </div>
-                    <span className="home-hdr-xp-text text-cyan-300 font-mono font-bold text-[7px] sm:text-[7.5px] tracking-tight whitespace-nowrap drop-shadow shrink-0">
-                      {playerXp % 300}/300
+                    <span className="home-hdr-xp-text text-cyan-300 font-mono font-bold text-[8px] sm:text-[8.5px] tracking-tight whitespace-nowrap drop-shadow shrink-0">
+                      {completedLevelsCount}/{dueLevelsCount}
                     </span>
                   </div>
                 </div>
@@ -4256,17 +4528,6 @@ import './index.css';
                   </span>
                 </div>
 
-                {/* Tactile Cyber Stats Button */}
-                <button 
-                  onClick={() => { sound.click(); navigateTo('stats'); }}
-                  className="w-[26px] h-[26px] sm:w-7 sm:h-7 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
-                  title="Statistics"
-                  aria-label="Statistics"
-                >
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </button>
 
                 {/* Tactile Cyber Settings Gear */}
                 <button 
@@ -4294,17 +4555,69 @@ import './index.css';
               />
             </div>
 
-            {/* 1. Daily Challenge Card (Native sharp chamfered cut corners) */}
+            {/* 1. Daily Challenge Card with Dynamic Text & Reduced Play Button */}
             <div 
-              onClick={() => navigateTo('daily')}
-              className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0"
+              onClick={() => { sound.click(); navigateTo('daily'); }}
+              className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0 rounded-2xl overflow-hidden"
             >
               <img 
-                src="/assets/card_daily_clean.png?v=4" 
+                src="/assets/card_daily_clean.png?v=5" 
                 alt="Daily Challenge" 
                 decoding="async"
                 className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]" 
               />
+
+              {/* Dynamic Content Overlay (Right side: 41% to 98% width) */}
+              <div 
+                className="absolute inset-y-0 right-0 left-[41%] flex flex-col justify-between py-2 sm:py-3 pr-2.5 sm:pr-4 pl-1 pointer-events-none"
+                style={{ top: '6%', bottom: '6%' }}
+              >
+                {/* Header Row: Calendar Icon + Title + Dynamic Date Badge */}
+                <div className="flex items-center justify-between gap-1 min-w-0">
+                  <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_8px_rgba(0,229,255,0.6)] p-0.5 shrink-0 border border-cyan-300/50">
+                      <span className="text-[10px] sm:text-xs leading-none">📅</span>
+                    </div>
+                    <span 
+                      className="text-white font-black tracking-tight leading-tight block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)] truncate"
+                      style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Arial Black', sans-serif", fontSize: 'clamp(12px, 3.4vw, 16px)' }}
+                    >
+                      Daily <span className="text-cyan-300">Challenge</span>
+                    </span>
+                  </div>
+                  
+                  {/* Dynamic Date Badge */}
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#0a1e4a]/90 border border-cyan-400/50 text-[8px] sm:text-[9.5px] font-mono font-bold text-cyan-200 shadow-sm shrink-0">
+                    <span>📅</span>
+                    <span>{todayFormattedDate}</span>
+                  </div>
+                </div>
+
+                {/* Dynamic Subtitle */}
+                <p 
+                  className="text-[#cce9ff] font-medium tracking-tight drop-shadow-[0_1px_2px_rgba(0,10,35,0.85)] truncate leading-tight my-0.5"
+                  style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif", fontSize: 'clamp(8.5px, 2.1vw, 10.5px)' }}
+                >
+                  Solve today's puzzle and get amazing rewards!
+                </p>
+
+                {/* 3D Play Button (Increased width to fit the space) */}
+                <div className="flex items-center justify-end pt-0.5 sm:pt-1 pointer-events-auto pr-0.5 sm:pr-1 w-full">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sound.click();
+                      navigateTo('daily');
+                    }}
+                    className="w-full max-w-[200px] sm:max-w-[225px] py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black flex items-center justify-center gap-2 shadow-[0_3px_0_#92400e,0_5px_14px_rgba(245,158,11,0.45),inset_0_1px_1px_rgba(255,255,255,0.8)] active:translate-y-0.5 active:shadow-[0_1px_0_#92400e] cursor-pointer transition-all border border-amber-200/60"
+                    style={{ fontSize: 'clamp(11.5px, 2.9vw, 13.5px)' }}
+                  >
+                    <span className="text-[10px] sm:text-xs">▶</span>
+                    <span>Play</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* 2. Mid Section (2 Cards Side-by-Side: Level & Rewards) */}
@@ -4322,20 +4635,20 @@ import './index.css';
                 />
                 {/* Dynamic Level Overlay for active level - pixel-perfect positioning */}
                 <div 
-                  className="absolute pointer-events-none flex flex-col justify-start select-none"
-                  style={{ top: '20%', left: '57%', right: '4%' }}
+                  className="absolute pointer-events-none flex flex-col justify-center select-none"
+                  style={{ top: '48%', transform: 'translateY(-50%)', left: '56%', right: '12%' }}
                 >
                   <span 
                     className="text-white font-black tracking-tight leading-none block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)]"
-                    style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Arial Black', sans-serif", fontSize: 'clamp(15px, 4.2vw, 19px)' }}
+                    style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Arial Black', sans-serif", fontSize: 'clamp(14px, 4vw, 18px)' }}
                   >
                     Level {activePlayerLevel}
                   </span>
                   <span 
-                    className="text-[#d8f2ff] font-bold tracking-tight block drop-shadow-[0_1px_3px_rgba(0,10,35,0.9)]"
-                    style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif", fontSize: 'clamp(9px, 2.4vw, 11px)', marginTop: '4px' }}
+                    className="text-[#d8f2ff] font-bold tracking-tight block drop-shadow-[0_1px_3px_rgba(0,10,35,0.9)] truncate mt-1 leading-tight font-mono"
+                    style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif", fontSize: 'clamp(9px, 2.2vw, 11px)' }}
                   >
-                    {activePlayerLevel >= 25 ? 'Master Achieved!' : 'Keep going!'}
+                    {completedLevelsCount}/{dueLevelsCount}
                   </span>
                 </div>
               </div>
@@ -4373,7 +4686,7 @@ import './index.css';
 
             {/* 4. New Game Card */}
             <div 
-              onClick={() => navigateTo('categories')}
+              onClick={() => { sound.click(); navigateTo('levels'); }}
               className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0"
             >
               <img 
@@ -4574,165 +4887,9 @@ import './index.css';
       );
 
       // ========================================================
-      // 4. CATEGORIES SCREEN (Modern Sci-Fi Arcade Edition)
+      // 4. CATEGORIES SCREEN (Deprecated - redirects to Levels)
       // ========================================================
-      const renderCategoriesScreen = () => {
-        const allCategories = [
-          { id: 'add', name: 'Addition', tier: 'basic', desc: 'Master Sums & Mental Math', color: 'from-emerald-400 to-teal-600', borderColor: 'border-emerald-400/50', icon: '+', levels: '20 Levels', progress: 100, tag: 'FOUNDATION' },
-          { id: 'sub', name: 'Subtraction', tier: 'basic', desc: 'Difference & Mental Agility', color: 'from-rose-400 to-red-600', borderColor: 'border-rose-400/50', icon: '−', levels: '20 Levels', progress: 85, tag: 'CORE MATH' },
-          { id: 'mul', name: 'Multiplication', tier: 'intermediate', desc: 'Rapid Factors & Timed Grids', color: 'from-purple-400 to-indigo-600', borderColor: 'border-purple-400/50', icon: '×', levels: '25 Levels', progress: 60, tag: 'FACTORS' },
-          { id: 'div', name: 'Division', tier: 'intermediate', desc: 'Quotients & Fractional Logic', color: 'from-cyan-400 to-blue-600', borderColor: 'border-cyan-400/50', icon: '÷', levels: '25 Levels', progress: 40, tag: 'QUOTIENT' },
-          { id: 'mix', name: 'Mixed Operations', tier: 'advanced', desc: 'Ultimate Cross-Math Brain Teasers', color: 'from-amber-400 to-orange-500', borderColor: 'border-amber-400/50', icon: '🔣', levels: '30 Levels', progress: 20, tag: 'CHALLENGE' },
-        ];
-
-        const filteredCategories = allCategories.filter(cat => {
-          if (selectedCategory === 'all' || !selectedCategory) return true;
-          return cat.tier === selectedCategory;
-        });
-
-        return (
-          <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
-            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 pb-6 space-y-3 max-w-md mx-auto w-full">
-              {/* Sticky Top Header */}
-              <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2.5 pb-2 shrink-0">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <button 
-                    onClick={() => { sound.click(); navigateTo('home'); }} 
-                    className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
-                    title="Back to Home"
-                  >
-                    <svg className="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Currency Capsules */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <div 
-                    onClick={() => { sound.click(); navigateTo('rewards'); }}
-                    className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/50 hover:border-amber-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,230,130,0.25)] transition-all active:scale-95 cursor-pointer"
-                    title="Coins - Tap to Open Rewards & Shop"
-                  >
-                    <svg className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_6px_rgba(245,158,11,0.7)] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" fill="url(#homeHdrCoinGrad)" stroke="url(#homeHdrCoinRim)" strokeWidth="1.5" />
-                      <circle cx="12" cy="12" r="7.5" fill="none" stroke="#fde047" strokeWidth="0.8" opacity="0.6" />
-                      <polygon points="12,6.5 13.6,9.8 17.2,10.3 14.6,12.7 15.2,16.2 12,14.5 8.8,16.2 9.4,12.7 6.8,10.3 10.4,9.8" fill="#fef08a" stroke="#d97706" strokeWidth="0.5" />
-                    </svg>
-                    <span className="text-amber-300 font-black text-[10.5px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                      {Math.max(coins, 10).toLocaleString()}
-                    </span>
-                    <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
-                      +
-                    </span>
-                  </div>
-
-                  <div 
-                    onClick={() => { sound.click(); navigateTo('rewards'); }}
-                    className="group bg-gradient-to-r from-[#071d38]/90 via-[#0a2347]/90 to-[#051429]/90 border border-cyan-400/50 hover:border-cyan-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(186,230,253,0.25)] transition-all active:scale-95 cursor-pointer"
-                    title="Diamonds - Tap to Open Rewards & Shop"
-                  >
-                    <svg className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_8px_rgba(0,229,255,0.8)] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
-                      <polygon points="6,4 18,4 22,9 12,21 2,9" fill="url(#homeHdrGemBot)" stroke="#38bdf8" strokeWidth="0.8" strokeLinejoin="round" />
-                      <polygon points="6,4 18,4 15,9 9,9" fill="#bae6fd" />
-                      <polygon points="2,9 6,4 9,9" fill="#7dd3fc" />
-                      <polygon points="18,4 22,9 15,9" fill="#38bdf8" />
-                      <polygon points="9,9 15,9 12,21" fill="#0284c7" />
-                      <polygon points="2,9 9,9 12,21" fill="#0369a1" />
-                      <polygon points="15,9 22,9 12,21" fill="#0c4a6e" />
-                      <circle cx="7" cy="6" r="0.8" fill="#ffffff" />
-                    </svg>
-                    <span className="text-cyan-200 font-black text-[10.5px] font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.6)]">
-                      {gems.toLocaleString()}
-                    </span>
-                    <span className="w-3 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
-                      +
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Holographic Filter Tabs */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-                {['All', 'Basic', 'Intermediate', 'Advanced'].map((tab, idx) => {
-                  const isSelected = selectedCategory === tab.toLowerCase() || (idx === 0 && selectedCategory === 'all');
-                  return (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        sound.click();
-                        setSelectedCategory(tab.toLowerCase());
-                      }}
-                      className={`px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
-                        isSelected
-                          ? 'bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 text-white border border-cyan-300 shadow-[0_0_12px_rgba(0,229,255,0.6)] scale-105'
-                          : 'bg-[#102454]/80 text-cyan-200/70 border border-cyan-500/30 hover:border-cyan-400/70 hover:text-white active:scale-95'
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* 3D Cyber Category Cards */}
-              <div className="space-y-2.5 pb-4">
-                {filteredCategories.map((cat) => (
-                  <div
-                    key={cat.id}
-                    onClick={() => {
-                      sound.click();
-                      navigateTo('levels');
-                    }}
-                    className="math-arch-card relative bg-gradient-to-r from-[#142d68] via-[#1a3a85] to-[#12285a] border-[1.5px] border-cyan-400/50 rounded-2xl p-3 shadow-[0_6px_18px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.2)] hover:border-cyan-300 hover:shadow-[0_8px_24px_rgba(0,229,255,0.35)] transition-all cursor-pointer active:scale-[0.98] group overflow-hidden"
-                  >
-                    {/* Architectural Blueprint Grid */}
-                    <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
-                    
-                    {/* Corner Marks */}
-                    <span className="absolute top-1 left-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-                    <span className="absolute top-1 right-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-
-                    <div className="relative z-10 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        {/* 3D Operation Badge */}
-                        <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${cat.color} border border-white/40 text-white flex items-center justify-center font-black text-2xl shadow-[0_0_15px_rgba(0,0,0,0.4)] shrink-0 group-hover:scale-105 transition-transform`}>
-                          {cat.icon}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <h3 className="text-sm font-extrabold text-white font-display tracking-tight truncate">{cat.name}</h3>
-                            <span className="bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 font-extrabold text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-tight">
-                              {cat.tag}
-                            </span>
-                          </div>
-                          <p className="text-[10px] text-cyan-200/70 truncate mt-0.5">{cat.desc}</p>
-                          <div className="flex items-center gap-2 mt-1.5">
-                            <div className="w-20 h-1.5 bg-[#0a183b] border border-cyan-400/40 rounded-full overflow-hidden p-0.5 shadow-inner">
-                              <div 
-                                className={`h-full bg-gradient-to-r ${cat.color} rounded-full`}
-                                style={{ width: `${cat.progress}%` }}
-                              />
-                            </div>
-                            <span className="text-[9px] font-mono text-cyan-300/90 font-bold">
-                              {cat.levels} • {cat.progress}%
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right chevron action */}
-                      <div className="w-8 h-8 rounded-xl bg-cyan-950/70 border border-cyan-400/50 text-cyan-300 flex items-center justify-center text-sm font-black shadow-inner shrink-0 group-hover:translate-x-1 group-hover:border-cyan-300 group-hover:text-white transition-all">
-                        ➔
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      };
+      const renderCategoriesScreen = () => renderLevelSelectScreen();
 
       // ========================================================
       // 5. LEVEL SELECTION SCREEN (Modern Sci-Fi Arcade Edition - 25 Levels)
@@ -4822,9 +4979,9 @@ import './index.css';
               <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2.5 pb-2 shrink-0">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <button 
-                    onClick={() => { sound.click(); navigateTo('categories'); }} 
+                    onClick={() => { sound.click(); navigateTo('home'); }} 
                     className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
-                    title="Back to Categories"
+                    title="Back to Home"
                   >
                     <svg className="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/>
@@ -4883,12 +5040,7 @@ import './index.css';
                 <div className="relative z-10 flex items-center justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-base">🏆</span>
-                    <div>
-                      <span className="text-xs font-black font-display text-white">Campaign Progress</span>
-                      <span className="text-[10px] font-mono text-cyan-300 block">
-                        {clearedCount} of 25 Missions Completed
-                      </span>
-                    </div>
+                    <span className="text-xs font-black font-display text-white">Campaign Progress</span>
                   </div>
                   <div className="flex items-center gap-1 bg-cyan-950/80 border border-cyan-400/50 px-2 py-0.5 rounded-full">
                     <span className="text-xs font-black font-mono text-cyan-300">{progressPct}%</span>
@@ -5053,34 +5205,37 @@ import './index.css';
                         </span>
                       </div>
 
-                      {/* 3 Stars Rating */}
-                      <div className="flex items-center gap-0.5 mb-2">
-                        {[1, 2, 3].map((starIdx) => (
-                          <span
-                            key={starIdx}
-                            className={`text-xs ${
-                              isCompleted
-                                ? 'text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.9)]'
-                                : 'text-slate-600'
-                            }`}
-                          >
-                            ★
-                          </span>
-                        ))}
+                      {/* 3 Stars Rating & Status Pill */}
+                      <div className="flex items-center justify-between gap-1 mb-2">
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3].map((starIdx) => (
+                            <span
+                              key={starIdx}
+                              className={`text-xs ${
+                                isCompleted
+                                  ? 'text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.9)]'
+                                  : 'text-slate-600'
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                        <span className={`text-[8px] sm:text-[8.5px] font-mono font-bold px-1.5 py-0.2 rounded ${
+                          isCompleted
+                            ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
+                            : isUnlocked
+                            ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/40'
+                            : 'bg-slate-900/80 text-slate-400 border border-slate-700/40'
+                        }`}>
+                          {isCompleted ? '✓ Completed' : isUnlocked ? '● Due' : '🔒 Due'}
+                        </span>
                       </div>
 
                       {/* Bottom Row: Specs Pills & Capsule Play Button */}
                       <div className="flex items-center justify-between gap-1 mt-auto pt-1.5 border-t border-white/5">
-                        {/* Specs Pills: Puzzles & Timer */}
+                        {/* Specs Pills: Timer */}
                         <div className="flex items-center gap-1 shrink-0">
-                          {/* Puzzles Count */}
-                          <span
-                            className="flex items-center gap-0.5 text-[9px] text-white font-mono font-bold bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/25 shadow-xs"
-                            title="Puzzles in this level"
-                          >
-                            <span>🎮</span>
-                            <span>{getStageCount(lvl.num)}</span>
-                          </span>
                           {/* Timer */}
                           <span
                             className="flex items-center gap-0.5 text-[9px] text-white font-mono font-bold bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/25 shadow-xs"
@@ -5156,8 +5311,52 @@ import './index.css';
 
       // ========================================================
       // 6. PUZZLE GAMEPLAY (Modern Sci-Fi Arcade Edition)
-      const renderGameScreen = () => (
-        <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
+      const renderGameScreen = () => {
+        // Responsive typography helpers that adapt dynamically to digit count and screen viewport
+        const getTileTextClass = (val) => {
+          const str = String(val ?? '');
+          const len = str.length;
+          if (len >= 3) {
+            return largeFontEnabled
+              ? 'text-[clamp(10px,2.7vw,13px)] tracking-tight font-black'
+              : 'text-[clamp(9.5px,2.4vw,11.5px)] tracking-tight font-black';
+          }
+          if (len === 2) {
+            return largeFontEnabled
+              ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black'
+              : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black';
+          }
+          return largeFontEnabled
+            ? 'text-[clamp(16px,4.8vw,22px)] font-black'
+            : 'text-[clamp(14px,4.2vw,19px)] font-black';
+        };
+
+        const getOperatorTextClass = () => {
+          return largeFontEnabled
+            ? 'text-[clamp(14px,4.5vw,20px)] font-black'
+            : 'text-[clamp(12px,3.8vw,17px)] font-black';
+        };
+
+        const getTrayTextClass = (val) => {
+          const str = String(val ?? '');
+          const len = str.length;
+          if (len >= 3) {
+            return largeFontEnabled
+              ? 'text-[clamp(10px,2.6vw,12px)] tracking-tight font-black'
+              : 'text-[clamp(9.5px,2.3vw,11px)] tracking-tight font-black';
+          }
+          if (len === 2) {
+            return largeFontEnabled
+              ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black'
+              : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black';
+          }
+          return largeFontEnabled
+            ? 'text-[clamp(16px,5vw,22px)] font-black'
+            : 'text-[clamp(14px,4.3vw,19px)] font-black';
+        };
+
+        return (
+          <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
           <div 
             className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 space-y-2.5 max-w-md mx-auto w-full"
             style={{ paddingBottom: 'max(3.5rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem))' }}
@@ -5279,7 +5478,7 @@ import './index.css';
             )}
 
             {/* Mission Board Terminal */}
-            <section className="flex flex-col rounded-3xl p-3 sm:p-4 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl">
+            <section className="flex flex-col rounded-3xl p-2.5 sm:p-4 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl">
               {/* Blueprint Grid Overlay */}
               <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
 
@@ -5319,10 +5518,10 @@ import './index.css';
               </div>
 
               {/* Cross-Math 9x9 Puzzle Grid */}
-              <div className="relative z-10 flex justify-center pb-3 pt-3">
-                <div className="w-full max-w-[340px] p-1 sm:p-1.5">
+              <div className="relative z-10 flex justify-center pb-2.5 pt-2 sm:pb-3 sm:pt-3">
+                <div className="w-full max-w-[340px] p-0.5 sm:p-1.5">
                   <div 
-                    className="grid gap-1.5 sm:gap-2 w-full" 
+                    className="grid gap-1 sm:gap-1.5 md:gap-2 w-full" 
                     style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
                     role="group" 
                     aria-label="Cross-math puzzle board"
@@ -5360,18 +5559,20 @@ import './index.css';
                             }}
                             aria-label={`Puzzle blank ${slot + 1}${puzzleAnswers[slot] !== undefined ? `, ${puzzleAnswers[slot]}` : ''}`}
                             aria-pressed={isSelected}
-                            className={`relative flex aspect-square min-w-0 items-center justify-center select-none ${
+                            className={`relative flex aspect-square min-w-0 items-center justify-center select-none p-0.5 ${
                               isFilled
-                                ? `scifi-tile-slot-filled ${hasImpact ? 'animate-tile-pop' : ''} ${largeFontEnabled ? 'text-[clamp(17px,5.5vw,26px)]' : 'text-[clamp(14px,4.5vw,22px)]'}`
+                                ? `scifi-tile-slot-filled ${hasImpact ? 'animate-tile-pop' : ''} ${getTileTextClass(puzzleAnswers[slot])}`
                                 : isSelected
-                                ? `scifi-tile-slot-selected ${largeFontEnabled ? 'text-[clamp(17px,5.5vw,26px)]' : 'text-[clamp(14px,4.5vw,22px)]'}`
+                                ? 'scifi-tile-slot-selected'
                                 : isSlotPending
                                 ? 'scifi-tile-slot-target-locked'
                                 : 'scifi-tile-slot-empty'
                             }`}
                           >
                             {isFilled ? (
-                              puzzleAnswers[slot]
+                              <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5 drop-shadow-xs">
+                                {puzzleAnswers[slot]}
+                              </span>
                             ) : isSlotPending ? (
                               <span className="w-2.5 h-2.5 rounded-full bg-cyan-300 animate-ping opacity-90" />
                             ) : isSelected ? (
@@ -5389,13 +5590,15 @@ import './index.css';
                       return (
                         <div 
                           key={`${rowIndex}-${columnIndex}`} 
-                          className={`flex aspect-square min-w-0 items-center justify-center select-none ${
+                          className={`flex aspect-square min-w-0 items-center justify-center select-none p-0.5 ${
                             isOperator
-                              ? `scifi-tile-operator ${largeFontEnabled ? 'text-[clamp(16px,5vw,24px)]' : 'text-[clamp(13px,4vw,20px)]'}`
-                              : `scifi-tile-fixed ${largeFontEnabled ? 'text-[clamp(17px,5.5vw,26px)]' : 'text-[clamp(14px,4.5vw,22px)]'}`
+                              ? `scifi-tile-operator ${getOperatorTextClass()}`
+                              : `scifi-tile-fixed ${getTileTextClass(cell)}`
                           }`}
                         >
-                          {cell === '÷' ? divisionSymbol : cell}
+                          <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
+                            {cell === '÷' ? divisionSymbol : cell}
+                          </span>
                         </div>
                       );
                     }))}
@@ -5404,7 +5607,7 @@ import './index.css';
               </div>
 
               {/* Number Tray Keyboard */}
-              <div className="relative z-10 flex items-center justify-center gap-2 pt-4 border-t border-cyan-400/20">
+              <div className="relative z-10 flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 pt-3 sm:pt-4 border-t border-cyan-400/20 w-full px-0.5">
                 {puzzleNumbers.map(number => {
                   const isAnswered = Object.values(puzzleAnswers).includes(number);
                   const isPending = pendingNumbers.has(number);
@@ -5419,13 +5622,15 @@ import './index.css';
                       }}
                       disabled={used || isGamePaused || isTimeOver}
                       aria-label={`Place number ${number}`}
-                      className={`grid aspect-square min-w-0 flex-1 max-w-[54px] place-items-center rounded-xl transition-all ${
+                      className={`grid aspect-square min-w-0 flex-1 max-w-[48px] sm:max-w-[54px] place-items-center rounded-xl p-0.5 transition-all select-none overflow-hidden ${
                         used
                           ? 'opacity-25 scale-95 border border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed'
-                          : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_4px_0_#064e3b,0_6px_12px_rgba(16,185,129,0.35)] active:translate-y-1 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
-                      } ${largeFontEnabled ? 'text-[clamp(20px,6.5vw,32px)]' : 'text-[clamp(17px,5.5vw,26px)]'}`}
+                          : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_3px_0_#064e3b,0_5px_10px_rgba(16,185,129,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
+                      } ${getTrayTextClass(number)}`}
                     >
-                      {number}
+                      <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5">
+                        {number}
+                      </span>
                     </button>
                   );
                 })}
@@ -6041,8 +6246,9 @@ import './index.css';
               </div>
             </div>
           )}
-        </div>
-      );
+          </div>
+        );
+      };
 
       // ========================================================
       // 7. HINT BOTTOM SHEET (Modern Sci-Fi Edition - 3 Interactive Steps)
@@ -6368,9 +6574,7 @@ import './index.css';
       );
 
       // ========================================================
-      // 10. DAILY CHALLENGE (Pixel Perfect to Screen 10)
-      // ========================================================
-      // 10. DAILY CHALLENGE (Cyber Arcade Modernization)
+      // 10. DAILY CHALLENGE (100% Dynamic Season & Calendar Hub)
       // ========================================================
       const renderDailyScreen = () => {
         const handleClaimDailyGift = () => {
@@ -6387,25 +6591,32 @@ import './index.css';
             try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
             return next;
           });
+          try { localStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
           setDailyGiftClaimed(true);
         };
 
-        const handleLaunchDailyPuzzle = () => {
-          sound.click();
-          const targetLvl = Math.min(25, Math.max(1, 10 + activeDailyDay));
-          startNewPuzzle(targetLvl);
-        };
+        const completedCount = completedDailyDays.filter(d => d <= daysInCurrentMonth).length;
+        const monthlyProgressPct = Math.min(100, Math.round((completedCount / daysInCurrentMonth) * 100));
 
-        const isToday = activeDailyDay === 9;
-        const isCompleted = activeDailyDay < 9;
-        const isLocked = activeDailyDay > 9;
+        const isTodaySelected = activeDailyDay === todayCalendarDay;
+        const isCompletedDay = completedDailyDays.includes(activeDailyDay);
+        const isFutureDay = activeDailyDay > todayCalendarDay;
+
+        // Dynamic calendar matrix with padding for starting day of week
+        const calendarCells = [
+          ...Array.from({ length: firstDayOfWeek }, () => null),
+          ...Array.from({ length: daysInCurrentMonth }, (_, i) => i + 1)
+        ];
 
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
             {/* Mathematical Coordinate Blueprint Overlay */}
             <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Glass Underlay */}
+            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/18 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-1/3 -right-20 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 left-0 w-80 h-80 bg-indigo-600/18 rounded-full blur-3xl pointer-events-none" />
 
             {/* Sticky Modern Sci-Fi Header */}
             <header className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 px-4 py-3 shrink-0 backdrop-blur-md">
@@ -6417,19 +6628,13 @@ import './index.css';
                 >
                   ‹
                 </button>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">📅</span>
-                  <div className="text-center">
-                    <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-300 via-sky-100 to-white bg-clip-text text-transparent uppercase leading-tight">
-                      Daily Challenge
-                    </h1>
-                    <span className="text-[10px] text-cyan-300/80 font-mono tracking-widest uppercase block">
-                      October 2026 Season
-                    </span>
-                  </div>
+                <div className="flex items-center">
+                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-300 via-sky-100 to-white bg-clip-text text-transparent uppercase leading-tight">
+                    Daily Challenge
+                  </h1>
                 </div>
                 <button 
-                  onClick={() => { sound.click(); navigateTo('achievements'); }} 
+                  onClick={() => { sound.click(); setShowTrophyModal(true); }} 
                   aria-label="Awards & Achievements" 
                   className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
@@ -6441,15 +6646,15 @@ import './index.css';
             {/* Scrollable Daily Challenge Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-4 relative z-10">
 
-              {/* 1. Hero Season Cup Banner Card */}
-              <div className="relative rounded-3xl p-4 bg-gradient-to-b from-[#122e6b] via-[#0d2354] to-[#071536] border border-amber-400/40 shadow-[0_12px_32px_rgba(0,0,0,0.6)] overflow-hidden">
+              {/* 1. Hero Season Cup Banner Card (Glassmorphic) */}
+              <div className="relative rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl overflow-hidden">
                 <div className="absolute right-0 top-0 bottom-0 w-48 bg-gradient-to-l from-amber-500/15 to-transparent pointer-events-none" />
                 <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
 
                 <div className="relative z-10 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="relative shrink-0">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400/25 to-yellow-600/35 border-2 border-amber-400/70 flex items-center justify-center shadow-[0_0_16px_rgba(251,191,36,0.4)]">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400/25 via-amber-500/15 to-yellow-600/25 border border-amber-300/60 flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.35),inset_0_1.5px_0_rgba(255,255,255,0.35)] backdrop-blur-md">
                         <img 
                           src="/assets/icon_trophy_3d.png" 
                           alt="Monthly Trophy" 
@@ -6464,20 +6669,17 @@ import './index.css';
                     <div>
                       <div className="flex items-center gap-2">
                         <h2 className="text-sm sm:text-base font-black font-display text-white tracking-wide">
-                          October Cyber Cup
+                          {currentMonthName} Cup
                         </h2>
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40">
-                          SEASON 10
+                        <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-300/40 backdrop-blur-sm">
+                          SEASON {currentSeasonNum}
                         </span>
-                      </div>
-                      <div className="text-[11px] text-amber-200/90 font-medium mt-0.5">
-                        Solve 31 daily missions for the Cyber Grand Trophy
                       </div>
                     </div>
                   </div>
 
                   {/* Streak Flame Pill */}
-                  <div className="shrink-0 flex flex-col items-center justify-center px-2.5 py-1.5 rounded-2xl bg-[#09183d]/90 border border-orange-400/40 shadow-xs">
+                  <div className="shrink-0 flex flex-col items-center justify-center px-2.5 py-1.5 rounded-2xl bg-white/[0.08] border border-orange-400/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md">
                     <span className="text-base leading-none">🔥</span>
                     <span className="text-xs font-black text-orange-300 font-display mt-0.5 leading-none">
                       {streakDays}d
@@ -6489,53 +6691,56 @@ import './index.css';
                 </div>
 
                 {/* Progress Bar */}
-                <div className="relative z-10 mt-3 pt-3 border-t border-cyan-400/15">
+                <div className="relative z-10 mt-3 pt-3 border-t border-white/10">
                   <div className="flex items-center justify-between text-[10.5px] font-bold mb-1">
-                    <span className="text-cyan-300">Monthly Mission Progress</span>
-                    <span className="text-amber-300 font-mono">28 / 31 Solved (90%)</span>
+                    <span className="text-cyan-200">Monthly Progress</span>
+                    <span className="text-amber-300 font-mono">
+                      {completedCount} / {daysInCurrentMonth} ({monthlyProgressPct}%)
+                    </span>
                   </div>
-                  <div className="w-full h-2.5 rounded-full bg-[#030919] border border-cyan-500/30 overflow-hidden p-0.5 shadow-inner">
+                  <div className="w-full h-2.5 rounded-full bg-black/40 border border-white/15 overflow-hidden p-0.5 shadow-inner backdrop-blur-sm">
                     <div 
                       className="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-300 shadow-[0_0_10px_rgba(251,191,36,0.7)] transition-all duration-500"
-                      style={{ width: '90%' }}
+                      style={{ width: `${monthlyProgressPct}%` }}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* 2. Tactile Cyber Calendar Matrix (Month View) */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg relative overflow-hidden">
+              {/* 2. Tactile Cyber Calendar Matrix (Glassmorphic) */}
+              <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/65 to-[#071536]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-white/[0.10] border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-xs backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
                       📆
                     </div>
                     <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
-                      October 2026 Mission Matrix
+                      {currentMonthName} {currentCalendarYear}
                     </h3>
                   </div>
                   <span className="text-[10px] text-cyan-300/80 font-mono">
-                    Today: <strong className="text-cyan-300">Day 9</strong>
+                    Today: <strong className="text-cyan-300">Day {todayCalendarDay}</strong>
                   </span>
                 </div>
 
                 {/* Days of Week Header */}
-                <div className="grid grid-cols-7 text-center text-[10px] font-bold text-sky-300/80 uppercase pb-2 mb-1 border-b border-cyan-400/20">
+                <div className="grid grid-cols-7 text-center text-[10px] font-bold text-sky-300/80 uppercase pb-2 mb-1 border-b border-white/10">
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
                     <span key={d}>{d}</span>
                   ))}
                 </div>
 
-                {/* 7x5 Days Matrix */}
+                {/* Dynamic Days Matrix Grid */}
                 <div className="grid grid-cols-7 gap-1.5 text-center">
-                  {[null, null, null, null, ...Array.from({ length: 31 }, (_, i) => i + 1)].map((day, i) => {
+                  {calendarCells.map((day, i) => {
                     if (!day) {
                       return <div key={i} className="h-10" />;
                     }
 
-                    const isPast = day < 9;
-                    const isCurrent = day === 9;
-                    const isFuture = day > 9;
+                    const isPast = day < todayCalendarDay;
+                    const isCurrent = day === todayCalendarDay;
+                    const isFuture = day > todayCalendarDay;
+                    const isDone = completedDailyDays.includes(day);
                     const isSelected = activeDailyDay === day;
 
                     return (
@@ -6547,25 +6752,29 @@ import './index.css';
                         }}
                         className={`relative h-10 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group active:scale-95 ${
                           isSelected
-                            ? 'bg-gradient-to-b from-cyan-500/40 to-blue-600/50 border-2 border-cyan-300 text-white shadow-[0_0_14px_rgba(0,229,255,0.8)] scale-105 z-10'
+                            ? 'bg-gradient-to-b from-cyan-400/45 via-blue-500/55 to-indigo-600/65 border-2 border-cyan-200 text-white shadow-[0_0_16px_rgba(0,229,255,0.8),inset_0_1px_0_rgba(255,255,255,0.5)] scale-105 z-10 backdrop-blur-md'
                             : isCurrent
-                            ? 'bg-gradient-to-b from-cyan-900/60 to-blue-950/70 border-2 border-cyan-400/80 text-cyan-200 shadow-[0_0_8px_rgba(0,229,255,0.4)]'
+                            ? 'bg-gradient-to-b from-cyan-500/25 to-blue-700/40 border-2 border-cyan-400/90 text-cyan-200 shadow-[0_0_10px_rgba(0,229,255,0.45),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md'
+                            : isDone
+                            ? 'bg-emerald-500/15 border border-emerald-400/45 text-emerald-300 hover:border-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md'
                             : isPast
-                            ? 'bg-[#061a3d]/90 border border-emerald-400/40 text-emerald-300 hover:border-emerald-300'
-                            : 'bg-[#030919]/60 border border-slate-800 text-slate-500 hover:text-slate-400'
+                            ? 'bg-white/[0.07] hover:bg-white/[0.12] border border-amber-400/35 text-amber-200/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md'
+                            : 'bg-white/[0.03] border border-white/10 text-slate-500 backdrop-blur-sm'
                         }`}
                       >
-                        <span className={`text-xs font-black font-display leading-none ${isPast ? 'text-emerald-200' : isCurrent ? 'text-cyan-200' : isSelected ? 'text-white' : 'text-slate-400'}`}>
+                        <span className={`text-xs font-black font-display leading-none ${
+                          isSelected ? 'text-white' : isCurrent ? 'text-cyan-200' : isDone ? 'text-emerald-200' : isPast ? 'text-amber-200' : 'text-slate-400'
+                        }`}>
                           {day}
                         </span>
 
                         {/* Status Dots / Badges */}
-                        {isPast && (
+                        {isDone && (
                           <span className="text-[8px] text-amber-300 leading-none mt-0.5">
                             ★
                           </span>
                         )}
-                        {isCurrent && (
+                        {!isDone && isCurrent && (
                           <span className="text-[7.5px] font-black uppercase text-cyan-300 leading-none mt-0.5">
                             TODAY
                           </span>
@@ -6581,78 +6790,62 @@ import './index.css';
                 </div>
               </div>
 
-              {/* 3. Selected Day Mission Telemetry Card */}
-              <div className="rounded-2xl p-4 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between mb-3">
+              {/* 3. Selected Day Mission Card (Glassmorphic) */}
+              <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/65 to-[#071536]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-sm">
+                    <div className="w-8 h-8 rounded-xl bg-white/[0.10] border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-sm backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
                       🎯
                     </div>
-                    <div>
-                      <h3 className="text-xs sm:text-sm font-black font-display text-white tracking-wide">
-                        {isToday ? "Today's Daily Mission" : `Day ${activeDailyDay} Mission Brief`}
-                      </h3>
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        October {activeDailyDay}, 2026 • Protocol #{274 + activeDailyDay}
-                      </span>
-                    </div>
+                    <h3 className="text-xs sm:text-sm font-black font-display text-white tracking-wide">
+                      {isTodaySelected ? "Today's Mission" : `Day ${activeDailyDay} Mission`}
+                    </h3>
                   </div>
 
-                  <span className={`text-[9.5px] font-black uppercase px-2 py-0.5 rounded-full border ${
-                    isToday
-                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_8px_rgba(0,229,255,0.4)]'
-                      : isCompleted
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50'
-                      : 'bg-slate-800 text-slate-400 border-slate-700'
+                  <span className={`text-[9.5px] font-black uppercase px-2 py-0.5 rounded-full border backdrop-blur-md ${
+                    isTodaySelected && !isCompletedDay
+                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_8px_rgba(0,229,255,0.4),inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      : isCompletedDay
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      : isFutureDay
+                      ? 'bg-white/[0.05] text-slate-400 border-white/10'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-400/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
                   }`}>
-                    {isToday ? 'ACTIVE NOW' : isCompleted ? 'COMPLETED (3★)' : 'LOCKED'}
+                    {isTodaySelected && !isCompletedDay ? 'ACTIVE NOW' : isCompletedDay ? 'COMPLETED (3★)' : isFutureDay ? 'LOCKED' : 'AVAILABLE'}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-center py-2 border-y border-cyan-400/15 my-2">
-                  <div className="bg-[#050f26]/80 rounded-xl p-2 border border-cyan-500/20">
-                    <span className="text-[9px] text-slate-400 uppercase font-bold block">Difficulty</span>
+                <div className="grid grid-cols-3 gap-2 text-center py-2 border-t border-white/10 mt-2">
+                  <div className="bg-white/[0.07] rounded-2xl p-2 border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <span className="text-[9px] text-slate-300 uppercase font-bold block">Difficulty</span>
                     <span className="text-xs font-black text-amber-300 font-display block mt-0.5">
-                      {activeDailyDay % 3 === 0 ? 'HARD ⚡' : activeDailyDay % 2 === 0 ? 'MEDIUM' : 'CADET'}
+                      {activeDailyDay % 4 === 0 ? 'EXPERT ⚡' : activeDailyDay % 3 === 0 ? 'HARD ⚡' : activeDailyDay % 2 === 0 ? 'TACTICAL' : 'CADET'}
                     </span>
                   </div>
-                  <div className="bg-[#050f26]/80 rounded-xl p-2 border border-cyan-500/20">
-                    <span className="text-[9px] text-slate-400 uppercase font-bold block">Reward</span>
+                  <div className="bg-white/[0.07] rounded-2xl p-2 border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <span className="text-[9px] text-slate-300 uppercase font-bold block">Reward</span>
                     <span className="text-xs font-black text-emerald-300 font-display block mt-0.5">+150 Coins</span>
                   </div>
-                  <div className="bg-[#050f26]/80 rounded-xl p-2 border border-cyan-500/20">
-                    <span className="text-[9px] text-slate-400 uppercase font-bold block">Bonus</span>
+                  <div className="bg-white/[0.07] rounded-2xl p-2 border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <span className="text-[9px] text-slate-300 uppercase font-bold block">Bonus</span>
                     <span className="text-xs font-black text-cyan-300 font-display block mt-0.5">+20 Gems</span>
                   </div>
                 </div>
-
-                <p className="text-[11px] text-slate-300/90 leading-relaxed mt-2">
-                  {isToday 
-                    ? "Solve today's high-speed quantum arithmetic matrix. Precision completion awards full coins, gems, and extends your active streak!"
-                    : isCompleted
-                    ? "This daily challenge was successfully solved with a 3-star rating. You can replay anytime to train speed and precision."
-                    : `This daily challenge unlocks automatically on October ${activeDailyDay}, 2026.`}
-                </p>
               </div>
 
-              {/* 4. Daily Supply Crate (Daily Login Bonus) */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-r from-[#102761] via-[#0b1c48] to-[#071330] border border-cyan-400/30 shadow-md flex items-center justify-between">
+              {/* 4. Daily Supply Crate (Glassmorphic) */}
+              <div className="rounded-3xl p-3 bg-gradient-to-b from-white/[0.12] via-[#0f2762]/65 to-[#071330]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-xl shadow-[0_0_8px_rgba(168,85,247,0.3)]">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-500/25 border border-purple-300/50 flex items-center justify-center text-xl shadow-[0_0_12px_rgba(168,85,247,0.35),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md">
                     🎁
                   </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-black font-display text-white flex items-center gap-1.5">
-                      <span>Daily Cyber Supply Crate</span>
-                      {dailyGiftClaimed ? (
-                        <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">CLAIMED</span>
-                      ) : (
-                        <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-400 text-slate-950">READY</span>
-                      )}
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
-                      {dailyGiftClaimed ? 'Next free crate available tomorrow!' : "Claim today's free +250 Coins & +10 Gems"}
-                    </div>
+                  <div className="text-xs sm:text-sm font-black font-display text-white flex items-center gap-1.5">
+                    <span>Daily Supply</span>
+                    {dailyGiftClaimed ? (
+                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">CLAIMED</span>
+                    ) : (
+                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 shadow-xs">READY</span>
+                    )}
                   </div>
                 </div>
 
@@ -6661,37 +6854,1194 @@ import './index.css';
                   disabled={dailyGiftClaimed}
                   className={`px-3 py-1.5 rounded-xl font-black text-xs transition-all cursor-pointer ${
                     dailyGiftClaimed
-                      ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-[0_0_12px_rgba(251,191,36,0.6)] active:scale-95'
+                      ? 'bg-white/[0.05] text-slate-500 border border-white/10 cursor-not-allowed backdrop-blur-sm'
+                      : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-[0_0_14px_rgba(251,191,36,0.6),inset_0_1px_0_rgba(255,255,255,0.4)] active:scale-95'
                   }`}
                 >
                   {dailyGiftClaimed ? 'CLAIMED ✓' : 'CLAIM FREE'}
                 </button>
               </div>
 
-              {/* 5. Primary Action Launch Button */}
-              <div className="pt-2">
+              {/* 5. Primary Action Launch Button (Glassmorphic Cyber) */}
+              <div className="pt-1.5">
                 <button
-                  onClick={handleLaunchDailyPuzzle}
-                  disabled={isLocked}
-                  className={`w-full py-4 rounded-2xl font-black font-display text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
-                    isLocked
-                      ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 border border-cyan-300/60 text-white shadow-[0_0_20px_rgba(0,229,255,0.5)] hover:shadow-[0_0_25px_rgba(0,229,255,0.7)] active:scale-98 cursor-pointer'
+                  onClick={() => startDailyChallenge(activeDailyDay)}
+                  disabled={isFutureDay}
+                  className={`w-full py-3.5 rounded-2xl font-black font-display text-sm uppercase tracking-wider transition-all flex items-center justify-center ${
+                    isFutureDay
+                      ? 'bg-white/[0.05] text-slate-500 border border-white/10 cursor-not-allowed backdrop-blur-sm'
+                      : 'bg-gradient-to-r from-cyan-500/90 via-blue-600/95 to-indigo-600/90 border border-white/30 text-white shadow-[0_12px_28px_rgba(0,229,255,0.45),inset_0_1.5px_0_rgba(255,255,255,0.4)] hover:shadow-[0_14px_32px_rgba(0,229,255,0.65)] active:scale-98 cursor-pointer backdrop-blur-md'
                   }`}
                 >
-                  <span>⚡</span>
                   <span>
-                    {isLocked 
-                      ? `LOCKED • UNLOCKS OCT ${activeDailyDay}` 
-                      : isCompleted 
-                      ? `REPLAY DAY ${activeDailyDay} CHALLENGE ›` 
-                      : `START DAY ${activeDailyDay} DAILY PUZZLE ›`}
+                    {isFutureDay 
+                      ? `LOCKED • UNLOCKS ${currentMonthShort.toUpperCase()} ${activeDailyDay}` 
+                      : isCompletedDay 
+                      ? `REPLAY DAY ${activeDailyDay} ›` 
+                      : `START DAY ${activeDailyDay} ›`}
                   </span>
                 </button>
               </div>
 
             </div>
+
+            {/* Season Trophy Dialog Modal (Glassmorphic) */}
+            {showTrophyModal && (
+              <div className="fixed inset-0 z-50 bg-[#06122d]/75 backdrop-blur-xl flex items-center justify-center p-4">
+                <div className="w-full max-w-sm rounded-[32px] bg-gradient-to-b from-white/[0.14] via-[#0f2868]/85 to-[#06122d]/90 border border-white/25 p-5 shadow-[0_25px_60px_rgba(0,0,0,0.7),inset_0_1.5px_0_rgba(255,255,255,0.3)] backdrop-blur-2xl relative text-white animate-in fade-in zoom-in-95 duration-200">
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-400/20 border border-amber-300/50 flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md mb-2">
+                      <img src="/assets/icon_trophy_3d.png" alt="Cup" className="w-12 h-12 object-contain" />
+                    </div>
+                    <h3 className="text-lg font-black font-display text-white uppercase tracking-wider">
+                      {currentMonthName} Cup
+                    </h3>
+                    <p className="text-xs text-amber-200/80 font-mono mt-0.5">
+                      Season {currentSeasonNum} Trophies
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5 my-4">
+                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] text-xs">
+                      <span className="font-bold flex items-center gap-2"><span>🥉</span> Bronze Cup</span>
+                      <span className={completedCount >= 7 ? "text-emerald-300 font-black" : "text-slate-400 font-mono"}>
+                        {completedCount >= 7 ? "UNLOCKED ✓" : `${completedCount}/7 Days`}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] text-xs">
+                      <span className="font-bold flex items-center gap-2"><span>🥈</span> Silver Cup</span>
+                      <span className={completedCount >= 14 ? "text-emerald-300 font-black" : "text-slate-400 font-mono"}>
+                        {completedCount >= 14 ? "UNLOCKED ✓" : `${completedCount}/14 Days`}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] text-xs">
+                      <span className="font-bold flex items-center gap-2"><span>🥇</span> Gold Cup</span>
+                      <span className={completedCount >= 21 ? "text-emerald-300 font-black" : "text-slate-400 font-mono"}>
+                        {completedCount >= 21 ? "UNLOCKED ✓" : `${completedCount}/21 Days`}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/[0.07] border border-amber-400/40 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] text-xs">
+                      <span className="font-bold text-amber-300 flex items-center gap-2"><span>💎</span> Grand Trophy</span>
+                      <span className={completedCount >= daysInCurrentMonth ? "text-amber-300 font-black" : "text-amber-200/60 font-mono"}>
+                        {completedCount >= daysInCurrentMonth ? "UNLOCKED 🏆" : `${completedCount}/${daysInCurrentMonth} Days`}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => { sound.click(); setShowTrophyModal(false); }}
+                    className="w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xs uppercase tracking-wider cursor-pointer shadow-[0_10px_20px_rgba(0,229,255,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // ========================================================
+      // 10B. DEDICATED DAILY CHALLENGE QUANTUM MATRIX GAMEPLAY
+      // ========================================================
+      const renderDailyGameScreen = () => {
+        const {
+          protocolId = (274 + dailyGameDay),
+          difficulty = 'TACTICAL ⚡',
+          rowAlpha = { id: 'mul_add', op1: '×', op2: '+' },
+          rowBeta = { id: 'add_mul', op1: '+', op2: '×' },
+          rowGamma = { id: 'mul_sub', op1: '×', op2: '−' },
+          colLink = { op1: '+', op2: '−' },
+          targetAlpha = 39,
+          targetBeta = 26,
+          targetGamma = 18,
+          targetLink = 10,
+          answers = {},
+          trayNumbers = []
+        } = dailyGamePuzzle || {};
+
+        const a0 = dailyGameAnswers[0];
+        const a1 = dailyGameAnswers[1];
+        const a2 = dailyGameAnswers[2];
+        const a3 = dailyGameAnswers[3];
+        const a4 = dailyGameAnswers[4];
+        const a5 = dailyGameAnswers[5];
+        const a6 = dailyGameAnswers[6];
+        const a7 = dailyGameAnswers[7];
+        const a8 = dailyGameAnswers[8];
+
+        // Row 1: Core Alpha
+        const alphaFilled = a0 !== undefined && a1 !== undefined && a2 !== undefined;
+        const alphaVal = alphaFilled ? evalDailyRow(rowAlpha, a0, a1, a2) : null;
+        const isAlphaCorrect = alphaFilled && alphaVal === targetAlpha;
+
+        // Row 2: Core Beta
+        const betaFilled = a3 !== undefined && a4 !== undefined && a5 !== undefined;
+        const betaVal = betaFilled ? evalDailyRow(rowBeta, a3, a4, a5) : null;
+        const isBetaCorrect = betaFilled && betaVal === targetBeta;
+
+        // Row 3: Core Gamma
+        const gammaFilled = a6 !== undefined && a7 !== undefined && a8 !== undefined;
+        const gammaVal = gammaFilled ? evalDailyRow(rowGamma, a6, a7, a8) : null;
+        const isGammaCorrect = gammaFilled && gammaVal === targetGamma;
+
+        // Resonance Link: Column 2 (a1, a4, a7)
+        const linkFilled = a1 !== undefined && a4 !== undefined && a7 !== undefined;
+        const currentColVal = linkFilled ? evalDailyCol(colLink, a1, a4, a7) : null;
+        const isLinkCorrect = linkFilled && currentColVal === targetLink;
+
+        const isAllSynchronized = isAlphaCorrect && isBetaCorrect && isGammaCorrect && isLinkCorrect;
+
+        // Numbers currently placed in any slot (to dim in tray)
+        const placedValues = Object.values(dailyGameAnswers);
+
+        // Responsive typography helpers
+        const getTileTextClass = (val) => {
+          const str = String(val ?? '');
+          const len = str.length;
+          if (len >= 3) {
+            return largeFontEnabled
+              ? 'text-[clamp(10px,2.7vw,13px)] tracking-tight font-black'
+              : 'text-[clamp(9.5px,2.4vw,11.5px)] tracking-tight font-black';
+          }
+          if (len === 2) {
+            return largeFontEnabled
+              ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black'
+              : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black';
+          }
+          return largeFontEnabled
+            ? 'text-[clamp(16px,4.8vw,22px)] font-black'
+            : 'text-[clamp(14px,4.2vw,19px)] font-black';
+        };
+
+        const getOperatorTextClass = () => {
+          return largeFontEnabled
+            ? 'text-[clamp(14px,4.5vw,20px)] font-black'
+            : 'text-[clamp(12px,3.8vw,17px)] font-black';
+        };
+
+        const getTrayTextClass = (val) => {
+          const str = String(val ?? '');
+          const len = str.length;
+          if (len >= 3) {
+            return largeFontEnabled
+              ? 'text-[clamp(10px,2.6vw,12px)] tracking-tight font-black'
+              : 'text-[clamp(9.5px,2.3vw,11px)] tracking-tight font-black';
+          }
+          if (len === 2) {
+            return largeFontEnabled
+              ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black'
+              : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black';
+          }
+          return largeFontEnabled
+            ? 'text-[clamp(16px,5vw,22px)] font-black'
+            : 'text-[clamp(14px,4.3vw,19px)] font-black';
+        };
+
+        // Check victory condition
+        const evaluateCompletion = (nextAnswers) => {
+          const n0 = nextAnswers[0], n1 = nextAnswers[1], n2 = nextAnswers[2];
+          const n3 = nextAnswers[3], n4 = nextAnswers[4], n5 = nextAnswers[5];
+          const n6 = nextAnswers[6], n7 = nextAnswers[7], n8 = nextAnswers[8];
+
+          const aOk = n0 !== undefined && n1 !== undefined && n2 !== undefined && 
+                      evalDailyRow(rowAlpha, n0, n1, n2) === targetAlpha;
+          const bOk = n3 !== undefined && n4 !== undefined && n5 !== undefined && 
+                      evalDailyRow(rowBeta, n3, n4, n5) === targetBeta;
+          const cOk = n6 !== undefined && n7 !== undefined && n8 !== undefined && 
+                      evalDailyRow(rowGamma, n6, n7, n8) === targetGamma;
+          const linkOk = n1 !== undefined && n4 !== undefined && n7 !== undefined && 
+                         evalDailyCol(colLink, n1, n4, n7) === targetLink;
+
+          if (aOk && bOk && cOk && linkOk) {
+            setTimeout(() => {
+              sound.correct();
+              sound.fanfare();
+              confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+
+              // Mark day as completed
+              setCompletedDailyDays(prev => {
+                const next = Array.from(new Set([...prev, dailyGameDay]));
+                try {
+                  const key = `newromath_daily_completed_${currentCalendarYear}_${currentSeasonNum}`;
+                  localStorage.setItem(key, JSON.stringify(next));
+                } catch (e) {}
+                return next;
+              });
+
+              // Award Rewards (+150 Coins & +20 Gems)
+              setCoins(c => {
+                const next = c + 150;
+                try { localStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+                return next;
+              });
+              setGems(g => {
+                const next = g + 20;
+                try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+                return next;
+              });
+
+              setDailyGameVictoryModal(true);
+            }, 300);
+          }
+        };
+
+        // Place number from tray into active slot
+        const placeDailyNumber = (num) => {
+          if (isDailyGamePaused || dailyGameTimeOver) return;
+          sound.snap();
+
+          const allSlots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+          let targetSlot = dailyGameSelectedSlot;
+          if (targetSlot === null || targetSlot === undefined || dailyGameAnswers[targetSlot] !== undefined) {
+            const nextEmpty = allSlots.find(s => dailyGameAnswers[s] === undefined);
+            if (nextEmpty !== undefined) {
+              targetSlot = nextEmpty;
+            } else {
+              targetSlot = 0;
+            }
+          }
+
+          const nextAnswers = { ...dailyGameAnswers, [targetSlot]: num };
+          setDailyGameAnswers(nextAnswers);
+          setDailyGameHistory(prev => [...prev, targetSlot]);
+
+          // Automatically seek next empty slot
+          const nextEmpty = allSlots.find(s => s !== targetSlot && nextAnswers[s] === undefined);
+          if (nextEmpty !== undefined) {
+            setDailyGameSelectedSlot(nextEmpty);
+          }
+
+          evaluateCompletion(nextAnswers);
+        };
+
+        // Undo last placed number
+        const undoDailyNumber = () => {
+          if (!dailyGameHistory.length) return;
+          sound.click();
+          const lastSlot = dailyGameHistory[dailyGameHistory.length - 1];
+          setDailyGameHistory(prev => prev.slice(0, -1));
+          setDailyGameAnswers(prev => {
+            const next = { ...prev };
+            delete next[lastSlot];
+            return next;
+          });
+          setDailyGameSelectedSlot(lastSlot);
+        };
+
+        // Quantum Scan Hint
+        const handleDailyHint = () => {
+          sound.whoosh();
+          const allSlots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+          const targetSlot = allSlots.find(s => dailyGameAnswers[s] !== answers[s]);
+          if (targetSlot !== undefined) {
+            const nextAnswers = { ...dailyGameAnswers, [targetSlot]: answers[targetSlot] };
+            setDailyGameAnswers(nextAnswers);
+            setDailyGameHistory(prev => [...prev, targetSlot]);
+            setDailyGameSelectedSlot(targetSlot);
+            setDailyHintUsed(h => h + 1);
+            evaluateCompletion(nextAnswers);
+          }
+        };
+
+        const handleDailyReroll = () => {
+          sound.click();
+          startDailyChallenge(dailyGameDay);
+        };
+
+        const renderSlot = (slotIdx, label) => {
+          const val = dailyGameAnswers[slotIdx];
+          const isSelected = dailyGameSelectedSlot === slotIdx;
+          const isFilled = val !== undefined;
+          
+          let slotTag = '';
+          let slotTheme = '';
+          if (slotIdx < 3) {
+            slotTag = `α-${slotIdx + 1}`;
+            slotTheme = 'alpha';
+          } else if (slotIdx < 6) {
+            slotTag = `β-${slotIdx - 2}`;
+            slotTheme = 'beta';
+          } else {
+            slotTag = `γ-${slotIdx - 5}`;
+            slotTheme = 'gamma';
+          }
+
+          return (
+            <button
+              key={slotIdx}
+              onClick={() => {
+                if (dailyGameTimeOver) return;
+                sound.click();
+                if (dailyGameAnswers[slotIdx] !== undefined) {
+                  setDailyGameAnswers(prev => {
+                    const next = { ...prev };
+                    delete next[slotIdx];
+                    return next;
+                  });
+                  setDailyGameHistory(hist => hist.filter(item => item !== slotIdx));
+                  setDailyGameSelectedSlot(slotIdx);
+                } else {
+                  setDailyGameSelectedSlot(slotIdx);
+                }
+              }}
+              aria-label={`Daily Slot ${slotTag}${val !== undefined ? `, ${val}` : ''}`}
+              aria-pressed={isSelected}
+              className={`relative flex items-center justify-center transition-all select-none cursor-pointer w-9 h-9 sm:w-11 sm:h-11 aspect-square rounded-xl shrink-0 ${
+                isSelected
+                  ? 'bg-amber-400/25 border-2 border-yellow-300 shadow-[0_0_16px_rgba(251,191,36,0.9),inset_0_0_8px_rgba(251,191,36,0.4)] scale-105 z-20'
+                  : isFilled
+                  ? `bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#173887] border-2 border-cyan-300 text-white font-black shadow-[0_4px_0_#0b1d4d,0_6px_12px_rgba(0,0,0,0.45),inset_0_1px_2px_rgba(255,255,255,0.6)] ${getTileTextClass(val)}`
+                  : slotTheme === 'alpha'
+                  ? 'bg-[#102a63]/55 hover:bg-[#163884]/65 border-2 border-dashed border-cyan-400/80 hover:border-cyan-300 shadow-[inset_0_2px_6px_rgba(8,20,52,0.4),0_0_8px_rgba(0,229,255,0.2)]'
+                  : slotTheme === 'beta'
+                  ? 'bg-[#211756]/55 hover:bg-[#2c1f72]/65 border-2 border-dashed border-purple-400/80 hover:border-purple-300 shadow-[inset_0_2px_6px_rgba(24,12,60,0.4),0_0_8px_rgba(192,132,252,0.2)]'
+                  : 'bg-[#0e2c22]/55 hover:bg-[#133b2e]/65 border-2 border-dashed border-emerald-400/80 hover:border-emerald-300 shadow-[inset_0_2px_6px_rgba(6,32,20,0.4),0_0_8px_rgba(52,211,153,0.2)]'
+              }`}
+            >
+              {isFilled ? (
+                <span className="font-black text-white text-base sm:text-lg leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  {val}
+                </span>
+              ) : isSelected ? (
+                <span className="text-amber-300 font-mono font-black text-[11px] sm:text-xs tracking-tight leading-none drop-shadow-[0_0_8px_rgba(251,191,36,0.9)] animate-pulse">
+                  {slotTag}
+                </span>
+              ) : (
+                <span className={`font-mono font-black text-[11px] sm:text-xs tracking-tight leading-none ${
+                  slotTheme === 'alpha'
+                    ? 'text-cyan-200 drop-shadow-[0_0_6px_rgba(0,229,255,0.85)]'
+                    : slotTheme === 'beta'
+                    ? 'text-purple-200 drop-shadow-[0_0_6px_rgba(192,132,252,0.85)]'
+                    : 'text-emerald-200 drop-shadow-[0_0_6px_rgba(52,211,153,0.85)]'
+                }`}>
+                  {slotTag}
+                </span>
+              )}
+            </button>
+          );
+        };
+
+        const renderOperator = (symbol, isParen = false) => (
+          <div 
+            className={`flex items-center justify-center select-none font-black shrink-0 ${
+              isParen
+                ? 'w-3 sm:w-4 text-sky-200/85 text-base sm:text-lg font-bold'
+                : 'w-4.5 sm:w-5.5 text-cyan-200 text-base sm:text-lg drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]'
+            }`}
+          >
+            <span>{symbol}</span>
+          </div>
+        );
+
+        const renderFixedTarget = (val, isCorrect = false) => (
+          <div 
+            className={`flex items-center justify-center select-none font-black w-9 h-9 sm:w-11 sm:h-11 aspect-square rounded-xl shrink-0 transition-all ${
+              isCorrect
+                ? 'bg-gradient-to-b from-[#059669] via-[#047857] to-[#064e3b] border-2 border-emerald-300 text-white shadow-[0_4px_0_#022c22,0_0_14px_rgba(16,185,129,0.7),inset_0_1px_2px_rgba(255,255,255,0.6)]'
+                : 'bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#173887] border-2 border-cyan-300 text-white shadow-[0_4px_0_#0b1d4d,0_6px_12px_rgba(0,0,0,0.45),inset_0_1px_2px_rgba(255,255,255,0.6)]'
+            } ${getTileTextClass(val)}`}
+          >
+            <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-none text-sm sm:text-base font-black">{val}</span>
+          </div>
+        );
+
+        return (
+          <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
+            <div 
+              className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 space-y-2.5 max-w-md mx-auto w-full"
+              style={{ paddingBottom: 'max(3.5rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem))' }}
+            >
+              {/* Top Navigation & HUD Header (Fully Responsive on All Android Devices) */}
+              <div 
+                className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1 sm:gap-2 px-3 sm:px-3.5 pt-2 pb-2 shrink-0 w-[calc(100%+1.5rem)]"
+                style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0px))' }}
+              >
+                {/* 1. Left Navigation Controls (True 1:1 Circular Icon Buttons) */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button 
+                    onClick={() => { sound.click(); navigateTo('daily'); }} 
+                    aria-label="Back to daily hub" 
+                    title="Back to daily hub"
+                    className="w-8 h-8 sm:w-8.5 sm:h-8.5 aspect-square rounded-full bg-gradient-to-b from-[#1e4ba6] via-[#163884] to-[#102a63] border-2 border-cyan-400/80 text-cyan-200 flex items-center justify-center shadow-[0_2px_8px_rgba(0,229,255,0.35),inset_0_1px_2px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                  >
+                    <svg className="w-4 h-4 text-cyan-200 drop-shadow-[0_0_6px_rgba(0,229,255,0.85)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                  </button>
+                  <button 
+                    onClick={handleDailyReroll} 
+                    aria-label="Reset daily puzzle" 
+                    title="Reset daily puzzle" 
+                    className="w-8 h-8 sm:w-8.5 sm:h-8.5 aspect-square rounded-full bg-gradient-to-b from-[#1e4ba6] via-[#163884] to-[#102a63] border-2 border-cyan-400/80 text-cyan-200 flex items-center justify-center shadow-[0_2px_8px_rgba(0,229,255,0.35),inset_0_1px_2px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer overflow-hidden shrink-0 group"
+                  >
+                    <svg className="w-4 h-4 text-cyan-200 drop-shadow-[0_0_6px_rgba(0,229,255,0.85)] group-hover:rotate-180 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+                      <path d="M21 3v5h-5" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* 2. Center Daily Mission Pill (Compact & Responsive) */}
+                <div className="flex items-center justify-center bg-[#0d255a]/80 backdrop-blur-md border border-cyan-400/50 rounded-full px-2 sm:px-2.5 py-1 shadow-inner shrink min-w-0">
+                  <span className="text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display truncate">
+                    DAILY #{protocolId}
+                  </span>
+                </div>
+
+                {/* 3. Right Currency Capsules: Gold Coins & Diamonds */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {/* Gold Coins */}
+                  <div 
+                    onClick={() => { sound.click(); navigateTo('rewards'); }}
+                    className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/60 hover:border-amber-300 rounded-xl px-1.5 py-0.5 sm:py-1 flex items-center gap-1 shadow-sm transition-all active:scale-95 cursor-pointer"
+                    title="Coins - Tap for Rewards & Shop"
+                    aria-label={`Coin Balance: ${coins}`}
+                  >
+                    <img 
+                      src="/assets/icon_gold_coin_3d_clean.png" 
+                      alt="Coin" 
+                      className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_4px_rgba(245,158,11,0.7)] group-hover:scale-110 transition-transform" 
+                    />
+                    <span className="text-amber-300 font-black text-[9.5px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                      {coins.toLocaleString()}
+                    </span>
+                    <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[8px] flex items-center justify-center shadow-xs leading-none shrink-0">
+                      +
+                    </span>
+                  </div>
+
+                  {/* Diamonds */}
+                  <div 
+                    onClick={() => { sound.click(); navigateTo('rewards'); }}
+                    className="group bg-gradient-to-r from-[#071d38]/90 via-[#0a2347]/90 to-[#051429]/90 border border-cyan-400/60 hover:border-cyan-300 rounded-xl px-1.5 py-0.5 sm:py-1 flex items-center gap-1 shadow-sm transition-all active:scale-95 cursor-pointer"
+                    title="Diamonds - Tap for Rewards & Shop"
+                    aria-label={`Diamond Balance: ${gems}`}
+                  >
+                    <img 
+                      src="/assets/icon_gem_3d_clean.png" 
+                      alt="Diamond" 
+                      className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_6px_rgba(0,229,255,0.8)] group-hover:scale-110 transition-transform" 
+                    />
+                    <span className="text-cyan-200 font-black text-[9.5px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.6)]">
+                      {gems.toLocaleString()}
+                    </span>
+                    <span className="w-3 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-[8px] flex items-center justify-center shadow-xs leading-none shrink-0">
+                      +
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mission Board Terminal Card (Housing Daily Challenge Functions in Unified Cyber Card) */}
+              <section className="flex flex-col rounded-3xl p-2.5 sm:p-3.5 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl">
+                {/* Blueprint Grid Overlay */}
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+
+                {/* Drafting Corner Crosses */}
+                <span className="absolute top-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+                <span className="absolute top-1.5 right-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+                <span className="absolute bottom-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+                <span className="absolute bottom-1.5 right-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+
+                {/* Mission HUD Header: Difficulty, Timer, and Pause */}
+                <div className="relative z-10 flex items-center justify-between px-1 pb-2.5 text-xs font-bold border-b border-cyan-400/20 mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-900/60 border border-emerald-400/50 text-emerald-300 shadow-xs">
+                      {difficulty}
+                    </span>
+                    <span className="text-[10px] text-cyan-200/80 font-mono font-bold">DAY {dailyGameDay}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono font-black text-xs transition-colors ${
+                      dailyGameTimer <= 15
+                        ? 'animate-timer-warning text-red-200 bg-red-950/80 border border-red-500/80'
+                        : 'text-cyan-200 bg-[#0d2861]/70 border border-cyan-400/50 shadow-inner'
+                    }`}>
+                      <span>⏱️</span>
+                      <span>{formatTimer(dailyGameTimer)}</span>
+                    </div>
+
+                    <button 
+                      onClick={() => { sound.click(); setIsDailyGamePaused(v => !v); }} 
+                      aria-label={isDailyGamePaused ? 'Resume puzzle' : 'Pause puzzle'} 
+                      className="w-7 h-7 rounded-lg bg-[#0d2861]/80 hover:bg-[#13357b] border border-cyan-400/50 text-cyan-300 flex items-center justify-center text-xs font-black shadow-inner active:scale-95 cursor-pointer transition-all"
+                    >
+                      {isDailyGamePaused ? '▶' : '⏸'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Daily Mathematical Equations Matrix (Clean Arcade Board with 3 Mixed Rows + Connected Link) */}
+                <div className="relative z-10 flex flex-col items-center justify-center space-y-1 sm:space-y-1.5 my-2 sm:my-2.5 w-full">
+                  
+                  {/* Row 1: Core Alpha Equation */}
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full py-0.5">
+                    {renderOperator('(', true)}
+                    {renderSlot(0, 'α-1')}
+                    {renderOperator(rowAlpha.op1)}
+                    {renderSlot(1, 'α-2')}
+                    {renderOperator(')', true)}
+                    {renderOperator(rowAlpha.op2)}
+                    {renderSlot(2, 'α-3')}
+                    {renderOperator('=')}
+                    {renderFixedTarget(targetAlpha, isAlphaCorrect)}
+                  </div>
+
+                  {/* Connector 1: Link Operator between Alpha and Beta (Column 2) */}
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full py-0 pointer-events-none select-none">
+                    <div className="w-3 sm:w-4" />
+                    <div className="w-9 sm:w-11" />
+                    <div className="w-4.5 sm:w-5.5" />
+                    <div className="w-9 sm:w-11 flex items-center justify-center">
+                      <span className="text-cyan-200 text-base sm:text-lg font-black leading-none drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]">
+                        {colLink.op1}
+                      </span>
+                    </div>
+                    <div className="w-3 sm:w-4" />
+                    <div className="w-4.5 sm:w-5.5" />
+                    <div className="w-9 sm:w-11" />
+                    <div className="w-4.5 sm:w-5.5" />
+                    <div className="w-9 sm:w-11" />
+                  </div>
+
+                  {/* Row 2: Core Beta Equation */}
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full py-0.5">
+                    {renderOperator('(', true)}
+                    {renderSlot(3, 'β-1')}
+                    {renderOperator(rowBeta.op1)}
+                    {renderSlot(4, 'β-2')}
+                    {renderOperator(')', true)}
+                    {renderOperator(rowBeta.op2)}
+                    {renderSlot(5, 'β-3')}
+                    {renderOperator('=')}
+                    {renderFixedTarget(targetBeta, isBetaCorrect)}
+                  </div>
+
+                  {/* Connector 2: Link Operator between Beta and Gamma (Column 2) */}
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full py-0 pointer-events-none select-none">
+                    <div className="w-3 sm:w-4" />
+                    <div className="w-9 sm:w-11" />
+                    <div className="w-4.5 sm:w-5.5" />
+                    <div className="w-9 sm:w-11 flex items-center justify-center">
+                      <span className="text-cyan-200 text-base sm:text-lg font-black leading-none drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]">
+                        {colLink.op2}
+                      </span>
+                    </div>
+                    <div className="w-3 sm:w-4" />
+                    <div className="w-4.5 sm:w-5.5" />
+                    <div className="w-9 sm:w-11" />
+                    <div className="w-4.5 sm:w-5.5" />
+                    <div className="w-9 sm:w-11" />
+                  </div>
+
+                  {/* Row 3: Core Gamma Equation */}
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full py-0.5">
+                    {renderOperator('(', true)}
+                    {renderSlot(6, 'γ-1')}
+                    {renderOperator(rowGamma.op1)}
+                    {renderSlot(7, 'γ-2')}
+                    {renderOperator(')', true)}
+                    {renderOperator(rowGamma.op2)}
+                    {renderSlot(8, 'γ-3')}
+                    {renderOperator('=')}
+                    {renderFixedTarget(targetGamma, isGammaCorrect)}
+                  </div>
+
+                  {/* Connected Link Status Bar */}
+                  <div className="pt-1.5 pb-0.5 w-full flex justify-center">
+                    <div className={`flex items-center justify-center gap-1.5 px-3 py-1 rounded-xl border text-[10px] sm:text-xs font-mono font-black transition-all ${
+                      isLinkCorrect
+                        ? 'bg-emerald-950/80 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.45)]'
+                        : linkFilled && !isLinkCorrect
+                        ? 'bg-rose-950/80 border-rose-400/80 text-rose-300 shadow-[0_0_8px_rgba(244,63,94,0.35)]'
+                        : 'bg-[#0d2254]/75 border-cyan-400/40 text-cyan-200 shadow-inner'
+                    }`}>
+                      <span className="text-[11px]">🔗</span>
+                      <span className="tracking-tight">LINK: α-2 {colLink.op1} β-2 {colLink.op2} γ-2 = {targetLink}</span>
+                      {isLinkCorrect ? (
+                        <span className="text-emerald-300 font-sans font-bold text-[9px] bg-emerald-900/60 px-1 rounded border border-emerald-400/60">
+                          ✓ LOCKED
+                        </span>
+                      ) : linkFilled && !isLinkCorrect ? (
+                        <span className="text-rose-300 font-sans font-bold text-[9px] bg-rose-900/60 px-1 rounded border border-rose-400/60">
+                          ≠ {currentColVal}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Number Tray Keyboard (3D Green Tiles in 2 Balanced Rows for All Android Screens) */}
+                <div className="relative z-10 flex flex-col items-center gap-1.5 pt-2.5 mt-1 border-t border-cyan-400/20 w-full px-0.5">
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full">
+                    {trayNumbers.slice(0, Math.ceil(trayNumbers.length / 2)).map(number => {
+                      const used = placedValues.includes(number);
+                      return (
+                        <button
+                          key={number}
+                          onClick={() => placeDailyNumber(number)}
+                          disabled={used || isDailyGamePaused || dailyGameTimeOver}
+                          aria-label={`Place number ${number}`}
+                          className={`grid aspect-square min-w-0 flex-1 max-w-[42px] sm:max-w-[46px] place-items-center rounded-xl p-0.5 transition-all select-none overflow-hidden ${
+                            used
+                              ? 'opacity-25 scale-95 border border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed'
+                              : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_3px_0_#064e3b,0_5px_10px_rgba(16,185,129,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
+                          } ${getTrayTextClass(number)}`}
+                        >
+                          <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5 text-xs sm:text-sm">
+                            {number}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full">
+                    {trayNumbers.slice(Math.ceil(trayNumbers.length / 2)).map(number => {
+                      const used = placedValues.includes(number);
+                      return (
+                        <button
+                          key={number}
+                          onClick={() => placeDailyNumber(number)}
+                          disabled={used || isDailyGamePaused || dailyGameTimeOver}
+                          aria-label={`Place number ${number}`}
+                          className={`grid aspect-square min-w-0 flex-1 max-w-[42px] sm:max-w-[46px] place-items-center rounded-xl p-0.5 transition-all select-none overflow-hidden ${
+                            used
+                              ? 'opacity-25 scale-95 border border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed'
+                              : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_3px_0_#064e3b,0_5px_10px_rgba(16,185,129,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
+                          } ${getTrayTextClass(number)}`}
+                        >
+                          <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5 text-xs sm:text-sm">
+                            {number}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+
+              {/* Bottom Action Controls (Modern 3D Cyber Arcade Matching Reference Design) */}
+              <div 
+                className="flex items-center justify-around px-4 pt-3 pb-8 sm:pb-6"
+                style={{ paddingBottom: 'max(2.25rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))' }}
+              >
+                {/* 1. Daily Hub / Mission Records Button */}
+                <button 
+                  onClick={() => { sound.click(); navigateTo('daily'); }} 
+                  aria-label="Daily Challenge Hub" 
+                  className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#173887] border-2 border-cyan-400 text-cyan-100 shadow-[0_4px_0_#0c235c,0_6px_16px_rgba(0,229,255,0.35),inset_0_1px_2px_rgba(255,255,255,0.45)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#0c235c] transition-all cursor-pointer"
+                  title="Daily Hub"
+                >
+                  <svg className="w-6 h-6 text-cyan-200 drop-shadow-[0_0_8px_rgba(0,229,255,0.85)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" />
+                    <rect x="13.5" y="3" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" />
+                    <rect x="3" y="13.5" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" />
+                    <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" />
+                  </svg>
+                </button>
+
+                {/* 2. Undo Move Button */}
+                <button 
+                  onClick={undoDailyNumber} 
+                  aria-label="Undo last number" 
+                  disabled={!dailyGameHistory.length} 
+                  className={`relative grid h-[54px] w-[54px] place-items-center rounded-2xl transition-all ${
+                    dailyGameHistory.length > 0
+                      ? 'bg-gradient-to-b from-[#0284c7] via-[#0369a1] to-[#075985] border-2 border-cyan-300 text-white shadow-[0_4px_0_#082f49,0_8px_20px_rgba(14,165,233,0.55),inset_0_1px_2px_rgba(255,255,255,0.6)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#082f49] cursor-pointer'
+                      : 'bg-gradient-to-b from-[#1b3670]/80 via-[#152c5c]/85 to-[#0f2249]/90 border-2 border-cyan-500/30 shadow-[0_4px_0_#0b1a38] text-cyan-200/50 cursor-not-allowed opacity-75'
+                  }`}
+                  title="Undo Number"
+                >
+                  <svg className={`w-6 h-6 ${dailyGameHistory.length > 0 ? 'text-white drop-shadow-[0_0_8px_rgba(56,189,248,0.95)]' : 'text-cyan-300/60'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 10h11a5 5 0 0 1 5 5v1a5 5 0 0 1-5 5H9" />
+                    <path d="M7 6L3 10l4 4" />
+                  </svg>
+                  {dailyGameHistory.length > 0 && (
+                    <span className="absolute -top-2 -right-2 min-w-[22px] h-[22px] px-1 rounded-full bg-gradient-to-r from-cyan-400 to-sky-300 border-2 border-white text-slate-950 font-black text-[10px] flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.95)] animate-bounce leading-none">
+                      {dailyGameHistory.length}
+                    </span>
+                  )}
+                </button>
+
+                {/* 3. Instructions & Rules Button (Pointed by User Red Arrow) */}
+                <button 
+                  onClick={() => { sound.click(); setShowDailyInstructionsModal(true); }} 
+                  aria-label="Mission Instructions & How to Play" 
+                  className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border-2 border-yellow-200 shadow-[0_4px_0_#92400e,0_8px_24px_rgba(245,158,11,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all cursor-pointer"
+                  title="Mission Instructions"
+                >
+                  <div className="relative flex items-center justify-center">
+                    <span className="absolute w-8 h-8 rounded-full bg-amber-300/40 blur-[3px] animate-pulse pointer-events-none" />
+                    <svg className="w-7 h-7 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.95)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="9.5" stroke="#ffffff" strokeWidth="2.2" fill="rgba(254, 240, 138, 0.3)" />
+                      <line x1="12" y1="16" x2="12" y2="11.5" stroke="#ffffff" strokeWidth="2.5" />
+                      <circle cx="12" cy="8" r="1.3" fill="#ffffff" />
+                    </svg>
+                  </div>
+                  <span className="absolute -bottom-2 rounded-full bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-400 border border-amber-950/40 px-2 py-0.5 text-[9px] font-black text-amber-950 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_10px_rgba(251,191,36,0.95)] tracking-wider leading-none">
+                    INFO
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* 3D Glassmorphic "Protocol Instructions" Banner Modal (Compact Height & Reduced Text Sizes) */}
+            {showDailyInstructionsModal && (
+              <div className="fixed inset-0 z-50 bg-[#06122c]/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="relative w-full max-w-[315px] sm:max-w-[335px] rounded-[32px] p-3.5 pt-9 sm:pt-10 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible max-h-[78vh] sm:max-h-[80vh] flex flex-col">
+
+                  {/* Top Close Button (Top-Right) */}
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      setShowDailyInstructionsModal(false);
+                    }}
+                    aria-label="Close Instructions"
+                    title="Close Instructions"
+                    className="absolute top-3 right-3 z-30 w-7 h-7 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+
+                  {/* 3D Hero + Halo + Arched Banner (Floating Overflow Compact) */}
+                  <div className="absolute -top-11 sm:-top-12 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
+                    <div className="relative flex items-center justify-center">
+                      <div className="absolute -bottom-1 w-24 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                      {/* Sparkle Stars */}
+                      <div className="absolute -top-2 -left-2 text-amber-400 font-bold text-base select-none">✦</div>
+                      <div className="absolute -top-1.5 -right-2 text-amber-400 font-bold text-base select-none">✦</div>
+
+                      {/* 3D Blueprint / Brain Hologram Icon */}
+                      <div className="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 flex items-center justify-center text-2xl sm:text-3xl shadow-[0_6px_16px_rgba(14,165,233,0.5),inset_0_2px_4px_rgba(255,255,255,0.7)]">
+                        <span className="drop-shadow-md">📘</span>
+                      </div>
+                    </div>
+
+                    {/* Arched 3D Banner "Instructions" */}
+                    <div className="relative -mt-2 w-52 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(29,78,216,0.45)] scale-90">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                        <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
+                        <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
+                        <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#1e40af" />
+                        <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#172554" />
+                        <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#dailyInstructionsRibbonGrad)" stroke="#60a5fa" strokeWidth="2" />
+                        <defs>
+                          <linearGradient id="dailyInstructionsRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="50%" stopColor="#2563eb" />
+                            <stop offset="100%" stopColor="#1d4ed8" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
+                        <span className="text-amber-300 text-xs filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                        <span className="font-black text-sm sm:text-base tracking-wide text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.9)] font-display">
+                          Instructions
+                        </span>
+                        <span className="text-amber-300 text-xs filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Clock / Compass Divider */}
+                  <div className="flex items-center justify-center gap-2 my-1 mt-1 shrink-0">
+                    <div className="h-[1.5px] w-8 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                    <div className="w-5 h-5 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 7v5l3 2" />
+                      </svg>
+                    </div>
+                    <div className="h-[1.5px] w-8 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  </div>
+
+                  {/* Headline & Description */}
+                  <h2 className="text-[#152a55] font-black text-xs sm:text-sm tracking-tight font-display mb-0.5 shrink-0">
+                    Quantum Reactor Calibration
+                  </h2>
+                  <p className="text-[#4b618a] text-[9px] sm:text-[9.5px] font-semibold px-2 leading-tight mb-1.5 shrink-0">
+                    Follow these mission parameters to balance all cores:
+                  </p>
+
+                  {/* Scrollable Marked Instructions Content */}
+                  <div className="flex-1 overflow-y-auto no-scrollbar space-y-1.5 text-left pr-0.5">
+                    
+                    {/* 1. System Mission */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-white/90 border border-blue-200/80 shadow-xs">
+                      <div className="flex items-center gap-1 mb-0.5">
+                        <span className="text-xs">🧬</span>
+                        <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-blue-950 font-display">
+                          Mission Objective
+                        </span>
+                      </div>
+                      <p className="text-[8.5px] sm:text-[9px] text-slate-700 font-medium leading-tight">
+                        Balance all <b>3 Reactor Cores</b> simultaneously and lock the central <b>Connected Resonance Link</b> to clear Day {dailyGameDay}.
+                      </p>
+                    </div>
+
+                    {/* 2. Core Alpha Formula */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-[#eff6ff] border border-cyan-300/80 shadow-xs">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <div className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-cyan-500 shadow-xs" />
+                          <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-blue-900 font-display">
+                            Core Alpha // Row 1
+                          </span>
+                        </div>
+                        <span className="text-[8px] font-black text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded border border-cyan-200">
+                          TARGET = {targetAlpha}
+                        </span>
+                      </div>
+                      <div className="p-1 rounded-lg bg-white/90 border border-cyan-200 font-mono text-[9.5px] sm:text-[10px] font-black text-blue-950 text-center my-0.5">
+                        (α-1 {rowAlpha.op1} α-2) {rowAlpha.op2} α-3 = {targetAlpha}
+                      </div>
+                      <p className="text-[8px] sm:text-[8.5px] text-slate-600 leading-tight">
+                        Place data chips in Core Alpha to balance equation 1 to target <b>{targetAlpha}</b>.
+                      </p>
+                    </div>
+
+                    {/* 3. Core Beta Formula */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-[#faf5ff] border border-purple-300/80 shadow-xs">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <div className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-purple-500 shadow-xs" />
+                          <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-purple-900 font-display">
+                            Core Beta // Row 2
+                          </span>
+                        </div>
+                        <span className="text-[8px] font-black text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded border border-purple-200">
+                          TARGET = {targetBeta}
+                        </span>
+                      </div>
+                      <div className="p-1 rounded-lg bg-white/90 border border-purple-200 font-mono text-[9.5px] sm:text-[10px] font-black text-purple-950 text-center my-0.5">
+                        (β-1 {rowBeta.op1} β-2) {rowBeta.op2} β-3 = {targetBeta}
+                      </div>
+                      <p className="text-[8px] sm:text-[8.5px] text-slate-600 leading-tight">
+                        Place data chips in Core Beta to balance equation 2 to target <b>{targetBeta}</b>.
+                      </p>
+                    </div>
+
+                    {/* 4. Core Gamma Formula */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-[#ecfdf5] border border-emerald-300/80 shadow-xs">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <div className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-xs" />
+                          <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-emerald-900 font-display">
+                            Core Gamma // Row 3
+                          </span>
+                        </div>
+                        <span className="text-[8px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
+                          TARGET = {targetGamma}
+                        </span>
+                      </div>
+                      <div className="p-1 rounded-lg bg-white/90 border border-emerald-200 font-mono text-[9.5px] sm:text-[10px] font-black text-emerald-950 text-center my-0.5">
+                        (γ-1 {rowGamma.op1} γ-2) {rowGamma.op2} γ-3 = {targetGamma}
+                      </div>
+                      <p className="text-[8px] sm:text-[8.5px] text-slate-600 leading-tight">
+                        Place data chips in Core Gamma to balance equation 3 to target <b>{targetGamma}</b>.
+                      </p>
+                    </div>
+
+                    {/* 5. Connected Resonance Link */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-[#fffbeb] border border-amber-300/80 shadow-xs">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-amber-950 font-display flex items-center gap-1">
+                          <span>🔗</span> Connected Resonance Link
+                        </span>
+                        <span className="text-[8px] font-black text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                          TARGET = {targetLink}
+                        </span>
+                      </div>
+                      <div className="p-1 rounded-lg bg-white/90 border border-amber-200 font-mono text-[9.5px] sm:text-[10px] font-black text-amber-950 text-center my-0.5">
+                        α-2 {colLink.op1} β-2 {colLink.op2} γ-2 = {targetLink}
+                      </div>
+                      <p className="text-[8px] sm:text-[8.5px] text-slate-600 leading-tight">
+                        The central column connects all 3 cores vertically! Both rows and the column must balance!
+                      </p>
+                    </div>
+
+                  </div>
+
+                  {/* Action Controls */}
+                  <div className="pt-2 shrink-0">
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setShowDailyInstructionsModal(false);
+                      }}
+                      aria-label="Continue Mission"
+                      className="w-full h-9 sm:h-9.5 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-[0_3px_0_#1e40af,0_6px_16px_rgba(37,99,235,0.4),inset_0_1.5px_2px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-0.5 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
+                    >
+                      <span>✓</span>
+                      <span>Got It! Resume Mission</span>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+            {/* 3D Glassmorphic "Time Out" Banner Modal (Identical to Image 2 Reference) */}
+            {dailyGameTimeOver && (
+              <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible">
+
+                  {/* Top Close Button */}
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      setDailyGameTimeOver(false);
+                      navigateTo('daily');
+                    }}
+                    aria-label="Close"
+                    title="Close"
+                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+
+                  {/* 3D Hourglass Hero + Halo + Arched Banner */}
+                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                    <div className="relative flex items-center justify-center">
+                      <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                      {/* Left Splashes */}
+                      <svg className="absolute -left-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+                      <svg className="absolute -left-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+
+                      {/* Right Splashes */}
+                      <svg className="absolute -right-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+                      <svg className="absolute -right-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+
+                      {/* Sparkle Stars */}
+                      <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
+                      <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
+
+                      {/* 3D Hourglass SVG Graphic */}
+                      <svg className="w-24 h-24 drop-shadow-[0_8px_16px_rgba(14,165,233,0.45)]" viewBox="0 0 100 100" fill="none">
+                        <ellipse cx="50" cy="18" rx="22" ry="7" fill="url(#dailyTimeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
+                        <ellipse cx="50" cy="16" rx="19" ry="5" fill="#7dd3fc" />
+                        <ellipse cx="50" cy="82" rx="22" ry="7" fill="url(#dailyTimeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
+                        <ellipse cx="50" cy="80" rx="19" ry="5" fill="#0284c7" />
+                        <path d="M33 20 C33 42, 46 48, 46 50 C46 52, 33 58, 33 80 L67 80 C67 58, 54 52, 54 50 C54 48, 67 42, 67 20 Z" fill="rgba(224, 242, 254, 0.45)" stroke="#38bdf8" strokeWidth="2.5" />
+                        <path d="M36 24 C36 38, 46 44, 46 50 C46 56, 36 62, 36 76" stroke="rgba(255,255,255,0.85)" strokeWidth="2.5" strokeLinecap="round" />
+                        <path d="M38 32 C38 43, 47 47, 50 49 C53 47, 62 43, 62 32 Z" fill="url(#dailyTimeOutHgGold)" />
+                        <ellipse cx="50" cy="32" rx="12" ry="3" fill="#fde047" />
+                        <line x1="50" y1="49" x2="50" y2="68" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 2" />
+                        <path d="M36 78 C38 68, 46 64, 50 64 C54 64, 62 68, 64 78 Z" fill="url(#dailyTimeOutHgGold)" />
+                        <defs>
+                          <linearGradient id="dailyTimeOutHgBlue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#38bdf8" />
+                            <stop offset="50%" stopColor="#0284c7" />
+                            <stop offset="100%" stopColor="#0369a1" />
+                          </linearGradient>
+                          <linearGradient id="dailyTimeOutHgGold" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#fef08a" />
+                            <stop offset="40%" stopColor="#f59e0b" />
+                            <stop offset="100%" stopColor="#d97706" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+
+                    {/* Arched 3D Banner "Time Out" */}
+                    <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(29,78,216,0.5)]">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                        <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
+                        <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
+                        <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#1e40af" />
+                        <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#172554" />
+                        <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#dailyTimeOutRibbonGrad)" stroke="#60a5fa" strokeWidth="2" />
+                        <defs>
+                          <linearGradient id="dailyTimeOutRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="50%" stopColor="#2563eb" />
+                            <stop offset="100%" stopColor="#1d4ed8" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
+                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                        <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                          Time <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Out</span>
+                        </span>
+                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Clock Divider */}
+                  <div className="flex items-center justify-center gap-3 my-3 mt-4">
+                    <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                    <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 7v5l3 2" />
+                      </svg>
+                    </div>
+                    <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  </div>
+
+                  {/* Headline & Description */}
+                  <h2 className="text-[#152a55] font-black text-xl tracking-tight font-display mb-1">
+                    Take a short break!
+                  </h2>
+                  <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-6">
+                    You can continue the game anytime you're ready.
+                  </p>
+
+                  {/* Action Controls */}
+                  <div className="space-y-3">
+                    {/* Primary 3D Restart Button */}
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        startDailyChallenge(dailyGameDay);
+                      }}
+                      aria-label="Restart Daily Challenge"
+                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#1e40af,0_10px_25px_rgba(37,99,235,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
+                    >
+                      <svg className="w-5 h-5 text-white stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                      </svg>
+                      <span>Restart</span>
+                    </button>
+
+                    {/* Secondary Options: +30s Extra Time & Daily Hub */}
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <button
+                        onClick={() => {
+                          sound.click();
+                          setDailyGameTimer(t => t + 30);
+                          setDailyGameTimeOver(false);
+                        }}
+                        aria-label="Extra Time (+30s)"
+                        className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#b45309,0_6px_16px_rgba(245,158,11,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
+                      >
+                        <span>⚡</span>
+                        <span>+30s Time</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          sound.click();
+                          setDailyGameTimeOver(false);
+                          navigateTo('daily');
+                        }}
+                        aria-label="Daily Hub"
+                        className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                      >
+                        <span>⊞</span>
+                        <span>Daily Hub</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 3D Glassmorphic "Daily Cleared" Victory Banner Modal */}
+            {dailyGameVictoryModal && (
+              <div className="fixed inset-0 z-50 bg-[#06122c]/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0fdf4]/95 to-[#dcfce7]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(6,78,59,0.5),inset_0_2px_4px_rgba(255,255,255,0.95)] text-center overflow-visible">
+
+                  {/* Floating 3D Trophy / Star + Arched Ribbon */}
+                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                    <div className="relative flex items-center justify-center">
+                      <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bbf7d0] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                      {/* Golden Sparkles */}
+                      <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-xl select-none animate-pulse">✦</div>
+                      <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-xl select-none animate-pulse">✦</div>
+
+                      {/* 3D Trophy Graphic */}
+                      <div className="w-20 h-20 rounded-3xl bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 border-2 border-yellow-200 flex items-center justify-center text-4xl shadow-[0_10px_25px_rgba(245,158,11,0.5),inset_0_2px_4px_rgba(255,255,255,0.8)]">
+                        🏆
+                      </div>
+                    </div>
+
+                    {/* Arched 3D Banner "Daily Cleared" */}
+                    <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(5,150,105,0.5)]">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                        <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#047857" />
+                        <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#064e3b" />
+                        <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#047857" />
+                        <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#064e3b" />
+                        <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#dailyWinRibbonGrad)" stroke="#34d399" strokeWidth="2" />
+                        <defs>
+                          <linearGradient id="dailyWinRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#10b981" />
+                            <stop offset="50%" stopColor="#059669" />
+                            <stop offset="100%" stopColor="#047857" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
+                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                        <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                          Daily <span className="text-[#fef08a] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Cleared</span>
+                        </span>
+                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Headline */}
+                  <h2 className="text-[#064e3b] font-black text-xl tracking-tight font-display mt-3 mb-1">
+                    Protocol Synchronized!
+                  </h2>
+                  <p className="text-[#047857] text-xs font-semibold px-2 leading-relaxed mb-4">
+                    Day {dailyGameDay} Quantum Matrix Cleared (3★)
+                  </p>
+
+                  {/* Rewards Section */}
+                  <div className="grid grid-cols-2 gap-2 my-3">
+                    <div className="p-2.5 rounded-2xl bg-amber-50 border border-amber-300 shadow-sm flex flex-col items-center">
+                      <span className="text-[10px] text-amber-800 font-bold uppercase">Reward</span>
+                      <span className="text-sm font-black text-amber-600 font-display mt-0.5">+150 Coins 🪙</span>
+                    </div>
+                    <div className="p-2.5 rounded-2xl bg-cyan-50 border border-cyan-300 shadow-sm flex flex-col items-center">
+                      <span className="text-[10px] text-cyan-800 font-bold uppercase">Bonus</span>
+                      <span className="text-sm font-black text-cyan-600 font-display mt-0.5">+20 Gems 💎</span>
+                    </div>
+                  </div>
+
+                  {/* Streak Card */}
+                  <div className="p-2 rounded-xl bg-orange-100/80 border border-orange-300 text-xs text-orange-900 font-bold mb-4 flex items-center justify-center gap-1.5">
+                    <span>🔥</span>
+                    <span>Streak Extended: {streakDays} Consecutive Days!</span>
+                  </div>
+
+                  {/* Primary Return Button */}
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      setDailyGameVictoryModal(false);
+                      navigateTo('daily');
+                    }}
+                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] border-2 border-emerald-200/90 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center shadow-[0_5px_0_#064e3b,0_10px_25px_rgba(16,185,129,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#064e3b] transition-all cursor-pointer"
+                  >
+                    Collect Rewards & Return to Hub
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         );
       };
@@ -7165,11 +8515,11 @@ import './index.css';
                     <div className="grid grid-cols-2 gap-2 mb-3">
                       <div className="bg-[#050f26]/80 border border-orange-400/20 rounded-xl p-2.5 text-center">
                         <span className="text-[9px] text-slate-400 uppercase font-bold block">Current Day</span>
-                        <span className="text-base font-black text-orange-300 font-display block mt-0.5">Day {activeDailyDay} / 31</span>
+                        <span className="text-base font-black text-orange-300 font-display block mt-0.5">Day {todayCalendarDay} / {daysInCurrentMonth}</span>
                       </div>
                       <div className="bg-[#050f26]/80 border border-orange-400/20 rounded-xl p-2.5 text-center">
                         <span className="text-[9px] text-slate-400 uppercase font-bold block">Season Solves</span>
-                        <span className="text-base font-black text-white font-display block mt-0.5">28 Victories</span>
+                        <span className="text-base font-black text-white font-display block mt-0.5">{completedDailyDays.length} Victories</span>
                       </div>
                     </div>
 
@@ -7289,16 +8639,19 @@ import './index.css';
 
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
-            {/* Blueprint Grid Overlay */}
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Glass Underlay */}
             <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/18 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-1/3 -right-20 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 left-0 w-80 h-80 bg-indigo-600/18 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Sticky Modern Header */}
-            <header className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 px-4 py-3 shrink-0">
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <button 
                   onClick={() => { sound.click(); navigateTo('home'); }} 
                   aria-label="Back to home" 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-xl font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-2xl bg-gradient-to-b from-[#1b4394]/80 to-[#12306d]/80 border border-white/20 text-cyan-200 flex items-center justify-center text-xl font-bold shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   ‹
                 </button>
@@ -7306,7 +8659,7 @@ import './index.css';
                 <button 
                   onClick={() => { sound.click(); navigateTo('help'); }} 
                   aria-label="Leaderboard information" 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-2xl bg-gradient-to-b from-[#1b4394]/80 to-[#12306d]/80 border border-white/20 text-cyan-200 flex items-center justify-center text-base font-bold shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   ⓘ
                 </button>
@@ -7316,52 +8669,53 @@ import './index.css';
             {/* Scrollable Arena Body */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-2 space-y-4 relative z-10">
 
-              {/* Champions Arena Podium Stage */}
-              <div className="relative rounded-3xl p-3.5 bg-gradient-to-b from-[#102761]/90 to-[#081538]/95 border border-cyan-400/40 shadow-[0_12px_32px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.15)] overflow-hidden">
-                <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+              {/* Champions Arena Podium Stage (Glassmorphic) */}
+              <div className="relative rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl overflow-hidden">
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-32 bg-amber-400/12 rounded-full blur-2xl pointer-events-none" />
                 
                 <div className="relative z-10 flex items-end justify-center gap-2 pt-5 pb-1">
                   {/* Rank 2 (Silver) */}
                   <div className="flex-1 flex flex-col items-center">
                     <div className="relative mb-2 flex flex-col items-center">
                       <span className="text-xl -mb-1 filter drop-shadow">🥈</span>
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-200 via-sky-300 to-slate-400 border-2 border-white p-0.5 shadow-[0_0_14px_rgba(56,189,248,0.4)] flex items-center justify-center text-xl relative">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-200/90 via-sky-300/80 to-slate-400/90 border-2 border-white/90 p-0.5 shadow-[0_0_16px_rgba(56,189,248,0.5),inset_0_1px_0_rgba(255,255,255,0.4)] backdrop-blur-md flex items-center justify-center text-xl relative">
                         <span>{podium[0].avatar}</span>
                         <span className="absolute -bottom-1 -right-1 text-xs">{podium[0].flag}</span>
                       </div>
-                      <span className="text-[11px] font-black text-white truncate max-w-[80px] mt-1.5 block">
+                      <span className="text-[11px] font-black text-white truncate max-w-[80px] mt-1.5 block drop-shadow-sm">
                         {podium[0].name}
                       </span>
-                      <span className="text-[9px] font-mono text-cyan-300/90 font-bold">
+                      <span className="text-[9px] font-mono text-cyan-200 font-bold bg-white/[0.08] px-1.5 py-0.2 rounded-md border border-white/10 mt-0.5">
                         {podium[0].score}
                       </span>
                     </div>
                     {/* Pillar */}
-                    <div className="w-full h-24 rounded-t-2xl bg-gradient-to-b from-[#1e3a6d] via-[#142852] to-[#0c1833] border-t-2 border-x-2 border-cyan-300/80 flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-b from-slate-200 to-slate-400 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
+                    <div className="w-full h-24 rounded-t-2xl bg-gradient-to-b from-white/[0.16] via-[#163674]/60 to-black/40 border-t-2 border-x-2 border-cyan-300/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(56,189,248,0.2),inset_0_1px_0_rgba(255,255,255,0.25)]">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-b from-slate-100 to-slate-300 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
                         2
                       </div>
-                      <span className="text-[9px] font-mono font-black text-cyan-300 tracking-wider">SILVER</span>
+                      <span className="text-[9px] font-mono font-black text-cyan-200 tracking-wider">SILVER</span>
                     </div>
                   </div>
 
                   {/* Rank 1 (Gold Champion - Center Elevated) */}
                   <div className="flex-1 flex flex-col items-center -translate-y-2">
                     <div className="relative mb-2 flex flex-col items-center">
-                      <span className="text-2xl -mb-1 animate-bounce filter drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">👑</span>
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 border-2 border-yellow-100 p-0.5 shadow-[0_0_22px_rgba(251,191,36,0.7)] flex items-center justify-center text-2xl relative">
+                      <span className="text-2xl -mb-1 animate-bounce filter drop-shadow-[0_0_10px_rgba(251,191,36,0.9)]">👑</span>
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-yellow-100 p-0.5 shadow-[0_0_24px_rgba(251,191,36,0.7),inset_0_1.5px_0_rgba(255,255,255,0.5)] backdrop-blur-md flex items-center justify-center text-2xl relative">
                         <span>{podium[1].avatar}</span>
                         <span className="absolute -bottom-1 -right-1 text-sm">{podium[1].flag}</span>
                       </div>
-                      <span className="text-xs font-black text-amber-200 truncate max-w-[90px] mt-1.5 block">
+                      <span className="text-xs font-black text-amber-200 truncate max-w-[90px] mt-1.5 block drop-shadow-sm">
                         {podium[1].name}
                       </span>
-                      <span className="text-[10px] font-mono text-yellow-300 font-black bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-400/40 mt-0.5">
+                      <span className="text-[10px] font-mono text-yellow-300 font-black bg-amber-400/20 backdrop-blur-md px-2 py-0.5 rounded-full border border-amber-300/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] mt-0.5">
                         {podium[1].score}
                       </span>
                     </div>
                     {/* Pillar */}
-                    <div className="w-full h-32 rounded-t-2xl bg-gradient-to-b from-[#3b2d11] via-[#241a08] to-[#120d04] border-t-2 border-x-2 border-amber-300 flex flex-col items-center justify-between py-2.5 shadow-[0_0_25px_rgba(251,191,36,0.35)]">
+                    <div className="w-full h-32 rounded-t-2xl bg-gradient-to-b from-amber-400/25 via-[#35250c]/60 to-black/50 border-t-2 border-x-2 border-amber-300/90 backdrop-blur-md flex flex-col items-center justify-between py-2.5 shadow-[0_0_25px_rgba(251,191,36,0.3),inset_0_1px_0_rgba(255,255,255,0.3)]">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-b from-amber-200 via-yellow-400 to-amber-500 border-2 border-white text-amber-950 font-black text-sm flex items-center justify-center shadow-lg">
                         1
                       </div>
@@ -7373,23 +8727,23 @@ import './index.css';
                   <div className="flex-1 flex flex-col items-center">
                     <div className="relative mb-2 flex flex-col items-center">
                       <span className="text-xl -mb-1 filter drop-shadow">🥉</span>
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 via-orange-500 to-amber-800 border-2 border-orange-200 p-0.5 shadow-[0_0_14px_rgba(249,115,22,0.4)] flex items-center justify-center text-xl relative">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600/90 via-orange-500/80 to-amber-700/90 border-2 border-orange-200/90 p-0.5 shadow-[0_0_16px_rgba(249,115,22,0.45),inset_0_1px_0_rgba(255,255,255,0.35)] backdrop-blur-md flex items-center justify-center text-xl relative">
                         <span>{podium[2].avatar}</span>
                         <span className="absolute -bottom-1 -right-1 text-xs">{podium[2].flag}</span>
                       </div>
-                      <span className="text-[11px] font-black text-white truncate max-w-[80px] mt-1.5 block">
+                      <span className="text-[11px] font-black text-white truncate max-w-[80px] mt-1.5 block drop-shadow-sm">
                         {podium[2].name}
                       </span>
-                      <span className="text-[9px] font-mono text-orange-300/90 font-bold">
+                      <span className="text-[9px] font-mono text-orange-200 font-bold bg-white/[0.08] px-1.5 py-0.2 rounded-md border border-white/10 mt-0.5">
                         {podium[2].score}
                       </span>
                     </div>
                     {/* Pillar */}
-                    <div className="w-full h-20 rounded-t-2xl bg-gradient-to-b from-[#2e190e] via-[#1f1009] to-[#0f0704] border-t-2 border-x-2 border-amber-500/80 flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+                    <div className="w-full h-20 rounded-t-2xl bg-gradient-to-b from-white/[0.14] via-[#2c180e]/60 to-black/40 border-t-2 border-x-2 border-amber-500/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(249,115,22,0.2),inset_0_1px_0_rgba(255,255,255,0.2)]">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-b from-orange-300 to-amber-600 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
                         3
                       </div>
-                      <span className="text-[9px] font-mono font-black text-amber-400 tracking-wider">BRONZE</span>
+                      <span className="text-[9px] font-mono font-black text-amber-300 tracking-wider">BRONZE</span>
                     </div>
                   </div>
                 </div>
@@ -7397,7 +8751,7 @@ import './index.css';
 
               {/* Leaderboard Table (Ranks 4 - 8) */}
               <div className="space-y-2 pb-2">
-                <div className="flex items-center justify-between px-2 text-[10px] font-mono font-black uppercase tracking-wider text-cyan-300/60 pb-0.5">
+                <div className="flex items-center justify-between px-2 text-[10px] font-mono font-black uppercase tracking-wider text-cyan-300/70 pb-0.5">
                   <span>Rank & Player</span>
                   <span>Total Score</span>
                 </div>
@@ -7405,11 +8759,11 @@ import './index.css';
                 {topPlayers.map((player) => (
                   <div 
                     key={player.rank}
-                    className="relative group bg-gradient-to-r from-[#102761]/90 via-[#0d1e45]/90 to-[#081538]/90 border border-cyan-400/30 hover:border-cyan-400/80 rounded-2xl p-3 flex items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.15)] transition-all hover:scale-[1.01]"
+                    className="relative group bg-gradient-to-r from-white/[0.10] via-[#0d245c]/55 to-[#071536]/70 border border-white/20 hover:border-cyan-300/60 rounded-2xl p-3 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-xl transition-all hover:scale-[1.01]"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {/* Rank Number Keycap */}
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#1b3d82] to-[#0d1f47] border border-cyan-400/50 text-cyan-200 font-mono font-black text-sm flex items-center justify-center shadow-inner shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-white/[0.10] border border-white/25 text-cyan-200 font-mono font-black text-sm flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md shrink-0">
                         #{player.rank}
                       </div>
 
@@ -7421,14 +8775,14 @@ import './index.css';
                             {player.name}
                           </span>
                         </div>
-                        <span className="text-[10px] font-mono text-cyan-300/70 block mt-0.5">
+                        <span className="text-[10px] font-mono text-cyan-300/80 block mt-0.5">
                           {player.title}
                         </span>
                       </div>
                     </div>
 
                     {/* Score Tag */}
-                    <div className="shrink-0 flex items-center gap-1.5 bg-black/40 border border-cyan-400/30 px-3 py-1.5 rounded-xl shadow-inner">
+                    <div className="shrink-0 flex items-center gap-1.5 bg-black/35 border border-white/15 px-3 py-1.5 rounded-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-md">
                       <span className="text-xs">⭐</span>
                       <span className="font-mono font-black text-xs text-cyan-200">
                         {player.score}
@@ -7438,11 +8792,11 @@ import './index.css';
                 ))}
               </div>
 
-              {/* Sticky Player Rank Dock (You) */}
-              <div className="sticky bottom-0 z-20 -mx-3 px-3 py-2 bg-[#07132e]/95 border-t-2 border-cyan-400/60 backdrop-blur-md shadow-[0_-8px_25px_rgba(0,0,0,0.8)]">
-                <div className="bg-gradient-to-r from-[#0284c7] via-[#0369a1] to-[#1e40af] border-2 border-cyan-300 rounded-2xl p-3 flex items-center justify-between shadow-[0_0_20px_rgba(0,229,255,0.4)]">
+              {/* Sticky Player Rank Dock (You - Glassmorphic) */}
+              <div className="sticky bottom-0 z-20 -mx-3 px-3 py-2.5 bg-[#051029]/80 border-t border-white/20 backdrop-blur-2xl shadow-[0_-12px_32px_rgba(0,0,0,0.7)]">
+                <div className="bg-gradient-to-r from-cyan-500/85 via-blue-600/85 to-indigo-600/85 border-2 border-white/40 rounded-2xl p-3 flex items-center justify-between shadow-[0_8px_28px_rgba(0,229,255,0.5),inset_0_1.5px_0_rgba(255,255,255,0.45)] backdrop-blur-xl">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-white text-blue-950 font-mono font-black text-sm flex items-center justify-center shadow-md shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-white/95 text-blue-950 font-mono font-black text-sm flex items-center justify-center shadow-md shrink-0">
                       #{playerRank}
                     </div>
                     <div className="min-w-0">
@@ -7451,7 +8805,7 @@ import './index.css';
                         <span className="font-black text-sm text-white truncate font-display">
                           Player (YOU)
                         </span>
-                        <span className="text-[9px] font-black uppercase bg-emerald-400 text-emerald-950 px-1.5 py-0.2 rounded-full font-mono">
+                        <span className="text-[9px] font-black uppercase bg-emerald-400 text-emerald-950 px-1.5 py-0.2 rounded-full font-mono shadow-xs">
                           ACTIVE
                         </span>
                       </div>
@@ -7461,11 +8815,11 @@ import './index.css';
                      </div>
                    </div>
 
-                   <div className="shrink-0 flex items-center gap-1.5 bg-black/40 border border-cyan-200/50 px-3 py-1.5 rounded-xl">
+                   <div className="shrink-0 flex items-center gap-1.5 bg-black/30 border border-white/30 px-3 py-1.5 rounded-xl backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
                      <span className="text-xs">⭐</span>
                      <span className="font-mono font-black text-xs text-white">
                        {playerScore.toLocaleString()}
-                    </span>
+                     </span>
                   </div>
                 </div>
               </div>
@@ -8630,15 +9984,16 @@ import './index.css';
           case 'splash': return renderSplashScreen();
           case 'onboarding': return renderOnboardingScreen();
           case 'home': return renderHomeScreen();
-          case 'categories': return renderCategoriesScreen();
+          case 'categories': return renderLevelSelectScreen();
           case 'levels': return renderLevelSelectScreen();
           case 'game': return renderGameScreen();
           case 'hint': return renderHintScreen();
           case 'correct': return renderCorrectScreen();
           case 'wrong': return renderWrongScreen();
           case 'daily': return renderDailyScreen();
+          case 'daily_game': return renderDailyGameScreen();
           case 'battle': return renderBattleScreen();
-          case 'stats': return renderStatsScreen();
+          case 'stats': return renderHomeScreen();
           case 'achievements': return renderAchievementsScreen();
           case 'leaderboard': return renderLeaderboardScreen();
           case 'history': return renderHistoryScreen();
