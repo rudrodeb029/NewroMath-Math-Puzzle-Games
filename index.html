@@ -626,15 +626,15 @@
     .nm-loader-overlay{
       position:absolute; inset:0; z-index:10000;
       display:flex; align-items:center; justify-content:center;
-      background:transparent;
+      background:#183278;
       animation:nmLoaderFade .18s ease-out both;
-      pointer-events:none;
+      pointer-events:auto;
     }
-    .nm-loader-overlay.nm-boot{ background:transparent; animation:nmLoaderFade .2s ease-out .35s both; }
+    .nm-loader-overlay.nm-boot{ background:#183278; animation:nmLoaderFade .2s ease-out .35s both; }
     .nm-loader-card{
       width:auto; height:auto; border-radius:0;
-      background:transparent; display:flex; align-items:center; justify-content:center;
-      box-shadow:none; border:none;
+      background:transparent !important; display:flex; align-items:center; justify-content:center;
+      box-shadow:none !important; border:none !important;
     }
     .nm-loader-card svg{ width:100px; height:80px; overflow:visible; }
     @keyframes nmLoaderFade{ from{opacity:0} to{opacity:1} }

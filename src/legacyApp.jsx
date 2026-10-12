@@ -122,7 +122,7 @@ import './index.css';
     }
     const sound = new SoundEngine();
 
-    function PageTransition({ screenKey, direction, children }) {
+    function PageTransition({ screenKey, direction, children, isWaitingForLoad = false }) {
       const [displayedKey, setDisplayedKey] = useState(screenKey);
       const [transition, setTransition] = useState(null);
       const prevChildrenRef = useRef(children);
@@ -202,7 +202,7 @@ import './index.css';
           )}
           <div
             key={`current-${screenKey}`}
-            className={`page-transition-layer page-transition-current ${isHintLayer ? 'hint-layer' : ''} ${incomingAnimClass}`}
+            className={`page-transition-layer page-transition-current ${isHintLayer ? 'hint-layer' : ''} ${incomingAnimClass} ${isWaitingForLoad ? 'opacity-0 pointer-events-none' : ''}`}
           >
             {children}
           </div>
@@ -216,7 +216,7 @@ import './index.css';
     const LOADER_TILE_COLORS = ['red', 'green', 'blue', 'black', 'orange', 'teal', 'gold'];
     function SlidingTileLoader() {
       return (
-        <div className="nm-loader-overlay bg-transparent" role="status" aria-label="Loading">
+        <div className="nm-loader-overlay bg-[#183278]" role="status" aria-label="Loading">
           <div className="nm-loader-card bg-transparent shadow-none border-none">
             <svg className="nm-loader" viewBox="0 0 100 80">
               <g transform="translate(50 0) scale(0.707 0.707) rotate(45 0 0)">
@@ -244,31 +244,56 @@ import './index.css';
     }
 
     // Shows the loader ONLY when the newly opened page is genuinely slow
-    // (its visible images still loading after `delayMs`). Fast pages open instantly, no loader flash.
-    function useSmartPageLoader(screenKey, delayMs = 260, maxMs = 6000) {
+    // (its visible images still loading). Fast pages open instantly, no loader flash.
+    function useSmartPageLoader(screenKey, minDisplayMs = 280, maxMs = 5000) {
       const [visible, setVisible] = useState(false);
+      const showStartRef = useRef(0);
+
       useEffect(() => {
         let cancelled = false;
-        let showTimer = null;
         let maxTimer = null;
+        let minTimer = null;
         const cleanups = [];
+
         const finish = () => {
           if (cancelled) return;
-          cancelled = true;
-          clearTimeout(showTimer);
-          clearTimeout(maxTimer);
-          cleanups.forEach(fn => fn());
-          setVisible(false);
+          const elapsed = Date.now() - showStartRef.current;
+          const remainingMin = showStartRef.current > 0 ? Math.max(0, minDisplayMs - elapsed) : 0;
+          if (remainingMin > 0) {
+            minTimer = setTimeout(() => {
+              if (!cancelled) setVisible(false);
+            }, remainingMin);
+          } else {
+            setVisible(false);
+          }
         };
+
         const raf = requestAnimationFrame(() => {
           if (cancelled) return;
           const layer = document.querySelector('.page-transition-current');
-          if (!layer) return;
+          if (!layer) {
+            setVisible(false);
+            return;
+          }
           const pending = Array.from(layer.querySelectorAll('img'))
             .filter(img => img.getAttribute('loading') !== 'lazy' && !img.complete);
-          if (pending.length === 0) return; // everything ready -> instant, no loader
+
+          if (pending.length === 0) {
+            // Fast screen: all assets cached -> open immediately without loader
+            setVisible(false);
+            return;
+          }
+
+          // Slower screen: assets need downloading -> show loader cleanly with solid theme background
+          showStartRef.current = Date.now();
+          setVisible(true);
+
           let remaining = pending.length;
-          const onDone = () => { remaining -= 1; if (remaining <= 0) finish(); };
+          const onDone = () => {
+            remaining -= 1;
+            if (remaining <= 0) finish();
+          };
+
           pending.forEach(img => {
             img.addEventListener('load', onDone, { once: true });
             img.addEventListener('error', onDone, { once: true });
@@ -277,18 +302,20 @@ import './index.css';
               img.removeEventListener('error', onDone);
             });
           });
-          showTimer = setTimeout(() => { if (!cancelled) setVisible(true); }, delayMs);
+
           maxTimer = setTimeout(finish, maxMs);
         });
+
         return () => {
           cancelled = true;
           cancelAnimationFrame(raf);
-          clearTimeout(showTimer);
           clearTimeout(maxTimer);
+          clearTimeout(minTimer);
           cleanups.forEach(fn => fn());
           setVisible(false);
         };
       }, [screenKey]);
+
       return visible;
     }
 
@@ -6013,7 +6040,7 @@ import './index.css';
 
       return (
         <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans">
-          <PageTransition screenKey={currentScreen} direction={transitionDirection}>
+          <PageTransition screenKey={currentScreen} direction={transitionDirection} isWaitingForLoad={isPageLoading}>
             {renderActiveScreen()}
           </PageTransition>
 
