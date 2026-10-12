@@ -3035,12 +3035,12 @@ import './index.css';
             style={{ paddingBottom: 'max(3.5rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem))' }}
           >
             {/* Top Navigation & HUD Header */}
-            <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2.5 pb-2 shrink-0">
-              <div className="flex items-center gap-2">
+            <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2 pb-2 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button 
                   onClick={() => { sound.click(); navigateTo('levels'); }} 
                   aria-label="Back to levels" 
-                  className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-lg font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   ‹
                 </button>
@@ -3048,7 +3048,7 @@ import './index.css';
                   onClick={rerollPuzzle} 
                   aria-label="Change all puzzle numbers" 
                   title="Change all puzzle numbers" 
-                  className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-lg font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer overflow-hidden"
+                  className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer overflow-hidden"
                 >
                   <span className={`inline-block transition-transform duration-500 ${isSpinningReroll ? 'rotate-180 scale-125 text-white' : ''}`}>
                     ↻
@@ -3057,29 +3057,54 @@ import './index.css';
               </div>
 
               {/* Level Mission Pill */}
-              <div className="flex items-center gap-1.5 bg-black/40 border border-cyan-400/40 rounded-full px-3 py-1 shadow-inner">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span className="text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display">
+              <div className="flex items-center gap-1.5 bg-black/40 border border-cyan-400/40 rounded-full px-2.5 py-1 shadow-inner shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display">
                   Mission L{selectedLevelNum}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => { sound.click(); setShowGamePreferences(v => !v); }} 
-                  aria-label="Puzzle appearance settings" 
-                  aria-expanded={showGamePreferences} 
-                  className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              {/* Currency Capsules: Gold Coins & Diamonds */}
+              <div className="flex items-center gap-1 shrink-0">
+                {/* Gold Coins */}
+                <div 
+                  onClick={() => { sound.click(); navigateTo('rewards'); }}
+                  className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/60 hover:border-amber-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,230,130,0.3)] transition-all active:scale-95 cursor-pointer"
+                  title="Coins - Tap for Rewards & Shop"
+                  aria-label={`Coin Balance: ${coins}`}
                 >
-                  ◉
-                </button>
-                <button 
-                  onClick={() => { sound.click(); navigateTo('settings'); }} 
-                  aria-label="Open settings" 
-                  className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  <img 
+                    src="/assets/icon_gold_coin_3d_clean.png" 
+                    alt="Coin" 
+                    className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_4px_rgba(245,158,11,0.7)] group-hover:scale-110 transition-transform" 
+                  />
+                  <span className="text-amber-300 font-black text-[10px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                    {coins.toLocaleString()}
+                  </span>
+                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
+                    +
+                  </span>
+                </div>
+
+                {/* Diamonds */}
+                <div 
+                  onClick={() => { sound.click(); navigateTo('rewards'); }}
+                  className="group bg-gradient-to-r from-[#071d38]/90 via-[#0a2347]/90 to-[#051429]/90 border border-cyan-400/60 hover:border-cyan-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(186,230,253,0.25)] transition-all active:scale-95 cursor-pointer"
+                  title="Diamonds - Tap for Rewards & Shop"
+                  aria-label={`Diamond Balance: ${gems}`}
                 >
-                  ⚙
-                </button>
+                  <img 
+                    src="/assets/icon_gem_3d_clean.png" 
+                    alt="Diamond" 
+                    className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_6px_rgba(0,229,255,0.8)] group-hover:scale-110 transition-transform" 
+                  />
+                  <span className="text-cyan-200 font-black text-[10px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.6)]">
+                    {gems.toLocaleString()}
+                  </span>
+                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
+                    +
+                  </span>
+                </div>
               </div>
             </div>
 
