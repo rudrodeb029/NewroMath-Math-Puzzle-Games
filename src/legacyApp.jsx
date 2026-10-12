@@ -3098,31 +3098,33 @@ import './index.css';
               {(() => {
                 const selectedCost = getLevelEntryCost(selectedLevelNum);
                 return (
-                  <button
-                    onClick={() => {
-                      sound.click();
-                      attemptStartLevel(selectedLevelNum);
-                    }}
-                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black text-base shadow-[0_6px_22px_rgba(245,158,11,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] active:scale-[0.98] transition-all flex flex-col items-center justify-center border border-amber-200 cursor-pointer mb-8 sm:mb-6"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span>🚀</span>
-                      <span>Launch Mission (Level {selectedLevelNum})</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-amber-950/85 font-mono font-black mt-0.5">
-                      <span className="flex items-center gap-1">
-                        Entry Fee: 
-                        <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
-                        {selectedCost.coins}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
-                        {selectedCost.gems}
-                      </span>
-                      <span className="text-[9.5px] bg-amber-950/20 px-1.5 py-0.5 rounded font-sans uppercase font-bold tracking-wider">Play</span>
-                    </div>
-                  </button>
+                  <div className="flex justify-center pb-5 sm:pb-3">
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        attemptStartLevel(selectedLevelNum);
+                      }}
+                      className="w-full max-w-[270px] py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black shadow-[0_4px_16px_rgba(245,158,11,0.45),inset_0_1px_0_rgba(255,255,255,0.7)] active:scale-[0.98] transition-all flex flex-col items-center justify-center border border-amber-200 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-black">
+                        <span className="text-xs">🚀</span>
+                        <span>Launch Mission (Level {selectedLevelNum})</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-amber-950/85 font-mono font-bold mt-0.5">
+                        <span className="flex items-center gap-0.5">
+                          Fee:
+                          <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-3 h-3 object-contain inline-block shrink-0" />
+                          {selectedCost.coins}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-0.5">
+                          <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-3 h-3 object-contain inline-block shrink-0" />
+                          {selectedCost.gems}
+                        </span>
+                        <span className="text-[9px] bg-amber-950/20 px-1 py-0.5 rounded font-sans uppercase font-bold tracking-wider">Play</span>
+                      </div>
+                    </button>
+                  </div>
                 );
               })()}
             </div>
