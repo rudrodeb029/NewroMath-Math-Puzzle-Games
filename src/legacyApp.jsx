@@ -11326,6 +11326,72 @@ import {
           setIsEditingName(false);
         };
 
+        const ProfileSkeuomorphicCircle = ({ 
+          icon: IconContent, 
+          variant = 'cyan', 
+          size = 'sm', 
+          className = ''
+        }) => {
+          const config = {
+            cyan: {
+              rim: 'from-cyan-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-cyan-200 drop-shadow-[0_0_6px_rgba(6,182,212,0.8)]'
+            },
+            amber: {
+              rim: 'from-amber-200 via-amber-400 to-amber-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]'
+            },
+            emerald: {
+              rim: 'from-emerald-200 via-emerald-400 to-teal-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(16,185,129,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#047857_0%,#065f46_50%,#022c22_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-emerald-200 drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]'
+            },
+            sky: {
+              rim: 'from-sky-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(14,165,233,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#0369a1_0%,#075985_50%,#082f49_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-sky-200 drop-shadow-[0_0_6px_rgba(14,165,233,0.8)]'
+            },
+            orange: {
+              rim: 'from-amber-200 via-orange-400 to-red-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(249,115,22,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#c2410c_0%,#9a3412_50%,#431407_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-orange-200 drop-shadow-[0_0_6px_rgba(249,115,22,0.8)]'
+            },
+            purple: {
+              rim: 'from-purple-200 via-purple-400 to-indigo-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#3b186b_0%,#200b3d_50%,#0e041a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-purple-200 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]'
+            }
+          };
+
+          const s = config[variant] || config.cyan;
+
+          const sizeClasses = {
+            sm: 'w-7 h-7 p-[1px]',
+            md: 'w-7.5 h-7.5 p-[1.5px]',
+            lg: 'w-17 h-17 p-[2px]'
+          }[size] || 'w-7 h-7 p-[1px]';
+
+          return (
+            <div className={`relative ${sizeClasses} rounded-full bg-gradient-to-b ${s.rim} shrink-0 flex items-center justify-center ${className}`}>
+              <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-black/80 via-black/40 to-black/80 flex items-center justify-center shadow-inner">
+                <div className={`w-full h-full rounded-full ${s.disc} flex items-center justify-center relative overflow-hidden`}>
+                  <div className="absolute inset-x-1 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                  <div className="absolute bottom-0.5 w-[60%] h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                  <div className={`relative z-10 flex items-center justify-center ${s.glow}`}>
+                    {typeof IconContent === 'string' ? (
+                      <img src={IconContent} alt="" className="w-full h-full object-contain" />
+                    ) : (
+                      IconContent
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
             {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlay */}
@@ -11366,14 +11432,21 @@ import {
                 {/* Avatar & Player Details */}
                 <div className="relative z-10 flex items-center gap-3.5">
                   <div className="relative shrink-0">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-[#18366d] to-[#0e2147] border-2 border-cyan-300/60 p-1.5 shadow-[0_0_16px_rgba(0,229,255,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md flex items-center justify-center overflow-hidden">
-                      <img 
-                        src={equippedAvatar || "/assets/icon_robot_3d.webp"} 
-                        alt="Player Avatar" 
-                        className="w-full h-full object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.65)] transition-transform duration-300 hover:scale-110" 
-                      />
+                    {/* Skeuomorphic Avatar Pedestal Circle */}
+                    <div className="relative w-17 h-17 rounded-full p-[2px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_6px_16px_rgba(0,0,0,0.6),0_0_16px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-blue-950 via-[#031533] to-cyan-950 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.25)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-2 top-0.5 h-[42%] bg-gradient-to-b from-white/50 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-8 h-1.5 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img 
+                            src={equippedAvatar || "/assets/icon_robot_3d.webp"} 
+                            alt="Player Avatar" 
+                            className="w-11 h-11 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.7)] relative z-10 transition-transform duration-300 hover:scale-110" 
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="absolute -bottom-1.5 -right-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black text-[9px] px-1.5 py-0.5 rounded-full border border-white/70 shadow-sm leading-none">
+                    <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black text-[9px] px-1.5 py-0.5 rounded-full border border-white/80 shadow-[0_2px_6px_rgba(0,0,0,0.5)] leading-none z-20">
                       LV.{activePlayerLevel}
                     </div>
                   </div>
@@ -11398,12 +11471,18 @@ import {
                         <h2 className="text-base sm:text-lg font-black font-display text-white tracking-wide truncate">
                           {playerName}
                         </h2>
+                        {/* Skeuomorphic Edit Name Button */}
                         <button 
                           onClick={() => { setNameInput(playerName); setIsEditingName(true); }}
                           aria-label="Edit Name"
-                          className="w-6 h-6 rounded-lg bg-white/[0.1] border border-white/20 text-cyan-300 flex items-center justify-center hover:bg-white/[0.2] transition-colors cursor-pointer"
+                          className="relative w-7 h-7 rounded-full p-[1.5px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_8px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-center active:scale-95 transition-all cursor-pointer"
                         >
-                          <Pencil className="w-3 h-3 text-cyan-300" />
+                          <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-blue-950 to-cyan-950 flex items-center justify-center shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.8)] flex items-center justify-center relative overflow-hidden">
+                              <div className="absolute inset-x-0.5 top-0.5 h-[40%] bg-gradient-to-b from-white/45 to-transparent rounded-t-full pointer-events-none" />
+                              <Pencil className="w-3 h-3 text-cyan-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] relative z-10" />
+                            </div>
+                          </div>
                         </button>
                       </div>
                     )}
@@ -11444,10 +11523,15 @@ import {
                   </div>
                 </div>
 
-                {/* Treasury & Metric Pillars */}
+                {/* Treasury & Metric Pillars with Skeuomorphic Pedestals */}
                 <div className="relative z-10 grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-white/10">
                   <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
-                    <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain mb-0.5" />
+                    <ProfileSkeuomorphicCircle 
+                      icon={<img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4.5 h-4.5 object-contain" />} 
+                      variant="amber" 
+                      size="sm" 
+                      className="mb-1"
+                    />
                     <span className="text-xs font-black text-amber-300 font-display leading-none">
                       {coins.toLocaleString()}
                     </span>
@@ -11457,7 +11541,12 @@ import {
                   </div>
 
                   <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
-                    <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain mb-0.5" />
+                    <ProfileSkeuomorphicCircle 
+                      icon={<img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4.5 h-4.5 object-contain" />} 
+                      variant="cyan" 
+                      size="sm" 
+                      className="mb-1"
+                    />
                     <span className="text-xs font-black text-cyan-300 font-display leading-none">
                       {gems}
                     </span>
@@ -11467,7 +11556,12 @@ import {
                   </div>
 
                   <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
-                    <Flame className="w-4 h-4 text-orange-400 mb-0.5 shrink-0" />
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Flame className="w-3.5 h-3.5 text-orange-200 shrink-0" />} 
+                      variant="orange" 
+                      size="sm" 
+                      className="mb-1"
+                    />
                     <span className="text-xs font-black text-orange-300 font-display leading-none">
                       {streakDays}d
                     </span>
@@ -11477,7 +11571,12 @@ import {
                   </div>
 
                   <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
-                    <img src="/assets/icon_star_3d.webp" alt="Level" className="w-4 h-4 object-contain mb-0.5" />
+                    <ProfileSkeuomorphicCircle 
+                      icon={<img src="/assets/icon_trophy_3d.webp" alt="Level" className="w-4.5 h-4.5 object-contain" />} 
+                      variant="purple" 
+                      size="sm" 
+                      className="mb-1"
+                    />
                     <span className="text-xs font-black text-purple-300 font-display leading-none">
                       Lv.{activePlayerLevel}
                     </span>
@@ -11488,7 +11587,7 @@ import {
                 </div>
               </div>
 
-              {/* Glassmorphic Gameplay Statistics Card */}
+              {/* Glassmorphic Gameplay Statistics Card with Skeuomorphic Badges */}
               <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
                 <div className="mb-3 px-1">
                   <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
@@ -11497,33 +11596,52 @@ import {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] text-slate-300 uppercase font-bold">Puzzles Solved</span>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Puzzles Solved</span>
+                      <span className="text-base font-black text-emerald-300 font-display block leading-none">{gamesWon}</span>
                     </div>
-                    <span className="text-base font-black text-emerald-300 font-display block">{gamesWon}</span>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />} 
+                      variant="emerald" 
+                      size="sm" 
+                    />
                   </div>
-                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] text-slate-300 uppercase font-bold">Puzzles Played</span>
-                      <Gamepad2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Puzzles Played</span>
+                      <span className="text-base font-black text-white font-display block leading-none">{gamesStarted}</span>
                     </div>
-                    <span className="text-base font-black text-white font-display block">{gamesStarted}</span>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Gamepad2 className="w-3.5 h-3.5 text-sky-200" />} 
+                      variant="sky" 
+                      size="sm" 
+                    />
                   </div>
-                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] text-slate-300 uppercase font-bold">Win Accuracy</span>
-                      <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Win Accuracy</span>
+                      <span className="text-base font-black text-cyan-300 font-display block leading-none">{winRate}%</span>
                     </div>
-                    <span className="text-base font-black text-cyan-300 font-display block">{winRate}%</span>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Target className="w-3.5 h-3.5 text-cyan-200" />} 
+                      variant="cyan" 
+                      size="sm" 
+                    />
                   </div>
-                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] text-slate-300 uppercase font-bold">Total Score</span>
-                      <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Total Score</span>
+                      <span className="text-base font-black text-amber-300 font-display block leading-none">{totalScore}</span>
                     </div>
-                    <span className="text-base font-black text-amber-300 font-display block">{totalScore}</span>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Trophy className="w-3.5 h-3.5 text-amber-200" />} 
+                      variant="amber" 
+                      size="sm" 
+                    />
                   </div>
                 </div>
               </div>
@@ -11703,7 +11821,78 @@ import {
       // 16. SETTINGS SCREEN (Cyber Arcade Modernization)
       // ========================================================
       const renderSettingsScreen = () => {
-        const GlassToggle = ({ checked, onChange, label, sublabel, icon: IconComponent, iconColor = 'text-cyan-300', iconBg = 'bg-cyan-500/20 border-cyan-400/40' }) => (
+        const SkeuomorphicIconCircle = ({ 
+          icon: IconComponent, 
+          variant = 'cyan', 
+          active = true,
+          className = '' 
+        }) => {
+          const config = {
+            cyan: {
+              rim: 'from-cyan-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-cyan-200 drop-shadow-[0_0_6px_rgba(6,182,212,0.8)]'
+            },
+            teal: {
+              rim: 'from-teal-200 via-teal-400 to-emerald-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(20,184,166,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#115e59_0%,#0f4842_50%,#042f2e_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-teal-200 drop-shadow-[0_0_6px_rgba(20,184,166,0.8)]'
+            },
+            sky: {
+              rim: 'from-sky-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(14,165,233,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#0369a1_0%,#075985_50%,#082f49_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-sky-200 drop-shadow-[0_0_6px_rgba(14,165,233,0.8)]'
+            },
+            amber: {
+              rim: 'from-amber-200 via-amber-400 to-amber-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(245,158,11,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]'
+            },
+            emerald: {
+              rim: 'from-emerald-200 via-emerald-400 to-teal-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(16,185,129,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#047857_0%,#065f46_50%,#022c22_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-emerald-200 drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]'
+            },
+            indigo: {
+              rim: 'from-indigo-200 via-indigo-400 to-indigo-800 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(99,102,241,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#312e81_0%,#1e1b4b_50%,#0f172a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-indigo-200 drop-shadow-[0_0_6px_rgba(99,102,241,0.8)]'
+            },
+            rose: {
+              rim: 'from-rose-200 via-rose-400 to-red-800 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(244,63,94,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#881337_0%,#4c0519_50%,#1f020a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-rose-200 drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]'
+            }
+          };
+
+          const s = active ? (config[variant] || config.cyan) : {
+            rim: 'from-slate-400/40 via-slate-600/40 to-slate-900/60 shadow-[0_2px_5px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+            disc: 'bg-[radial-gradient(circle_at_50%_30%,#1e293b_0%,#0f172a_50%,#020617_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]',
+            glow: 'text-slate-500'
+          };
+
+          return (
+            <div className={`relative w-8 h-8 rounded-full p-[1.5px] bg-gradient-to-b ${s.rim} shrink-0 flex items-center justify-center transition-all ${className}`}>
+              <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-black/80 via-black/40 to-black/80 flex items-center justify-center shadow-inner">
+                <div className={`w-full h-full rounded-full ${s.disc} flex items-center justify-center relative overflow-hidden`}>
+                  <div className="absolute inset-x-1 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                  <div className="absolute bottom-0.5 w-4 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                  <div className={`relative z-10 flex items-center justify-center ${s.glow}`}>
+                    {React.isValidElement(IconComponent) ? (
+                      IconComponent
+                    ) : typeof IconComponent === 'function' ? (
+                      <IconComponent className="w-4 h-4" />
+                    ) : (
+                      IconComponent
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const GlassToggle = ({ checked, onChange, label, sublabel, icon: IconComponent, variant = 'cyan' }) => (
           <div 
             onClick={() => {
               sound.click();
@@ -11713,19 +11902,11 @@ import {
           >
             <div className="flex items-center gap-3 min-w-0 pr-3">
               {IconComponent && (
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border transition-all ${
-                  checked 
-                    ? `${iconBg} ${iconColor} shadow-[0_0_8px_rgba(0,229,255,0.25)]` 
-                    : 'bg-white/[0.06] border-white/15 text-slate-400'
-                }`}>
-                  {React.isValidElement(IconComponent) ? (
-                    IconComponent
-                  ) : typeof IconComponent === 'function' ? (
-                    <IconComponent className="w-4 h-4" />
-                  ) : (
-                    IconComponent
-                  )}
-                </div>
+                <SkeuomorphicIconCircle 
+                  icon={IconComponent} 
+                  variant={variant} 
+                  active={checked} 
+                />
               )}
               <div className="min-w-0">
                 <div className="text-xs sm:text-sm font-bold text-white tracking-wide">
@@ -11760,7 +11941,7 @@ import {
           </div>
         );
 
-        const GlassNavRow = ({ label, sublabel, icon: IconComponent, iconColor = 'text-cyan-300', iconBg = 'bg-cyan-500/20 border-cyan-400/40', onClick }) => (
+        const GlassNavRow = ({ label, sublabel, icon: IconComponent, variant = 'cyan', onClick }) => (
           <button 
             onClick={() => {
               sound.click();
@@ -11770,15 +11951,11 @@ import {
           >
             <div className="flex items-center gap-3 min-w-0 pr-3">
               {IconComponent && (
-                <div className={`w-8 h-8 rounded-xl ${iconBg} border flex items-center justify-center shrink-0 ${iconColor} group-hover:scale-105 transition-transform`}>
-                  {React.isValidElement(IconComponent) ? (
-                    IconComponent
-                  ) : typeof IconComponent === 'function' ? (
-                    <IconComponent className="w-4 h-4" />
-                  ) : (
-                    IconComponent
-                  )}
-                </div>
+                <SkeuomorphicIconCircle 
+                  icon={IconComponent} 
+                  variant={variant} 
+                  active={true} 
+                />
               )}
               <div className="min-w-0">
                 <div className="text-xs sm:text-sm font-bold text-white tracking-wide">
@@ -11845,8 +12022,7 @@ import {
                     label="Sound Effects"
                     sublabel="Tactile arcade clicks, fanfare & audio fx"
                     icon={<Volume2 className="w-4 h-4" />}
-                    iconColor="text-cyan-300"
-                    iconBg="bg-cyan-500/20 border-cyan-400/40"
+                    variant="cyan"
                   />
                   <GlassToggle 
                     checked={hapticsEnabled}
@@ -11854,8 +12030,7 @@ import {
                     label="Haptic Feedback"
                     sublabel="Vibration pulses on keypad presses and matches"
                     icon={<Vibrate className="w-4 h-4" />}
-                    iconColor="text-teal-300"
-                    iconBg="bg-teal-500/20 border-teal-400/40"
+                    variant="teal"
                   />
                   <GlassToggle 
                     checked={timerEnabled}
@@ -11863,8 +12038,7 @@ import {
                     label="Game Timer"
                     sublabel="Display countdown clock during puzzle battles"
                     icon={<Timer className="w-4 h-4" />}
-                    iconColor="text-sky-300"
-                    iconBg="bg-sky-500/20 border-sky-400/40"
+                    variant="sky"
                   />
                 </div>
               </div>
@@ -11884,8 +12058,7 @@ import {
                     label="Show Explanation Button"
                     sublabel="Reveal step-by-step mathematical reasoning"
                     icon={<Lightbulb className="w-4 h-4" />}
-                    iconColor="text-amber-300"
-                    iconBg="bg-amber-500/20 border-amber-400/40"
+                    variant="amber"
                   />
                   <GlassToggle 
                     checked={autoSubmitEnabled}
@@ -11893,8 +12066,7 @@ import {
                     label="Auto Submit Answer"
                     sublabel="Automatically verify once equation is filled"
                     icon={<Zap className="w-4 h-4" />}
-                    iconColor="text-emerald-300"
-                    iconBg="bg-emerald-500/20 border-emerald-400/40"
+                    variant="emerald"
                   />
                   <GlassToggle 
                     checked={largeFontEnabled}
@@ -11902,16 +12074,17 @@ import {
                     label="Large Math Font"
                     sublabel="High-legibility enlarged arithmetic tiles"
                     icon={<Type className="w-4 h-4" />}
-                    iconColor="text-indigo-300"
-                    iconBg="bg-indigo-500/20 border-indigo-400/40"
+                    variant="indigo"
                   />
 
                   {/* Division Symbol Notation Selector */}
                   <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300 shrink-0">
-                        <Divide className="w-4 h-4" />
-                      </div>
+                      <SkeuomorphicIconCircle 
+                        icon={<Divide className="w-4 h-4" />} 
+                        variant="indigo" 
+                        active={true} 
+                      />
                       <div>
                         <div className="text-xs sm:text-sm font-bold text-white tracking-wide">Division Notation</div>
                         <div className="text-[10px] text-slate-400 font-medium">Choose arithmetic operator symbol</div>
@@ -11952,8 +12125,7 @@ import {
                     label="How to Play" 
                     sublabel="Master rules, tips & tactical formulas"
                     icon={<BookOpen className="w-4 h-4" />}
-                    iconColor="text-emerald-300"
-                    iconBg="bg-emerald-500/20 border-emerald-400/40"
+                    variant="emerald"
                     onClick={() => navigateTo('help')}
                   />
                 </div>
@@ -11984,9 +12156,11 @@ import {
                       className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-600/20 border border-amber-400/40 hover:border-amber-300 transition-all cursor-pointer text-left active:scale-[0.99] backdrop-blur-md"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
-                          <Crown className="w-4 h-4" />
-                        </div>
+                        <SkeuomorphicIconCircle 
+                          icon={<Crown className="w-4 h-4" />} 
+                          variant="amber" 
+                          active={true} 
+                        />
                         <div>
                           <div className="text-xs sm:text-sm font-bold text-amber-200">Upgrade to PRO VIP Pass</div>
                           <div className="text-[10px] text-amber-300/70 font-medium">Remove ads & get bonus coins + gems</div>
@@ -11998,9 +12172,11 @@ import {
                     </button>
                   ) : (
                     <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0">
-                        <Crown className="w-4 h-4" />
-                      </div>
+                      <SkeuomorphicIconCircle 
+                        icon={<Crown className="w-4 h-4" />} 
+                        variant="emerald" 
+                        active={true} 
+                      />
                       <div>
                         <div className="text-xs sm:text-sm font-bold text-emerald-200">PRO VIP Lifetime Active</div>
                         <div className="text-[10px] text-emerald-300/70 font-medium">Enjoy unlimited ad-free math puzzles</div>
@@ -12024,9 +12200,11 @@ import {
                     className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 hover:bg-white/[0.1] hover:border-white/30 transition-all cursor-pointer text-left active:scale-[0.99] backdrop-blur-md"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center shrink-0 text-cyan-300">
-                        <RotateCcw className="w-4 h-4" />
-                      </div>
+                      <SkeuomorphicIconCircle 
+                        icon={<RotateCcw className="w-4 h-4" />} 
+                        variant="cyan" 
+                        active={true} 
+                      />
                       <div>
                         <div className="text-xs sm:text-sm font-bold text-white">Restore Google Play Purchases</div>
                         <div className="text-[10px] text-slate-400 font-medium">Recover previous purchases on this account</div>
@@ -12056,9 +12234,11 @@ import {
                     className="w-full flex items-center justify-between p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all cursor-pointer text-rose-300 font-bold text-xs sm:text-sm active:scale-[0.99] backdrop-blur-md shadow-inner"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shrink-0">
-                        <Trash2 className="w-4 h-4" />
-                      </div>
+                      <SkeuomorphicIconCircle 
+                        icon={<Trash2 className="w-4 h-4" />} 
+                        variant="rose" 
+                        active={true} 
+                      />
                       <div className="text-left">
                         <div className="text-xs sm:text-sm font-bold text-rose-200">Start Fresh from Level 1</div>
                         <div className="text-[10px] text-rose-300/70 font-medium">Reset campaign progress to beginning</div>
@@ -12844,7 +13024,6 @@ import {
                     className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)] animate-pulse" 
                   />
                   <div className="min-w-0 flex-1">
-                    <span className="text-[9.5px] sm:text-[10px] uppercase font-extrabold tracking-wider text-amber-300 block truncate">Daily Free Bonus</span>
                     <h3 className="text-xs sm:text-sm font-black text-white truncate">Daily Mystery Chest</h3>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       <span className="text-[9.5px] sm:text-[10px] font-bold text-amber-300 flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 rounded-full px-2 py-0.5 shrink-0">
@@ -12893,17 +13072,7 @@ import {
                       👑
                     </div>
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/40">
-                          {purchaseState.isProUser ? 'VIP UNLOCKED' : 'FEATURED PASS'}
-                        </span>
-                        {purchaseState.isProUser && (
-                          <span className="text-[9px] font-black text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-400/40">
-                            ACTIVE ✓
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-sm sm:text-base font-black text-white font-display mt-0.5">
+                      <h3 className="text-sm sm:text-base font-black text-white font-display">
                         PRO VIP Lifetime Pass
                       </h3>
                       <p className="text-[10px] text-amber-200/90 font-medium">
