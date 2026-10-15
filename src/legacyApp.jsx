@@ -1,3 +1,245 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import confetti from 'canvas-confetti';
@@ -12783,8 +13025,15 @@ import {
                 {/* Ad Option 3: Big Jackpot Chest Ad - Glassmorphic Banner */}
                 <div className="rounded-[22px] bg-gradient-to-r from-white/[0.10] via-[#1c2c63]/60 to-[#12224d]/80 backdrop-blur-xl border border-white/20 p-2.5 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.4),inset_0_1.5px_0_rgba(255,255,255,0.2)]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-purple-500/25 border border-purple-400/50 flex items-center justify-center text-lg shadow-[0_0_10px_rgba(168,85,247,0.35)]">
-                      👑
+                    {/* Skeuomorphic Purple Pedestal */}
+                    <div className="relative w-11 h-11 rounded-full p-[2px] bg-gradient-to-b from-purple-200 via-purple-400 to-indigo-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-purple-950 via-[#1e0b36] to-indigo-950 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#3b186b_0%,#200b3d_50%,#0e041a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1 top-0.5 h-[40%] bg-gradient-to-b from-white/40 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-0.5 w-5 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img src="/assets/icon_chest_3d.webp" alt="Chest" className="w-6 h-6 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" />
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <span className="text-xs font-black text-purple-200 block">Jackpot Ad Chest</span>
@@ -12831,13 +13080,20 @@ import {
                           {pack.badge}
                         </span>
                       )}
-                      <div className="text-center pt-1">
-                        <div className="h-9 flex items-center justify-center mb-1">
-                          {pack.isCustomImg ? (
-                            <img src={pack.customIcon} alt={pack.name} className="w-8 h-8 object-contain drop-shadow-[0_2px_6px_rgba(245,158,11,0.7)]" />
-                          ) : (
-                            <span className="text-2xl block">{pack.icon}</span>
-                          )}
+                      <div className="text-center pt-1 flex flex-col items-center">
+                        {/* Skeuomorphic Golden Coin Pedestal Circle */}
+                        <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-amber-200 via-amber-400 to-amber-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                          <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-amber-950 via-[#1a0e02] to-amber-900 flex items-center justify-center shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                              <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                              <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                              {pack.isCustomImg ? (
+                                <img src={pack.customIcon} alt={pack.name} className="w-8 h-8 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" />
+                              ) : (
+                                <span className="text-2xl block relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{pack.icon}</span>
+                              )}
+                            </div>
+                          </div>
                         </div>
                         <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
                         <span className="text-xs font-black text-amber-300 font-display block mt-0.5">
@@ -12890,13 +13146,20 @@ import {
                           {pack.badge}
                         </span>
                       )}
-                      <div className="text-center pt-1">
-                        <div className="h-9 flex items-center justify-center mb-1">
-                          {pack.isCustomImg ? (
-                            <img src={pack.customIcon} alt={pack.name} className="w-8 h-8 object-contain drop-shadow-[0_2px_6px_rgba(6,182,212,0.7)]" />
-                          ) : (
-                            <span className="text-2xl block">{pack.icon}</span>
-                          )}
+                      <div className="text-center pt-1 flex flex-col items-center">
+                        {/* Skeuomorphic Diamond Pedestal Circle */}
+                        <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                          <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-blue-950 via-[#031533] to-cyan-950 flex items-center justify-center shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                              <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                              <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                              {pack.isCustomImg ? (
+                                <img src={pack.customIcon} alt={pack.name} className="w-7 h-7 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" />
+                              ) : (
+                                <span className="text-2xl block relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{pack.icon}</span>
+                              )}
+                            </div>
+                          </div>
                         </div>
                         <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
                         <span className="text-xs font-black text-cyan-200 font-display block mt-0.5">

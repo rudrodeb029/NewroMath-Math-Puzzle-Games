@@ -55,7 +55,8 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     name: 'Pouch of Gold',
     defaultPrice: '$1.99',
     badge: 'POPULAR',
-    icon: '💰',
+    isCustomImg: true,
+    customIcon: '/assets/awards/award_lvl_07.webp',
     isConsumable: true,
     gemsCost: 25,
     description: '5,000 Gold Coins with bonus value'
@@ -67,7 +68,8 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     name: 'Chest of Gold',
     defaultPrice: '$4.99',
     badge: 'BEST VALUE',
-    icon: '📦',
+    isCustomImg: true,
+    customIcon: '/assets/icon_chest_3d.webp',
     isConsumable: true,
     gemsCost: 65,
     description: '15,000 Gold Coins for serious math masters'
@@ -79,7 +81,8 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     name: 'Vault of Gold',
     defaultPrice: '$9.99',
     badge: 'MEGA PACK',
-    icon: '🏦',
+    isCustomImg: true,
+    customIcon: '/assets/awards/award_lvl_20.webp',
     isConsumable: true,
     gemsCost: 160,
     description: '45,000 Gold Coins - unlimited puzzle unlocking'
@@ -105,7 +108,8 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     name: 'Crystal Casket',
     defaultPrice: '$2.99',
     badge: 'HOT',
-    icon: '✨',
+    isCustomImg: true,
+    customIcon: '/assets/awards/award_lvl_18.webp',
     isConsumable: true,
     description: '200 Premium Diamonds with extra bonus gems'
   },
@@ -116,7 +120,8 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     name: 'Crown of Gems',
     defaultPrice: '$6.99',
     badge: 'POPULAR',
-    icon: '👑',
+    isCustomImg: true,
+    customIcon: '/assets/awards/award_lvl_23.webp',
     isConsumable: true,
     description: '600 Premium Diamonds for elite puzzle solvers'
   },
@@ -127,7 +132,8 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     name: 'Diamond Mountain',
     defaultPrice: '$19.99',
     badge: 'BEST DEAL',
-    icon: '🏔️',
+    isCustomImg: true,
+    customIcon: '/assets/awards/award_lvl_15.webp',
     isConsumable: true,
     description: '2,000 Premium Diamonds - the ultimate master treasury'
   }
