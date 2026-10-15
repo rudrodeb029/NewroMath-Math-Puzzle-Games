@@ -272,8 +272,46 @@ import {
   Sparkles,
   Check,
   Calendar,
-  Lock
+  Lock,
+  User,
+  X,
+  Globe,
+  Phone,
+  Mail
 } from 'lucide-react';
+
+const PLAYER_COUNTRIES = [
+  { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: 'BD', name: 'Bangladesh', flag: '🇧🇩' },
+  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+  { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
+  { code: 'CN', name: 'China', flag: '🇨🇳' },
+  { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+  { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
+  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
+  { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+  { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+  { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
+  { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+  { code: 'PK', name: 'Pakistan', flag: '🇵🇰' },
+  { code: 'ID', name: 'Indonesia', flag: '🇮🇩' },
+  { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+  { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
+  { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
+];
 
 
     // ==========================================
@@ -4781,14 +4819,66 @@ import {
           return 'Guest-JFNZLZ';
         }
       });
-      const [isEditingName, setIsEditingName] = useState(false);
-      const [nameInput, setNameInput] = useState(() => {
+      const [playerCountry, setPlayerCountry] = useState(() => {
         try {
-          return GameStorage.getItem('newromath_player_name') || 'Guest-JFNZLZ';
+          return GameStorage.getItem('newromath_player_country') || 'United States';
         } catch (e) {
-          return 'Guest-JFNZLZ';
+          return 'United States';
         }
       });
+      const [playerPhone, setPlayerPhone] = useState(() => {
+        try {
+          return GameStorage.getItem('newromath_player_phone') || '';
+        } catch (e) {
+          return '';
+        }
+      });
+      const [playerEmail, setPlayerEmail] = useState(() => {
+        try {
+          return GameStorage.getItem('newromath_player_email') || '';
+        } catch (e) {
+          return '';
+        }
+      });
+      const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+      const [profileFormName, setProfileFormName] = useState(() => playerName);
+      const [profileFormCountry, setProfileFormCountry] = useState(() => playerCountry);
+      const [profileFormPhone, setProfileFormPhone] = useState(() => playerPhone);
+      const [profileFormEmail, setProfileFormEmail] = useState(() => playerEmail);
+
+      const handleOpenProfileModal = () => {
+        sound.click();
+        setProfileFormName(playerName);
+        setProfileFormCountry(playerCountry || 'United States');
+        setProfileFormPhone(playerPhone || '');
+        setProfileFormEmail(playerEmail || '');
+        setIsProfileModalOpen(true);
+      };
+
+      const handleSaveProfileModal = (e) => {
+        if (e) e.preventDefault();
+        sound.celebrate();
+        const trimmedName = profileFormName.trim() || 'Guest-JFNZLZ';
+        const trimmedCountry = profileFormCountry || 'United States';
+        const trimmedPhone = profileFormPhone.trim();
+        const trimmedEmail = profileFormEmail.trim();
+
+        setPlayerName(trimmedName);
+        setPlayerCountry(trimmedCountry);
+        setPlayerPhone(trimmedPhone);
+        setPlayerEmail(trimmedEmail);
+
+        try {
+          GameStorage.setItem('newromath_player_name', trimmedName);
+          GameStorage.setItem('newromath_player_country', trimmedCountry);
+          GameStorage.setItem('newromath_player_phone', trimmedPhone);
+          GameStorage.setItem('newromath_player_email', trimmedEmail);
+        } catch (err) {}
+
+        confetti({ particleCount: 35, spread: 60 });
+        setRewardToast('🎉 Player profile updated successfully!');
+        setIsProfileModalOpen(false);
+      };
       const gameTimerRef = useRef(45);
       const timerContainerRef = useRef(null);
       const timerDisplayRef = useRef(null);
@@ -11590,44 +11680,34 @@ import {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    {isEditingName ? (
-                      <form onSubmit={handleSaveName} className="flex items-center gap-1.5 mb-1">
-                        <input 
-                          type="text" 
-                          value={nameInput} 
-                          onChange={(e) => setNameInput(e.target.value)} 
-                          maxLength={15}
-                          autoFocus
-                          className="bg-black/40 border border-cyan-300/60 rounded-xl px-2.5 py-1 text-xs text-white font-bold outline-none w-32 shadow-inner"
-                        />
-                        <button type="submit" className="bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-xl shadow-xs cursor-pointer">
-                          OK
-                        </button>
-                      </form>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-base sm:text-lg font-black font-display text-white tracking-wide truncate">
-                          {playerName}
-                        </h2>
-                        {/* Skeuomorphic Edit Name Button */}
-                        <button 
-                          onClick={() => { setNameInput(playerName); setIsEditingName(true); }}
-                          aria-label="Edit Name"
-                          className="relative w-7 h-7 rounded-full p-[1.5px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_8px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-center active:scale-95 transition-all cursor-pointer"
-                        >
-                          <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-blue-950 to-cyan-950 flex items-center justify-center shadow-inner">
-                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.8)] flex items-center justify-center relative overflow-hidden">
-                              <div className="absolute inset-x-0.5 top-0.5 h-[40%] bg-gradient-to-b from-white/45 to-transparent rounded-t-full pointer-events-none" />
-                              <Pencil className="w-3 h-3 text-cyan-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] relative z-10" />
-                            </div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-base sm:text-lg font-black font-display text-white tracking-wide truncate">
+                        {playerName}
+                      </h2>
+                      {/* Skeuomorphic Edit Profile Button */}
+                      <button 
+                        onClick={handleOpenProfileModal}
+                        aria-label="Edit Profile"
+                        title="Edit Profile"
+                        className="relative w-7 h-7 rounded-full p-[1.5px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_8px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-center active:scale-95 transition-all cursor-pointer hover:scale-105 shrink-0"
+                      >
+                        <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-blue-950 to-cyan-950 flex items-center justify-center shadow-inner">
+                          <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.8)] flex items-center justify-center relative overflow-hidden">
+                            <div className="absolute inset-x-0.5 top-0.5 h-[40%] bg-gradient-to-b from-white/45 to-transparent rounded-t-full pointer-events-none" />
+                            <Pencil className="w-3 h-3 text-cyan-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] relative z-10" />
                           </div>
-                        </button>
-                      </div>
-                    )}
+                        </div>
+                      </button>
+                    </div>
 
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       <span className="text-[10px] bg-cyan-400/15 border border-cyan-300/30 text-cyan-200 px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider backdrop-blur-sm">
                         {activePlayerLevel >= 25 ? 'GRANDMASTER' : activePlayerLevel >= 15 ? 'MASTER CADET' : activePlayerLevel >= 5 ? 'CHALLENGER' : 'ROOKIE CADET'}
+                      </span>
+                      {/* Country Flag Badge */}
+                      <span className="text-[9.5px] bg-blue-500/20 border border-cyan-400/40 text-cyan-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm shadow-xs">
+                        <span>{PLAYER_COUNTRIES.find(c => c.name === playerCountry)?.flag || '🌍'}</span>
+                        <span className="truncate max-w-[100px]">{playerCountry}</span>
                       </span>
                       {(() => {
                         const activeAward = LEVEL_AWARDS.find(a => a.icon === equippedAvatar);
@@ -11941,6 +12021,207 @@ import {
               </div>
 
             </div>
+
+            {/* ======================================================== */}
+            {/* SKEUOMORPHIC PROFILE EDIT BANNER / MODAL */}
+            {/* ======================================================== */}
+            {isProfileModalOpen && (
+              <div 
+                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto"
+                onClick={() => setIsProfileModalOpen(false)}
+              >
+                {/* Outer 3D Skeuomorphic Chassis Plate */}
+                <div 
+                  className="relative w-full max-w-sm rounded-[28px] p-[2.5px] bg-gradient-to-b from-cyan-200 via-sky-500 to-blue-900 shadow-[0_25px_60px_rgba(0,0,0,0.95),0_0_35px_rgba(6,182,212,0.4)] overflow-hidden my-auto select-none"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Intermediate Beveled Ridge */}
+                  <div className="w-full h-full p-[3px] rounded-[26px] bg-gradient-to-b from-[#0e2759] via-[#051433] to-[#020a1c] shadow-[inset_0_1.5px_2px_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.8)]">
+                    {/* Inner Tactile Console Surface */}
+                    <div className="w-full h-full rounded-[23px] bg-gradient-to-b from-[#0b2452] via-[#081b3d] to-[#040e24] p-4 sm:p-5 relative overflow-hidden shadow-[inset_0_2px_4px_rgba(255,255,255,0.15),inset_0_-4px_10px_rgba(0,0,0,0.9)]">
+                      {/* Blueprint Grid Watermark */}
+                      <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+
+                      {/* Top Curved Glass Specular Highlight */}
+                      <div className="absolute inset-x-2 top-0 h-32 bg-gradient-to-b from-white/25 via-white/5 to-transparent rounded-t-[23px] pointer-events-none" />
+
+                      {/* Header Bar */}
+                      <div className="relative z-10 flex items-center justify-between pb-3.5 mb-3 border-b border-cyan-400/25">
+                        <div className="flex items-center gap-2.5">
+                          {/* Skeuomorphic Icon Pedestal */}
+                          <div className="relative w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.9)] flex items-center justify-center shrink-0">
+                            <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-blue-950 to-cyan-950 flex items-center justify-center shadow-inner">
+                              <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.8)] flex items-center justify-center relative overflow-hidden">
+                                <div className="absolute inset-x-0.5 top-0.5 h-[40%] bg-gradient-to-b from-white/45 to-transparent rounded-t-full pointer-events-none" />
+                                <User className="w-4 h-4 text-cyan-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] relative z-10" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h3 className="text-sm sm:text-base font-black font-display text-white tracking-wide uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight">
+                              Player Profile
+                            </h3>
+                            <span className="text-[10px] text-cyan-300/80 font-bold tracking-tight block">
+                              Identity & Contact Information
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Skeuomorphic 3D Close Button */}
+                        <button
+                          type="button"
+                          onClick={() => { sound.click(); setIsProfileModalOpen(false); }}
+                          aria-label="Close"
+                          className="relative w-7 h-7 rounded-full p-[1.5px] bg-gradient-to-b from-white/40 via-slate-400 to-slate-700 shadow-[0_2px_6px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0"
+                        >
+                          <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-slate-900 to-black flex items-center justify-center shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#334155_0%,#1e293b_60%,#0f172a_100%)] flex items-center justify-center">
+                              <X className="w-3.5 h-3.5 text-slate-300 drop-shadow" />
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+
+                      {/* Form Body */}
+                      <form onSubmit={handleSaveProfileModal} className="relative z-10 space-y-3">
+                        {/* 1. Name Field */}
+                        <div className="space-y-1">
+                          <label className="flex items-center justify-between text-[11px] font-bold text-cyan-200 tracking-tight">
+                            <span className="flex items-center gap-1">
+                              <span>Player Name</span>
+                              <span className="text-rose-400">*</span>
+                            </span>
+                            <span className="text-[9px] font-mono text-cyan-400/60 uppercase">Max 20 chars</span>
+                          </label>
+                          {/* Skeuomorphic Inset Input Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-sm mr-2 text-cyan-400/70 shrink-0">👤</span>
+                              <input
+                                type="text"
+                                required
+                                maxLength={20}
+                                value={profileFormName}
+                                onChange={(e) => setProfileFormName(e.target.value)}
+                                placeholder="Enter your name"
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm placeholder:text-slate-500 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. Country Selection Field */}
+                        <div className="space-y-1">
+                          <label className="flex items-center justify-between text-[11px] font-bold text-cyan-200 tracking-tight">
+                            <span className="flex items-center gap-1">
+                              <span>Country / Region</span>
+                              <span className="text-rose-400">*</span>
+                            </span>
+                            <span className="text-[9px] font-mono text-cyan-400/60 uppercase">Leaderboard Flag</span>
+                          </label>
+                          {/* Skeuomorphic Inset Select Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-base mr-2 shrink-0">
+                                {PLAYER_COUNTRIES.find(c => c.name === profileFormCountry)?.flag || '🌍'}
+                              </span>
+                              <select
+                                value={profileFormCountry}
+                                onChange={(e) => setProfileFormCountry(e.target.value)}
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm outline-none cursor-pointer appearance-none"
+                                style={{ colorScheme: 'dark' }}
+                              >
+                                {PLAYER_COUNTRIES.map((country) => (
+                                  <option 
+                                    key={country.code} 
+                                    value={country.name}
+                                    className="bg-[#051433] text-white py-1"
+                                  >
+                                    {country.name}
+                                  </option>
+                                ))}
+                              </select>
+                              <span className="text-[10px] text-cyan-300 pointer-events-none ml-1 shrink-0">▼</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 3. Phone Number (Optional) */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-bold tracking-tight">
+                            <span className="text-cyan-200">Phone Number</span>
+                            <span className="text-[9px] font-mono font-bold text-slate-400 bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/10">
+                              Optional
+                            </span>
+                          </div>
+                          {/* Skeuomorphic Inset Input Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-sm mr-2 text-cyan-400/70 shrink-0">📱</span>
+                              <input
+                                type="tel"
+                                value={profileFormPhone}
+                                onChange={(e) => setProfileFormPhone(e.target.value)}
+                                placeholder="+1 (555) 000-0000"
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm placeholder:text-slate-500 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 4. Email Address (Optional) */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-bold tracking-tight">
+                            <span className="text-cyan-200">Email Address</span>
+                            <span className="text-[9px] font-mono font-bold text-slate-400 bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/10">
+                              Optional
+                            </span>
+                          </div>
+                          {/* Skeuomorphic Inset Input Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-sm mr-2 text-cyan-400/70 shrink-0">✉️</span>
+                              <input
+                                type="email"
+                                value={profileFormEmail}
+                                onChange={(e) => setProfileFormEmail(e.target.value)}
+                                placeholder="player@example.com"
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm placeholder:text-slate-500 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions: Save Button & Cancel */}
+                        <div className="pt-2 flex flex-col gap-2">
+                          {/* Skeuomorphic 3D Save Button */}
+                          <button
+                            type="submit"
+                            className="relative w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black flex items-center justify-center gap-2 shadow-[0_4px_0_#92400e,0_8px_18px_rgba(245,158,11,0.45),inset_0_1px_1.5px_rgba(255,255,255,0.85)] active:translate-y-1 active:shadow-[0_1px_0_#92400e] cursor-pointer transition-all border border-amber-200/80 uppercase tracking-wider text-xs sm:text-sm overflow-hidden"
+                          >
+                            {/* Curved specular highlight */}
+                            <div className="absolute inset-x-2 top-0 h-1/2 bg-gradient-to-b from-white/45 to-transparent rounded-t-xl pointer-events-none" />
+                            <span className="text-xs">💾</span>
+                            <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]">
+                              Save Profile
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => { sound.click(); setIsProfileModalOpen(false); }}
+                            className="w-full py-1.5 text-center text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
       };
