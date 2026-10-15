@@ -8470,6 +8470,75 @@ import {
           ...Array.from({ length: daysInCurrentMonth }, (_, i) => i + 1)
         ];
 
+        // Skeuomorphic Circular Pedestal for Daily Challenge Badges
+        const DailySkeuomorphicCircle = ({ 
+          icon: IconContent, 
+          variant = 'cyan', 
+          size = 'md',
+          className = '' 
+        }) => {
+          const config = {
+            amber: {
+              rim: 'from-amber-200 via-amber-400 to-amber-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_14px_rgba(245,158,11,0.45),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_2.5px_5px_rgba(0,0,0,0.85),inset_0_-1px_1.5px_rgba(255,255,255,0.25)]',
+              glow: 'text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]'
+            },
+            cyan: {
+              rim: 'from-cyan-200 via-sky-400 to-blue-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_14px_rgba(6,182,212,0.45),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_2.5px_5px_rgba(0,0,0,0.85),inset_0_-1px_1.5px_rgba(255,255,255,0.25)]',
+              glow: 'text-cyan-200 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]'
+            },
+            emerald: {
+              rim: 'from-emerald-200 via-emerald-400 to-teal-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_14px_rgba(16,185,129,0.45),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#047857_0%,#065f46_50%,#022c22_100%)] shadow-[inset_0_2.5px_5px_rgba(0,0,0,0.85),inset_0_-1px_1.5px_rgba(255,255,255,0.25)]',
+              glow: 'text-emerald-200 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]'
+            },
+            rose: {
+              rim: 'from-rose-200 via-rose-400 to-rose-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_14px_rgba(244,63,94,0.45),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#881337_0%,#4c0519_50%,#20030b_100%)] shadow-[inset_0_2.5px_5px_rgba(0,0,0,0.85),inset_0_-1px_1.5px_rgba(255,255,255,0.25)]',
+              glow: 'text-rose-200 drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]'
+            },
+            purple: {
+              rim: 'from-purple-200 via-purple-400 to-indigo-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_14px_rgba(168,85,247,0.45),inset_0_1.5px_1.5px_rgba(255,255,255,0.9)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#3b186b_0%,#200b3d_50%,#0e041a_100%)] shadow-[inset_0_2.5px_5px_rgba(0,0,0,0.85),inset_0_-1px_1.5px_rgba(255,255,255,0.25)]',
+              glow: 'text-purple-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]'
+            },
+            slate: {
+              rim: 'from-slate-300 via-slate-400 to-slate-700 shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1.5px_1.5px_rgba(255,255,255,0.6)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#1e293b_0%,#0f172a_50%,#020617_100%)] shadow-[inset_0_2.5px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.2)]',
+              glow: 'text-slate-400'
+            }
+          };
+
+          const s = config[variant] || config.cyan;
+
+          const sizeClasses = {
+            sm: 'w-7.5 h-7.5 p-[1px]',
+            md: 'w-8.5 h-8.5 p-[1.5px]',
+            lg: 'w-10.5 h-10.5 p-[1.5px]',
+            xl: 'w-15 h-15 p-[2px]'
+          }[size] || 'w-8.5 h-8.5 p-[1.5px]';
+
+          return (
+            <div className={`relative ${sizeClasses} rounded-full bg-gradient-to-b ${s.rim} shrink-0 flex items-center justify-center ${className}`}>
+              <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-black/85 via-black/45 to-black/85 flex items-center justify-center shadow-inner">
+                <div className={`w-full h-full rounded-full ${s.disc} flex items-center justify-center relative overflow-hidden`}>
+                  <div className="absolute inset-x-1 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                  <div className="absolute bottom-0.5 w-[60%] h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                  <div className={`relative z-10 flex items-center justify-center ${s.glow}`}>
+                    {typeof IconContent === 'string' ? (
+                      <span className="leading-none">{IconContent}</span>
+                    ) : (
+                      IconContent
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
             {/* Mathematical Coordinate Blueprint Overlay & Luminous Glass Underlay */}
@@ -8556,14 +8625,18 @@ import {
                 <div className="relative z-10 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="relative shrink-0">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400/25 via-amber-500/15 to-yellow-600/25 border border-amber-300/60 flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.35),inset_0_1.5px_0_rgba(255,255,255,0.35)] backdrop-blur-md">
-                        <img 
-                          src="/assets/icon_trophy_3d.webp" 
-                          alt="Monthly Trophy" 
-                          className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(255,200,0,0.5)]" 
-                        />
-                      </div>
-                      <span className="absolute -bottom-1 -right-1 bg-amber-400 text-slate-950 font-black text-[9px] px-1 rounded-full shadow-xs">
+                      <DailySkeuomorphicCircle 
+                        icon={
+                          <img 
+                            src="/assets/icon_trophy_3d.webp" 
+                            alt="Monthly Trophy" 
+                            className="w-10 h-10 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.7)] transition-transform hover:scale-105" 
+                          />
+                        }
+                        variant="amber" 
+                        size="xl"
+                      />
+                      <span className="absolute -bottom-0.5 -right-0.5 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black text-[8.5px] px-1.5 py-0.2 rounded-full border border-white/80 shadow-[0_2px_6px_rgba(0,0,0,0.5)] leading-none z-20">
                         TOP
                       </span>
                     </div>
@@ -8580,27 +8653,7 @@ import {
                     </div>
                   </div>
 
-                  {/* Streak Flame Pill */}
-                  {/* Streak Flame Pill */}
-                  <div 
-                    onClick={() => {
-                      if (streakDays === 0) {
-                        setRewardToast("Streak broken! Complete today's mission or recover missed days to rebuild your streak.");
-                      } else {
-                        setRewardToast(`🔥 Active Streak: ${streakDays} Consecutive Days!`);
-                      }
-                    }}
-                    className="shrink-0 flex flex-col items-center justify-center px-3 py-1.5 rounded-2xl bg-white/[0.08] border border-orange-400/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md cursor-pointer active:scale-95 transition-transform"
-                    title="Consecutive Daily Challenges Completed"
-                  >
-                    <span className="text-base leading-none drop-shadow-[0_2px_6px_rgba(249,115,22,0.6)]">🔥</span>
-                    <span className="text-xs font-black text-orange-300 font-display mt-0.5 leading-none">
-                      {streakDays}d
-                    </span>
-                    <span className="text-[8px] text-orange-200/80 font-bold uppercase tracking-tight mt-0.5">
-                      Streak
-                    </span>
-                  </div>
+
                 </div>
 
                 {/* Progress Bar with Milestone Stats */}
@@ -8628,9 +8681,11 @@ import {
               <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/65 to-[#071536]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-xl bg-white/[0.10] border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-xs backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
-                      📆
-                    </div>
+                    <DailySkeuomorphicCircle 
+                      icon={<span className="text-xs leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">📆</span>}
+                      variant="cyan" 
+                      size="sm"
+                    />
                     <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
                       {currentMonthName} {currentCalendarYear}
                     </h3>
@@ -8747,17 +8802,23 @@ import {
               <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/65 to-[#071536]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ${
-                      isCompletedDay
-                        ? 'bg-emerald-500/25 border border-emerald-400/50 text-emerald-300'
-                        : isMissedDay
-                        ? 'bg-rose-500/25 border border-rose-400/50 text-rose-300'
-                        : isTodaySelected
-                        ? 'bg-cyan-500/25 border border-cyan-400/50 text-cyan-300'
-                        : 'bg-white/[0.10] border border-white/20 text-slate-400'
-                    }`}>
-                      {isCompletedDay ? '★' : isMissedDay ? '✕' : isTodaySelected ? '🎯' : '🔒'}
-                    </div>
+                    <DailySkeuomorphicCircle 
+                      icon={
+                        isCompletedDay ? (
+                          <span className="text-emerald-200 font-black text-sm leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">★</span>
+                        ) : isMissedDay ? (
+                          <span className="text-rose-200 font-black text-sm leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">✕</span>
+                        ) : isTodaySelected ? (
+                          <span className="text-sm leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">🎯</span>
+                        ) : (
+                          <span className="text-xs leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">🔒</span>
+                        )
+                      }
+                      variant={
+                        isCompletedDay ? 'emerald' : isMissedDay ? 'rose' : isTodaySelected ? 'cyan' : 'slate'
+                      }
+                      size="md"
+                    />
                     <div>
                       <h3 className="text-xs sm:text-sm font-black font-display text-white tracking-wide">
                         {isTodaySelected ? "Today's Mission" : `Day ${activeDailyDay} Mission`}
@@ -8824,16 +8885,15 @@ import {
               {/* 4. Daily Supply Crate (Glassmorphic) */}
               <div className="rounded-3xl p-3 bg-gradient-to-b from-white/[0.12] via-[#0f2762]/65 to-[#071330]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-purple-500/25 border border-purple-300/50 flex items-center justify-center text-xl shadow-[0_0_12px_rgba(168,85,247,0.35),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md">
-                    🎁
-                  </div>
-                  <div className="text-xs sm:text-sm font-black font-display text-white flex items-center gap-1.5">
+                  <DailySkeuomorphicCircle 
+                    icon={
+                      <span className="text-xl leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">🎁</span>
+                    }
+                    variant={dailyGiftClaimed ? 'purple' : 'amber'}
+                    size="lg"
+                  />
+                  <div className="text-xs sm:text-sm font-black font-display text-white">
                     <span>Daily Supply</span>
-                    {dailyGiftClaimed ? (
-                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">CLAIMED</span>
-                    ) : (
-                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 shadow-xs">READY</span>
-                    )}
                   </div>
                 </div>
 
