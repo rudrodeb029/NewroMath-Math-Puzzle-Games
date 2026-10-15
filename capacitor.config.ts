@@ -9,7 +9,8 @@ const config: CapacitorConfig = {
   },
   plugins: {
     Haptics: {},
-    Preferences: {}
+    Preferences: {},
+    AdMob: {}
   }
 };
 

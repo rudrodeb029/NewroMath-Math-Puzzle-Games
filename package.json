@@ -5,14 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && node scripts/copy-assets.mjs",
-    "preview": "vite preview"
+    "build": "node scripts/convert-assets-to-webp.mjs && tsc && vite build && node scripts/copy-assets.mjs",
+    "preview": "vite preview",
+    "postinstall": "node scripts/patch-iap.mjs"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^6.2.0",
     "@capacitor/android": "^6.2.2",
     "@capacitor/core": "^6.2.0",
     "@capacitor/haptics": "^6.0.2",
     "@capacitor/preferences": "^6.0.3",
+    "@capgo/native-purchases": "^6.0.42",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "^0.475.0",
     "react": "^18.3.1",
@@ -27,6 +30,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.2",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
     "vite": "^5.4.11"

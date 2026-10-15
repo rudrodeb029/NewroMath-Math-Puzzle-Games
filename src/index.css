@@ -1,3 +1,5 @@
+@import '/fonts/cormorant-garamond.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,16 +8,22 @@
   --app-safe-top: env(safe-area-inset-top, 0px);
   --app-safe-bottom: env(safe-area-inset-bottom, 0px);
   -webkit-tap-highlight-color: transparent;
+  font-family: 'Cormorant Garamond', 'EB Garamond', Garamond, 'Times New Roman', Georgia, serif;
+}
+
+*, ::before, ::after {
+  font-family: 'Cormorant Garamond', 'EB Garamond', Garamond, 'Times New Roman', Georgia, serif;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: 'Cormorant Garamond', 'EB Garamond', Garamond, 'Times New Roman', Georgia, serif;
   touch-action: manipulation;
   overscroll-behavior: none;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
 
-.font-game {
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+.font-game, .font-sans, .font-display {
+  font-family: 'Cormorant Garamond', 'EB Garamond', Garamond, 'Times New Roman', Georgia, serif !important;
 }
 
 /* Custom scrollbars */

@@ -12,4 +12,6 @@ function copyDir(src, dest) {
 
 copyDir('assets', 'dist/assets');
 copyDir('image', 'dist/image');
+copyDir('assets', 'public/assets');
+copyDir('assets', 'android/app/src/main/assets/public/assets');
 

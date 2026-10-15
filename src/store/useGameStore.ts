@@ -347,9 +347,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           activeModal: 'victory',
           stats: newStats,
         });
-
-        // Trigger cached interstitial ad
-        adMobService.showInterstitial();
       } else {
         set({
           sudokuPlayerBoard: newBoard,
@@ -548,8 +545,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           activeModal: 'victory',
           stats: newStats,
         });
-
-        adMobService.showInterstitial();
       } else {
         set({
           crossmathPlayerBoard: updatedPlayerBoard,

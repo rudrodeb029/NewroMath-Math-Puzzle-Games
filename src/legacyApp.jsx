@@ -2,125 +2,665 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallba
 import { createRoot } from 'react-dom/client';
 import confetti from 'canvas-confetti';
 import './index.css';
+import { adMobService } from './services/adMobService';
+import { purchaseService, IAP_CATALOG } from './services/purchaseService';
+import { AdMobBanner, AdMobInterstitialModal, AdMobRewardedModal } from './components/AdMobComponents';
+import {
+  Volume2,
+  Vibrate,
+  Timer,
+  Lightbulb,
+  Zap,
+  Type,
+  Divide,
+  BookOpen,
+  Crown,
+  RotateCcw,
+  Trash2,
+  Settings as SettingsIcon,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  BarChart3,
+  CheckCircle2,
+  Gamepad2,
+  Target,
+  Trophy,
+  Flame,
+  Sparkles,
+  Check,
+  Calendar,
+  Lock
+} from 'lucide-react';
 
 
     // ==========================================
     // SOUND SYNTHESIZER
     // ==========================================
+    // ==========================================
+    // STUDIO-GRADE CYBER SCI-FI SOUND SYNTHESIZER
+    // Multi-layered FM & Sub-Harmonic Audio Synthesis
+    // ==========================================
     class SoundEngine {
       constructor() {
         this.ctx = null;
+        this.masterNode = null;
+        this.compressor = null;
         this.muted = false;
       }
+
       init() {
-        if (!this.ctx) {
+        if (!this.ctx && typeof window !== 'undefined') {
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (AudioCtx) this.ctx = new AudioCtx();
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+            // Studio limiter & dynamics compressor for distortion-free, warm sound on mobile speakers
+            this.compressor = this.ctx.createDynamicsCompressor();
+            this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
+            this.compressor.knee.setValueAtTime(24, this.ctx.currentTime);
+            this.compressor.ratio.setValueAtTime(8, this.ctx.currentTime);
+            this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+            this.compressor.release.setValueAtTime(0.2, this.ctx.currentTime);
+
+            this.masterNode = this.ctx.createGain();
+            this.masterNode.gain.setValueAtTime(0.9, this.ctx.currentTime);
+
+            this.compressor.connect(this.masterNode);
+            this.masterNode.connect(this.ctx.destination);
+          }
         }
         if (this.ctx && this.ctx.state === 'suspended') {
           this.ctx.resume();
         }
       }
-      tap() {
-        this.click();
+
+      getOut() {
+        this.init();
+        return this.compressor || (this.ctx && this.ctx.destination);
       }
+
+      // Modern Tactile Glass Click (Haptic UI Micro-Switch)
       click() {
         if (this.muted) return;
         this.init();
         if (!this.ctx) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.05);
-        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.05);
-      }
-      correct() {
-        if (this.muted) return;
-        this.init();
-        if (!this.ctx) return;
-        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.07);
-          gain.gain.setValueAtTime(0.12, this.ctx.currentTime + i * 0.07);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.07 + 0.18);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(this.ctx.currentTime + i * 0.07);
-          osc.stop(this.ctx.currentTime + i * 0.07 + 0.18);
-        });
-      }
-      wrong() {
-        if (this.muted) return;
-        this.init();
-        if (!this.ctx) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(140, this.ctx.currentTime + 0.2);
-        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.2);
-      }
-      whoosh() {
-        if (this.muted) return;
-        this.init();
-        if (!this.ctx) return;
         try {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          const filter = this.ctx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(450, this.ctx.currentTime);
-          filter.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 0.12);
-          filter.frequency.exponentialRampToValueAtTime(380, this.ctx.currentTime + 0.25);
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
 
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(620, this.ctx.currentTime + 0.1);
-          osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.25);
+          // 1. Crisp Glass Transient
+          const osc1 = this.ctx.createOscillator();
+          const gain1 = this.ctx.createGain();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(1400, t);
+          osc1.frequency.exponentialRampToValueAtTime(520, t + 0.035);
+          gain1.gain.setValueAtTime(0.14, t);
+          gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+          osc1.connect(gain1);
+          gain1.connect(out);
+          osc1.start(t);
+          osc1.stop(t + 0.035);
 
-          gain.gain.setValueAtTime(0.09, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
-
-          osc.connect(filter);
-          filter.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start();
-          osc.stop(this.ctx.currentTime + 0.25);
+          // 2. Warm Tactile Sub-Body
+          const osc2 = this.ctx.createOscillator();
+          const gain2 = this.ctx.createGain();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(420, t);
+          osc2.frequency.exponentialRampToValueAtTime(220, t + 0.04);
+          gain2.gain.setValueAtTime(0.09, t);
+          gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+          osc2.connect(gain2);
+          gain2.connect(out);
+          osc2.start(t);
+          osc2.stop(t + 0.04);
         } catch (e) {}
       }
+
+      tap() {
+        this.click();
+      }
+
+      // Resonant Magnetic Snap (Placing a puzzle tile into a slot)
       snap() {
         if (this.muted) return;
         this.init();
         if (!this.ctx) return;
         try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
+          // High Acoustic Slap
+          const oscHigh = this.ctx.createOscillator();
+          const gainHigh = this.ctx.createGain();
+          const filterHigh = this.ctx.createBiquadFilter();
+          filterHigh.type = 'bandpass';
+          filterHigh.frequency.setValueAtTime(1800, t);
+          filterHigh.Q.setValueAtTime(4, t);
+
+          oscHigh.type = 'triangle';
+          oscHigh.frequency.setValueAtTime(980, t);
+          oscHigh.frequency.exponentialRampToValueAtTime(320, t + 0.06);
+
+          gainHigh.gain.setValueAtTime(0.2, t);
+          gainHigh.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+
+          oscHigh.connect(filterHigh);
+          filterHigh.connect(gainHigh);
+          gainHigh.connect(out);
+          oscHigh.start(t);
+          oscHigh.stop(t + 0.06);
+
+          // Deep Magnetic Body Clack
+          const oscLow = this.ctx.createOscillator();
+          const gainLow = this.ctx.createGain();
+          oscLow.type = 'sine';
+          oscLow.frequency.setValueAtTime(260, t);
+          oscLow.frequency.exponentialRampToValueAtTime(95, t + 0.08);
+
+          gainLow.gain.setValueAtTime(0.18, t);
+          gainLow.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+          oscLow.connect(gainLow);
+          gainLow.connect(out);
+          oscLow.start(t);
+          oscLow.stop(t + 0.08);
+        } catch (e) {}
+      }
+
+      // Bubble Drop Pop (Returning tile to tray / undo)
+      pop() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(760, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(290, this.ctx.currentTime + 0.08);
-          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(340, t);
+          osc.frequency.exponentialRampToValueAtTime(780, t + 0.055);
+
+          gain.gain.setValueAtTime(0.12, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+
           osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start();
-          osc.stop(this.ctx.currentTime + 0.08);
+          gain.connect(out);
+          osc.start(t);
+          osc.stop(t + 0.055);
+        } catch (e) {}
+      }
+
+      // ========================================================
+      // 1. CELESTIAL CRYSTAL SUCCESS CHIME (Positive Reward & Stage Win)
+      // High-end Lydian Chime Cascade + Sustaining Harmonic Shimmer Chord
+      // ========================================================
+      success() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
+          // A. Ascending Crystal Lydian Cascade (Sparkling Glass Bell Arpeggio)
+          // Frequencies: G5 (783.99), B5 (987.77), D6 (1174.66), F#6 (1479.98), G6 (1567.98), B6 (1975.53)
+          const cascadeNotes = [783.99, 987.77, 1174.66, 1479.98, 1567.98, 1975.53];
+          cascadeNotes.forEach((freq, idx) => {
+            const noteStart = t + idx * 0.038;
+
+            // Dual harmonic oscillators: Pure fundamental + chorused overtone
+            const oscFundamental = this.ctx.createOscillator();
+            const oscHarmonic = this.ctx.createOscillator();
+            const noteGain = this.ctx.createGain();
+
+            oscFundamental.type = 'sine';
+            oscFundamental.frequency.setValueAtTime(freq, noteStart);
+
+            oscHarmonic.type = 'triangle';
+            oscHarmonic.frequency.setValueAtTime(freq, noteStart);
+            oscHarmonic.detune.setValueAtTime((idx % 2 === 0 ? 5 : -5), noteStart);
+
+            const duration = idx === cascadeNotes.length - 1 ? 0.38 : 0.22;
+            const peakGain = idx === cascadeNotes.length - 1 ? 0.16 : 0.12;
+
+            noteGain.gain.setValueAtTime(0.001, noteStart);
+            noteGain.gain.exponentialRampToValueAtTime(peakGain, noteStart + 0.004);
+            noteGain.gain.exponentialRampToValueAtTime(0.001, noteStart + duration);
+
+            oscFundamental.connect(noteGain);
+            oscHarmonic.connect(noteGain);
+            noteGain.connect(out);
+
+            oscFundamental.start(noteStart);
+            oscFundamental.stop(noteStart + duration);
+            oscHarmonic.start(noteStart);
+            oscHarmonic.stop(noteStart + duration);
+          });
+
+          // B. Sustaining Celestial Shimmer Chord (Blooms at arpeggio peak)
+          const chordTime = t + 0.16;
+          const chordFrequencies = [783.99, 1174.66, 1567.98, 1975.53];
+          chordFrequencies.forEach((freq, idx) => {
+            const chordOsc = this.ctx.createOscillator();
+            const chordGain = this.ctx.createGain();
+            const chordFilter = this.ctx.createBiquadFilter();
+
+            chordFilter.type = 'bandpass';
+            chordFilter.frequency.setValueAtTime(freq, chordTime);
+            chordFilter.Q.setValueAtTime(6.0, chordTime);
+
+            chordOsc.type = 'triangle';
+            chordOsc.frequency.setValueAtTime(freq, chordTime);
+            chordOsc.detune.setValueAtTime((idx % 2 === 0 ? 4 : -4), chordTime);
+
+            chordGain.gain.setValueAtTime(0.001, chordTime);
+            chordGain.gain.exponentialRampToValueAtTime(0.07, chordTime + 0.02);
+            chordGain.gain.exponentialRampToValueAtTime(0.0005, chordTime + 0.48);
+
+            chordOsc.connect(chordFilter);
+            chordFilter.connect(chordGain);
+            chordGain.connect(out);
+
+            chordOsc.start(chordTime);
+            chordOsc.stop(chordTime + 0.48);
+          });
+
+          // C. Stardust Sparkle (Ultra-high crystalline harmonic ping)
+          const sparkleTime = t + 0.19;
+          const sparkleOsc = this.ctx.createOscillator();
+          const sparkleGain = this.ctx.createGain();
+          sparkleOsc.type = 'sine';
+          sparkleOsc.frequency.setValueAtTime(3135.96, sparkleTime); // High G7
+          sparkleGain.gain.setValueAtTime(0.001, sparkleTime);
+          sparkleGain.gain.exponentialRampToValueAtTime(0.045, sparkleTime + 0.005);
+          sparkleGain.gain.exponentialRampToValueAtTime(0.0001, sparkleTime + 0.28);
+          sparkleOsc.connect(sparkleGain);
+          sparkleGain.connect(out);
+          sparkleOsc.start(sparkleTime);
+          sparkleOsc.stop(sparkleTime + 0.28);
+        } catch (e) {}
+      }
+
+      correct() {
+        this.success();
+      }
+
+      // ========================================================
+      // 2. FUTURISTIC TECH ERROR CHIME (Calculation Error & Invalid Action)
+      // Dissonant Rejection Chime + Haptic Sub Impact + Sci-Fi Recalculate Warp
+      // ========================================================
+      error() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
+          // A. Dual Rejection Chime (Dissonant descending glass/bell pair)
+          // Strike 1 (t): D5 (587.33Hz) + Eb5 (622.25Hz) - subtle minor second tension
+          // Strike 2 (t + 0.09s): A4 (440Hz) + Ab4 (415.30Hz) - downward resolution
+          const rejectSteps = [
+            { offset: 0, f1: 587.33, f2: 622.25, dur: 0.11, vol: 0.16 },
+            { offset: 0.09, f1: 440.00, f2: 415.30, dur: 0.16, vol: 0.14 }
+          ];
+
+          rejectSteps.forEach((step) => {
+            const hit = t + step.offset;
+
+            // Carrier 1 (Glass bell transient)
+            const osc1 = this.ctx.createOscillator();
+            const gain1 = this.ctx.createGain();
+            const filter1 = this.ctx.createBiquadFilter();
+
+            filter1.type = 'bandpass';
+            filter1.frequency.setValueAtTime(step.f1 * 1.5, hit);
+            filter1.Q.setValueAtTime(4.0, hit);
+
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(step.f1, hit);
+            osc1.frequency.exponentialRampToValueAtTime(step.f1 * 0.94, hit + step.dur);
+
+            gain1.gain.setValueAtTime(0.001, hit);
+            gain1.gain.exponentialRampToValueAtTime(step.vol, hit + 0.004);
+            gain1.gain.exponentialRampToValueAtTime(0.001, hit + step.dur);
+
+            osc1.connect(filter1);
+            filter1.connect(gain1);
+            gain1.connect(out);
+            osc1.start(hit);
+            osc1.stop(hit + step.dur);
+
+            // Carrier 2 (Harmonic Dissonance layer)
+            const osc2 = this.ctx.createOscillator();
+            const gain2 = this.ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(step.f2, hit);
+            osc2.frequency.exponentialRampToValueAtTime(step.f2 * 0.94, hit + step.dur);
+
+            gain2.gain.setValueAtTime(0.001, hit);
+            gain2.gain.exponentialRampToValueAtTime(step.vol * 0.55, hit + 0.004);
+            gain2.gain.exponentialRampToValueAtTime(0.001, hit + step.dur);
+
+            osc2.connect(gain2);
+            gain2.connect(out);
+            osc2.start(hit);
+            osc2.stop(hit + step.dur);
+          });
+
+          // B. Haptic Sub-Impact (Low-frequency damped pulse for physical presence)
+          const subHit = t + 0.01;
+          const subOsc = this.ctx.createOscillator();
+          const subGain = this.ctx.createGain();
+          const subFilter = this.ctx.createBiquadFilter();
+
+          subFilter.type = 'lowpass';
+          subFilter.frequency.setValueAtTime(240, subHit);
+
+          subOsc.type = 'sine';
+          subOsc.frequency.setValueAtTime(145, subHit);
+          subOsc.frequency.exponentialRampToValueAtTime(58, subHit + 0.14);
+
+          subGain.gain.setValueAtTime(0.001, subHit);
+          subGain.gain.exponentialRampToValueAtTime(0.18, subHit + 0.005);
+          subGain.gain.exponentialRampToValueAtTime(0.001, subHit + 0.14);
+
+          subOsc.connect(subFilter);
+          subFilter.connect(subGain);
+          subGain.connect(out);
+          subOsc.start(subHit);
+          subOsc.stop(subHit + 0.14);
+
+          // C. Sci-Fi Computation Mismatch Warp (Soft downward bandpass sweep)
+          const warpOsc = this.ctx.createOscillator();
+          const warpGain = this.ctx.createGain();
+          const warpFilter = this.ctx.createBiquadFilter();
+
+          warpFilter.type = 'bandpass';
+          warpFilter.frequency.setValueAtTime(680, t);
+          warpFilter.frequency.exponentialRampToValueAtTime(210, t + 0.18);
+          warpFilter.Q.setValueAtTime(3.0, t);
+
+          warpOsc.type = 'triangle';
+          warpOsc.frequency.setValueAtTime(320, t);
+          warpOsc.frequency.exponentialRampToValueAtTime(140, t + 0.18);
+
+          warpGain.gain.setValueAtTime(0.001, t);
+          warpGain.gain.exponentialRampToValueAtTime(0.09, t + 0.008);
+          warpGain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+
+          warpOsc.connect(warpFilter);
+          warpFilter.connect(warpGain);
+          warpGain.connect(out);
+          warpOsc.start(t);
+          warpOsc.stop(t + 0.18);
+        } catch (e) {}
+      }
+
+      wrong() {
+        this.error();
+      }
+
+      // Cyber Aerodynamic Sweep (Tile flying / modal transitions)
+      whoosh() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const filter = this.ctx.createBiquadFilter();
+
+          filter.type = 'bandpass';
+          filter.Q.setValueAtTime(2.5, t);
+          filter.frequency.setValueAtTime(450, t);
+          filter.frequency.exponentialRampToValueAtTime(1900, t + 0.09);
+          filter.frequency.exponentialRampToValueAtTime(420, t + 0.22);
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(260, t);
+          osc.frequency.exponentialRampToValueAtTime(740, t + 0.09);
+          osc.frequency.exponentialRampToValueAtTime(310, t + 0.22);
+
+          gain.gain.setValueAtTime(0.12, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(out);
+          osc.start(t);
+          osc.stop(t + 0.22);
+        } catch (e) {}
+      }
+
+      // Epic Triumphant Victory Fanfare (Level Completed / Daily Solved!)
+      fanfare() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
+          // Rapid ascending victory arpeggio: C5 -> E5 -> G5 -> C6 -> E6 -> G6
+          const arpeggio = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+          arpeggio.forEach((freq, i) => {
+            const noteStart = t + i * 0.075;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = i >= 4 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, noteStart);
+
+            const duration = i === arpeggio.length - 1 ? 0.65 : 0.26;
+            gain.gain.setValueAtTime(0.14, noteStart);
+            gain.gain.exponentialRampToValueAtTime(0.001, noteStart + duration);
+
+            osc.connect(gain);
+            gain.connect(out);
+            osc.start(noteStart);
+            osc.stop(noteStart + duration);
+          });
+
+          // Grand sustaining golden chord at the climax
+          const chordTime = t + 0.44;
+          const chordFrequencies = [523.25, 783.99, 1046.50, 1318.51];
+          chordFrequencies.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, chordTime);
+            osc.detune.setValueAtTime((idx % 2 === 0 ? 4 : -4), chordTime);
+
+            gain.gain.setValueAtTime(0.08, chordTime);
+            gain.gain.exponentialRampToValueAtTime(0.0005, chordTime + 0.75);
+
+            osc.connect(gain);
+            gain.connect(out);
+            osc.start(chordTime);
+            osc.stop(chordTime + 0.75);
+          });
+        } catch (e) {}
+      }
+
+      // Sparkling Arcade Coin Pickup Bell
+      coin() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
+          [987.77, 1318.51].forEach((freq, i) => {
+            const hit = t + i * 0.06;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, hit);
+
+            gain.gain.setValueAtTime(0.15, hit);
+            gain.gain.exponentialRampToValueAtTime(0.001, hit + 0.22);
+
+            osc.connect(gain);
+            gain.connect(out);
+            osc.start(hit);
+            osc.stop(hit + 0.22);
+          });
+        } catch (e) {}
+      }
+
+      // Crystalline Gem Sparkle
+      gem() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const out = this.getOut();
+
+          [1567.98, 2093.00, 2637.02].forEach((freq, i) => {
+            const hit = t + i * 0.045;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, hit);
+
+            gain.gain.setValueAtTime(0.12, hit);
+            gain.gain.exponentialRampToValueAtTime(0.001, hit + 0.25);
+
+            osc.connect(gain);
+            gain.connect(out);
+            osc.start(hit);
+            osc.stop(hit + 0.25);
+          });
         } catch (e) {}
       }
     }
     const sound = new SoundEngine();
+    if (typeof window !== 'undefined') window.__sound = sound;
+
+    // ==========================================
+    // FAST IN-MEMORY CACHED GAME STORAGE ENGINE
+    // Zero main-thread disk I/O pauses, 100% offline persistence
+    // ==========================================
+    class FastGameStorage {
+      constructor() {
+        this.cache = new Map();
+        this.pendingWrites = new Map();
+        this.debounceTimer = null;
+        this.initialized = false;
+        this.init();
+      }
+
+      init() {
+        if (this.initialized || typeof window === 'undefined') return;
+        try {
+          if (typeof localStorage !== 'undefined') {
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k) {
+                this.cache.set(k, localStorage.getItem(k));
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('[FastGameStorage] Init read fallback:', e);
+        }
+        this.initialized = true;
+
+        if (typeof window !== 'undefined') {
+          window.addEventListener('beforeunload', () => this.flushSync());
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') this.flushSync();
+          });
+        }
+      }
+
+      getItem(key) {
+        if (!this.initialized) this.init();
+        if (this.cache.has(key)) {
+          return this.cache.get(key);
+        }
+        try {
+          if (typeof localStorage !== 'undefined') {
+            const val = localStorage.getItem(key);
+            if (val !== null) this.cache.set(key, val);
+            return val;
+          }
+        } catch (e) {}
+        return null;
+      }
+
+      setItem(key, value) {
+        if (!this.initialized) this.init();
+        const strVal = String(value);
+        this.cache.set(key, strVal);
+        this.pendingWrites.set(key, strVal);
+        this.scheduleFlush();
+      }
+
+      removeItem(key) {
+        if (!this.initialized) this.init();
+        this.cache.delete(key);
+        this.pendingWrites.set(key, null);
+        this.scheduleFlush();
+      }
+
+      clear() {
+        this.cache.clear();
+        this.pendingWrites.clear();
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.clear();
+          }
+        } catch (e) {}
+      }
+
+      scheduleFlush() {
+        if (this.debounceTimer) return;
+        this.debounceTimer = setTimeout(() => {
+          this.debounceTimer = null;
+          this.flushPending();
+        }, 120);
+      }
+
+      flushPending() {
+        if (typeof localStorage === 'undefined' || this.pendingWrites.size === 0) return;
+        try {
+          this.pendingWrites.forEach((val, key) => {
+            if (val === null) {
+              localStorage.removeItem(key);
+            } else {
+              localStorage.setItem(key, val);
+            }
+          });
+          this.pendingWrites.clear();
+        } catch (e) {
+          console.warn('[FastGameStorage] Flush error:', e);
+        }
+      }
+
+      flushSync() {
+        if (this.debounceTimer) {
+          clearTimeout(this.debounceTimer);
+          this.debounceTimer = null;
+        }
+        this.flushPending();
+      }
+    }
+    const GameStorage = new FastGameStorage();
+    if (typeof window !== 'undefined') {
+      window.GameStorage = GameStorage;
+    }
 
     function PageTransition({ screenKey, direction, children, isWaitingForLoad = false }) {
       const [displayedKey, setDisplayedKey] = useState(screenKey);
@@ -230,12 +770,12 @@ import './index.css';
       );
     }
 
-    // Warm the image cache in idle time so later pages open instantly (no loader needed)
+    // Warm the image cache in idle time with optimized WebP assets so later pages open instantly
     const PREFETCH_ASSETS = [
-      '/assets/icon_brain_3d.png', '/assets/icon_chest_3d.png', '/assets/icon_gamepad_3d.png',
-      '/assets/icon_gem_3d_clean.png', '/assets/icon_gold_coin_3d_clean.png', '/assets/icon_star_3d.png',
-      '/assets/icon_stopwatch_3d.png', '/assets/icon_target_3d.png', '/assets/icon_trophy_3d.png',
-      '/assets/reward_gift_dial_full.png'
+      '/assets/icon_brain_3d.webp', '/assets/icon_chest_3d.webp', '/assets/icon_gamepad_3d.webp',
+      '/assets/icon_gem_3d_clean.webp', '/assets/icon_gold_coin_3d_clean.webp', '/assets/icon_star_3d.webp',
+      '/assets/icon_stopwatch_3d.webp', '/assets/icon_target_3d.webp', '/assets/icon_trophy_3d.webp',
+      '/assets/reward_gift_dial_full.webp'
     ];
     function prefetchAssetsWhenIdle() {
       const run = () => PREFETCH_ASSETS.forEach(src => { const img = new Image(); img.decoding = 'async'; img.src = src; });
@@ -320,80 +860,145 @@ import './index.css';
     }
 
     // ==========================================
-    // 3D CYBER-ARCADE FLYING TILE ANIMATOR
+    // 3D CYBER-ARCADE FLYING TILE OBJECT POOL (Zero GC Pauses & Zero DOM Churn)
+    // Pre-allocated fixed slots reused across all moves to eliminate memory allocations
     // ==========================================
-    function FlyingTileItem({ tile, onFinish, largeFontEnabled }) {
+    const FLYING_POOL_CAPACITY = 8;
+    const INITIAL_FLYING_POOL = Array.from({ length: FLYING_POOL_CAPACITY }, (_, i) => ({
+      slotId: i,
+      active: false,
+      id: null,
+      number: null,
+      targetSlot: null,
+      fromX: 0,
+      fromY: 0,
+      fromW: 48,
+      fromH: 48,
+      toX: 0,
+      toY: 0,
+      toW: 48,
+      toH: 48,
+      isReturn: false,
+      flightSeq: 0
+    }));
+
+    function PooledFlyingTileItem({ slot, onComplete, largeFontEnabled }) {
       const elRef = useRef(null);
+      const finishedRef = useRef(false);
 
       useEffect(() => {
+        if (!slot.active) {
+          finishedRef.current = false;
+          return;
+        }
+
+        finishedRef.current = false;
         const el = elRef.current;
-        if (!el) return;
+        if (!el || !isFinite(slot.fromX) || !isFinite(slot.toX)) {
+          finishedRef.current = true;
+          onComplete(slot);
+          return;
+        }
 
-        const dx = tile.toX - tile.fromX;
-        const dy = tile.toY - tile.fromY;
+        const dx = slot.toX - slot.fromX;
+        const dy = slot.toY - slot.fromY;
 
-        // Parabolic ballistic arc:
-        // Curves sideways slightly towards the center of the board
+        // Parabolic ballistic arc: curves sideways slightly towards the center
         const arcX = dx * 0.12 + (dx > 0 ? 16 : -16);
-        const arcY = dy * 0.5 + (tile.isReturn ? 28 : -38);
-        const midX = tile.fromX + dx * 0.5 + arcX;
-        const midY = tile.fromY + arcY;
-        const tilt = (dx > 0 ? 12 : -12) * (tile.isReturn ? -1 : 1);
-        const targetScaleX = tile.fromW ? tile.toW / tile.fromW : 1;
-        const targetScaleY = tile.fromH ? tile.toH / tile.fromH : 1;
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const arcY = dy * 0.5 + (slot.isReturn ? 28 : -38);
+        const midX = slot.fromX + dx * 0.5 + arcX;
+        const midY = slot.fromY + arcY;
+        const tilt = (dx > 0 ? 12 : -12) * (slot.isReturn ? -1 : 1);
+        const targetScaleX = Math.max(0.2, Math.min(3, (slot.toW || 48) / (slot.fromW || 48)));
+        const targetScaleY = Math.max(0.2, Math.min(3, (slot.toH || 48) / (slot.fromH || 48)));
+        const reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const duration = reducedMotion ? 100 : 260;
 
-        const animation = el.animate([
-          {
-            transform: `translate3d(${tile.fromX}px, ${tile.fromY}px, 0) scale(1, 1) rotate(0deg)`,
-            opacity: 1
-          },
-          {
-            offset: 0.45,
-            transform: `translate3d(${midX}px, ${midY}px, 0) scale(1.12, 1.12) rotate(${tilt}deg)`,
-            opacity: 1
-          },
-          {
-            transform: `translate3d(${tile.toX}px, ${tile.toY}px, 0) scale(${targetScaleX}, ${targetScaleY}) rotate(0deg)`,
-            opacity: 1
-          }
-        ], {
-          duration: reducedMotion ? 120 : 300,
-          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-          fill: 'forwards'
-        });
-
-        animation.onfinish = () => {
-          onFinish(tile);
+        const safeFinish = () => {
+          if (finishedRef.current) return;
+          finishedRef.current = true;
+          onComplete(slot);
         };
+
+        const watchdog = setTimeout(safeFinish, duration + 40);
+
+        let animation = null;
+        try {
+          if (typeof el.animate === 'function') {
+            animation = el.animate([
+              {
+                transform: `translate3d(${slot.fromX}px, ${slot.fromY}px, 0) scale(1, 1) rotate(0deg)`,
+                opacity: 1
+              },
+              {
+                offset: 0.45,
+                transform: `translate3d(${midX}px, ${midY}px, 0) scale(1.12, 1.12) rotate(${tilt}deg)`,
+                opacity: 1
+              },
+              {
+                transform: `translate3d(${slot.toX}px, ${slot.toY}px, 0) scale(${targetScaleX}, ${targetScaleY}) rotate(0deg)`,
+                opacity: 1
+              }
+            ], {
+              duration: duration,
+              easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+              fill: 'forwards'
+            });
+
+            animation.onfinish = safeFinish;
+            animation.onerror = safeFinish;
+          } else {
+            safeFinish();
+          }
+        } catch (e) {
+          safeFinish();
+        }
 
         return () => {
-          try { animation.cancel(); } catch (e) {}
+          clearTimeout(watchdog);
+          if (animation) {
+            try { animation.cancel(); } catch (e) {}
+          }
+          if (slot.active && !finishedRef.current) {
+            safeFinish();
+          }
         };
-      }, []);
+      }, [slot.active, slot.flightSeq]);
+
+      const initialTransform = slot.active && isFinite(slot.fromX) && isFinite(slot.fromY)
+        ? `translate3d(${slot.fromX}px, ${slot.fromY}px, 0)`
+        : 'translate3d(-9999px, -9999px, 0)';
 
       return (
         <div
           ref={elRef}
-          className={`scifi-flying-tile ${tile.isReturn ? 'scifi-flying-tile-return' : ''} pointer-events-none absolute select-none flex items-center justify-center font-black ${
+          aria-hidden={!slot.active}
+          className={`scifi-flying-tile ${slot.isReturn ? 'scifi-flying-tile-return' : ''} pointer-events-none absolute select-none flex items-center justify-center font-black ${
             largeFontEnabled ? 'text-[clamp(20px,6.5vw,30px)]' : 'text-[clamp(16px,5vw,24px)]'
           }`}
           style={{
             left: 0,
             top: 0,
-            width: `${tile.fromW}px`,
-            height: `${tile.fromH}px`,
+            width: `${slot.fromW || 48}px`,
+            height: `${slot.fromH || 48}px`,
             boxSizing: 'border-box',
-            willChange: 'transform, opacity'
+            transform: initialTransform,
+            WebkitTransform: initialTransform,
+            visibility: slot.active ? 'visible' : 'hidden',
+            opacity: slot.active ? 1 : 0,
+            willChange: slot.active ? 'transform, opacity' : 'auto'
           }}
         >
           <div className="scifi-flying-trail-halo" />
           <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-            {tile.number}
+            {slot.number}
           </span>
         </div>
       );
     }
+
+    // Backwards-compatible alias for single item compatibility
+    const FlyingTileItem = PooledFlyingTileItem;
 
     // ==========================================
     // CROSS-MATH PUZZLE TEMPLATES DATABASE
@@ -2757,9 +3362,10 @@ import './index.css';
     // Level 1 starts at 100 Gold Coins & 10 Diamond Coins (Gems).
     // The economy chain progressively scales as missions become harder.
     // ==========================================
-    // Each level is 1 complete cross-math puzzle challenge
+    // Each level is a series of puzzles: 10 on Level 1, growing steadily to 20 on Level 25.
     function getStageCount(levelNum) {
-      return 1;
+      const lvl = Math.max(1, Math.min(25, Number(levelNum) || 1));
+      return Math.round(10 + ((lvl - 1) * 10) / 24);
     }
 
     function getLevelEntryCost(levelNum) {
@@ -2820,6 +3426,34 @@ import './index.css';
       { num: 25, title: 'Apex Boss Stage', diff: 'Hard', range: '1491 - 1600', xp: 100, coins: 100, tag: 'APEX BOSS', tier: 'hard', cost: getLevelEntryCost(25) },
     ];
 
+    export const LEVEL_AWARDS = [
+      { level: 1, title: 'Chrono Speedster', icon: '/assets/awards/award_lvl_01.webp', desc: 'Conquered Level 1 arithmetic time challenge', color: 'from-amber-400 to-orange-500' },
+      { level: 2, title: 'Logic Cipher', icon: '/assets/awards/award_lvl_02.webp', desc: 'Mastered Level 2 puzzle sequences', color: 'from-cyan-400 to-blue-500' },
+      { level: 3, title: 'Matrix Cube', icon: '/assets/awards/award_lvl_03.webp', desc: 'Solved Level 3 isometric logic blocks', color: 'from-purple-400 to-indigo-500' },
+      { level: 4, title: 'Neural Flash', icon: '/assets/awards/award_lvl_04.webp', desc: 'Discharged Level 4 high-voltage reasoning', color: 'from-yellow-300 to-amber-500' },
+      { level: 5, title: 'Synapse Spark', icon: '/assets/awards/award_lvl_05.webp', desc: 'Illuminated Level 5 cognitive breakthroughs', color: 'from-amber-300 to-yellow-500' },
+      { level: 6, title: 'Arithmetic Matrix', icon: '/assets/awards/award_lvl_06.webp', desc: 'Calculated Level 6 cyber theorems', color: 'from-blue-400 to-indigo-600' },
+      { level: 7, title: 'Golden Sovereign', icon: '/assets/awards/award_lvl_07.webp', desc: 'Minted Level 7 golden arithmetic ratios', color: 'from-yellow-400 to-amber-600' },
+      { level: 8, title: 'Daily Chronicler', icon: '/assets/awards/award_lvl_08.webp', desc: 'Completed Level 8 calendar challenges', color: 'from-sky-400 to-cyan-600' },
+      { level: 9, title: 'Bullseye Marksman', icon: '/assets/awards/award_lvl_09.webp', desc: 'Scored Level 9 pinpoint precision equations', color: 'from-red-400 to-rose-600' },
+      { level: 10, title: 'Cosmic Ascendant', icon: '/assets/awards/award_lvl_10.webp', desc: 'Launched Level 10 supersonic ascension', color: 'from-orange-400 to-red-600' },
+      { level: 11, title: 'Aegis Defender', icon: '/assets/awards/award_lvl_11.webp', desc: 'Fortified Level 11 shield defenses', color: 'from-cyan-400 to-teal-500' },
+      { level: 12, title: 'Supernova Burst', icon: '/assets/awards/award_lvl_12.webp', desc: 'Ignited Level 12 blazing solve streaks', color: 'from-orange-500 to-rose-600' },
+      { level: 13, title: 'Grand Vault', icon: '/assets/awards/award_lvl_13.webp', desc: 'Unwrapped Level 13 mystery treasuries', color: 'from-pink-400 to-purple-600' },
+      { level: 14, title: 'Vault Keymaster', icon: '/assets/awards/award_lvl_14.webp', desc: 'Unlocked Level 14 secret vault doors', color: 'from-amber-400 to-yellow-500' },
+      { level: 15, title: 'Diamond Mind', icon: '/assets/awards/award_lvl_15.webp', desc: 'Faceted Level 15 flawless math perfection', color: 'from-cyan-300 to-blue-600' },
+      { level: 16, title: 'Victory Chime', icon: '/assets/awards/award_lvl_16.webp', desc: 'Rang the Level 16 victory bell', color: 'from-yellow-400 to-amber-500' },
+      { level: 17, title: 'Celestial Starlight', icon: '/assets/awards/award_lvl_17.webp', desc: 'Attained Level 17 astral mastery', color: 'from-amber-300 to-yellow-400' },
+      { level: 18, title: 'Omni Sphere', icon: '/assets/awards/award_lvl_18.webp', desc: 'Harmonized Level 18 multidimensional orbits', color: 'from-teal-400 to-cyan-600' },
+      { level: 19, title: 'Titan Battleaxe', icon: '/assets/awards/award_lvl_19.webp', desc: 'Cleaved Level 19 titan challenges', color: 'from-rose-400 to-red-600' },
+      { level: 20, title: 'Cipher Lockbreaker', icon: '/assets/awards/award_lvl_20.webp', desc: 'Decrypted Level 20 heavy cipher locks', color: 'from-amber-400 to-orange-600' },
+      { level: 21, title: 'Grandmaster Bishop', icon: '/assets/awards/award_lvl_21.webp', desc: 'Outplayed Level 21 tactical chessboards', color: 'from-indigo-400 to-violet-600' },
+      { level: 22, title: 'Medal of Honor', icon: '/assets/awards/award_lvl_22.webp', desc: 'Decorated with Level 22 medal of courage', color: 'from-yellow-400 to-amber-500' },
+      { level: 23, title: 'Imperial Sovereign', icon: '/assets/awards/award_lvl_23.webp', desc: 'Crowned sovereign of Level 23 math realm', color: 'from-amber-300 to-yellow-500' },
+      { level: 24, title: 'Champion Cup', icon: '/assets/awards/award_lvl_24.webp', desc: 'Raised Level 24 golden championship cup', color: 'from-yellow-400 to-amber-600' },
+      { level: 25, title: 'Apex Grandmaster', icon: '/assets/awards/award_lvl_25.webp', desc: 'Ascended to the supreme Level 25 apex throne', color: 'from-amber-300 to-yellow-400' },
+    ];
+
     function getLevelTargetXp(levelNum) {
       const lvl = Math.max(1, Math.min(25, Number(levelNum) || 1));
       const lvlObj = ALL_LEVELS.find(l => l.num === lvl);
@@ -2829,116 +3463,354 @@ import './index.css';
     // ==========================================
     // ==========================================
     // PROCEDURAL CROSS-MATH GENERATOR (+, −, ×, ÷)
-    // Generates 100% verified, attractive 5x5 puzzles gradually scaling from Easy to Hard
+    // Dynamic Difficulty Engine: Gradually scales complexity under EVERY level!
+    // Every game (1 to 10-20) within each level gets progressively harder:
+    // higher arithmetic range, more blank slots, mixed operators, and clever distractors.
     // ==========================================
-    function generateCrossMathPuzzle(levelNum, seed = 0) {
-      if (seed === 0) {
-        const idx = (Math.max(1, levelNum) - 1) % PUZZLE_TEMPLATES.length;
-        return PUZZLE_TEMPLATES[idx];
+    function getStageDifficultyProfile(levelNum, stageIndex = 0, totalStages = 10) {
+      const lvl = Math.max(1, Math.min(25, Number(levelNum) || 1));
+      const st = Math.max(0, Math.min(totalStages - 1, Number(stageIndex) || 0));
+      const progress = totalStages > 1 ? st / (totalStages - 1) : 0;
+
+      let tierName, badgeClass, mode, blankCount, trayCount, minVal, maxVal, minM, maxM, minD, maxD;
+
+      if (lvl === 1) {
+        if (progress < 0.35) {
+          tierName = 'INTRO ✦';
+          badgeClass = 'bg-cyan-900/60 border-cyan-400/50 text-cyan-200';
+          mode = 'add';
+          blankCount = 3;
+          trayCount = 5; // 3 answers + 2 distractors (1 row)
+          minVal = 1; maxVal = 6;
+        } else if (progress < 0.70) {
+          tierName = 'WARM-UP ⚡';
+          badgeClass = 'bg-emerald-900/60 border-emerald-400/50 text-emerald-200';
+          mode = (st % 2 === 0) ? 'add' : 'sub';
+          blankCount = (st <= 5) ? 3 : 4;
+          trayCount = 6; // 3-4 answers + distractors (1 row)
+          minVal = 2; maxVal = 9;
+        } else {
+          tierName = 'LEVEL FINALE 🔥';
+          badgeClass = 'bg-amber-900/60 border-amber-400/50 text-amber-200';
+          mode = (st % 2 === 0) ? 'sub' : 'add';
+          blankCount = 4;
+          trayCount = 7; // 4 answers + 3 distractors (2 rows: 4+3)
+          minVal = 3; maxVal = 14;
+        }
+      } else if (lvl <= 5) {
+        if (progress < 0.35) {
+          tierName = 'NOVICE ✦';
+          badgeClass = 'bg-cyan-900/60 border-cyan-400/50 text-cyan-200';
+          mode = (st % 2 === 0) ? 'add' : 'sub';
+          blankCount = 4;
+          trayCount = 6; // (1 row)
+          minVal = 2; maxVal = 10;
+        } else if (progress < 0.75) {
+          tierName = 'TACTICAL ⚡';
+          badgeClass = 'bg-emerald-900/60 border-emerald-400/50 text-emerald-200';
+          mode = (st % 3 === 0) ? 'mul' : (st % 3 === 1) ? 'sub' : 'add';
+          blankCount = (st % 2 === 0) ? 4 : 5;
+          trayCount = 7; // (2 rows: 4+3)
+          minVal = 3; maxVal = 16;
+          minM = 2; maxM = 4;
+        } else {
+          tierName = 'SECTOR BOSS 🔥';
+          badgeClass = 'bg-rose-900/60 border-rose-400/50 text-rose-200';
+          mode = (st % 2 === 0) ? 'mul' : 'sub_both';
+          blankCount = 5;
+          trayCount = 8; // (2 rows: 4+4)
+          minVal = 4; maxVal = 20;
+          minM = 2; maxM = 5;
+        }
+      } else if (lvl <= 10) {
+        if (progress < 0.30) {
+          tierName = 'ADEPT ✦';
+          badgeClass = 'bg-blue-900/60 border-blue-400/50 text-blue-200';
+          mode = (st % 3 === 0) ? 'add' : (st % 3 === 1) ? 'sub' : 'mul';
+          blankCount = (st % 2 === 0) ? 4 : 5;
+          trayCount = 7; // (2 rows: 4+3)
+          minVal = 4; maxVal = 18;
+          minM = 2; maxM = 5;
+        } else if (progress < 0.70) {
+          tierName = 'OPERATOR ⚡';
+          badgeClass = 'bg-indigo-900/60 border-indigo-400/50 text-indigo-200';
+          mode = (st % 4 === 0) ? 'div' : (st % 4 === 1) ? 'mul' : (st % 4 === 2) ? 'sub_both' : 'add';
+          blankCount = 5;
+          trayCount = 8; // (2 rows: 4+4)
+          minVal = 5; maxVal = 24;
+          minM = 2; maxM = 6;
+          minD = 2; maxD = 3;
+        } else {
+          tierName = 'MATRIX BOSS 🔥';
+          badgeClass = 'bg-purple-900/60 border-purple-400/50 text-purple-200';
+          mode = (st % 3 === 0) ? 'div' : (st % 3 === 1) ? 'mul_div' : 'mul';
+          blankCount = 5;
+          trayCount = 9; // (2 rows: 5+4)
+          minVal = 6; maxVal = 30;
+          minM = 3; maxM = 6;
+          minD = 2; maxD = 4;
+        }
+      } else if (lvl <= 17) {
+        if (progress < 0.30) {
+          tierName = 'SPECIALIST ⚡';
+          badgeClass = 'bg-indigo-900/60 border-indigo-400/50 text-indigo-200';
+          mode = (st % 4 === 0) ? 'mul' : (st % 4 === 1) ? 'div' : (st % 4 === 2) ? 'sub' : 'add';
+          blankCount = 5;
+          trayCount = 8; // (2 rows: 4+4)
+          minVal = 6; maxVal = 28;
+          minM = 3; maxM = 6;
+          minD = 2; maxD = 3;
+        } else if (progress < 0.75) {
+          tierName = 'VANGUARD 🔥';
+          badgeClass = 'bg-amber-900/60 border-amber-400/50 text-amber-200';
+          mode = (st % 4 === 0) ? 'mul_div' : (st % 4 === 1) ? 'div_mul' : (st % 4 === 2) ? 'div' : 'mul';
+          blankCount = (st % 2 === 0) ? 5 : 6;
+          trayCount = 9; // (2 rows: 5+4)
+          minVal = 8; maxVal = 35;
+          minM = 3; maxM = 7;
+          minD = 2; maxD = 4;
+        } else {
+          tierName = 'TRIAL OVERLORD 💀';
+          badgeClass = 'bg-rose-900/60 border-rose-400/50 text-rose-200';
+          mode = (st % 3 === 0) ? 'mul_div' : (st % 3 === 1) ? 'div_mul' : 'div';
+          blankCount = 6;
+          trayCount = 10; // (2 rows: 5+5)
+          minVal = 10; maxVal = 45;
+          minM = 3; maxM = 8;
+          minD = 2; maxD = 4;
+        }
+      } else {
+        // Levels 18 - 25: Master / Apex World
+        if (progress < 0.30) {
+          tierName = 'MASTER ⚡';
+          badgeClass = 'bg-purple-900/60 border-purple-400/50 text-purple-200';
+          mode = (st % 4 === 0) ? 'mul' : (st % 4 === 1) ? 'div' : (st % 4 === 2) ? 'mul_div' : 'sub_both';
+          blankCount = 5;
+          trayCount = 9; // (2 rows: 5+4)
+          minVal = 10; maxVal = 40;
+          minM = 3; maxM = 7;
+          minD = 2; maxD = 4;
+        } else if (progress < 0.80) {
+          tierName = 'GRANDMASTER 🔥';
+          badgeClass = 'bg-rose-900/60 border-rose-400/50 text-rose-200';
+          mode = (st % 4 === 0) ? 'mul_div' : (st % 4 === 1) ? 'div_mul' : (st % 4 === 2) ? 'div' : 'mul';
+          blankCount = 6;
+          trayCount = 10; // (2 rows: 5+5)
+          minVal = 12; maxVal = 55;
+          minM = 3; maxM = 8;
+          minD = 2; maxD = 5;
+        } else {
+          tierName = 'APEX BOSS 👑';
+          badgeClass = 'bg-red-950/80 border-red-500/80 text-red-200 shadow-[0_0_12px_rgba(239,68,68,0.5)]';
+          mode = (st % 3 === 0) ? 'mul_div' : (st % 3 === 1) ? 'div_mul' : 'div';
+          blankCount = 6;
+          trayCount = (lvl === 25 && progress >= 0.90) ? 12 : 11; // (2 rows: 6+5 or 6+6)
+          minVal = 15; maxVal = 70;
+          minM = 4; maxM = 9;
+          minD = 3; maxD = 5;
+        }
       }
 
-      let s = Math.abs((levelNum * 7919 + seed * 9973 + 12345)) % 233280;
+      return {
+        tierName,
+        badgeClass,
+        mode,
+        blankCount,
+        trayCount,
+        minVal,
+        maxVal,
+        minM: minM || 2,
+        maxM: maxM || 5,
+        minD: minD || 2,
+        maxD: maxD || 3,
+        progress
+      };
+    }
+
+    function generateCrossMathPuzzle(levelNum, seed = 0, stageIndex = -1) {
+      const totalStages = getStageCount(levelNum);
+      const st = Math.max(0, Math.min(totalStages - 1, stageIndex >= 0 ? stageIndex : (seed >= 1000 ? Math.floor(seed / 1000) : 0)));
+      const profile = getStageDifficultyProfile(levelNum, st, totalStages);
+
+      let s = Math.abs((levelNum * 7919 + seed * 9973 + (st + 1) * 31337 + 12345)) % 233280;
       const rnd = (min, max) => {
         s = (s * 9301 + 49297) % 233280;
         const r = s / 233280;
         return Math.floor(min + r * (max - min + 1));
       };
 
-      // Determine operator mode based on gradual level progression:
-      // Levels 1-4: addition (+) and subtraction (−)
-      // Levels 5-10: addition (+), subtraction (−), and multiplication (×)
-      // Levels 11-17: full operations including clean integer division (÷)
-      // Levels 18-25: master multi-operator cross math
-      let mode;
-      if (levelNum <= 2) {
-        mode = 'add';
-      } else if (levelNum <= 6) {
-        mode = (seed % 2 === 0) ? 'add' : 'sub';
-      } else if (levelNum <= 10) {
-        const m = (seed + levelNum) % 3;
-        mode = m === 0 ? 'mul' : m === 1 ? 'add' : 'sub';
-      } else {
-        const m = (seed + levelNum) % 4;
-        mode = m === 0 ? 'div' : m === 1 ? 'mul' : m === 2 ? 'sub' : 'add';
-      }
-
+      const mode = profile.mode;
       let X, Y, Z, A, B, C, D, E, F;
       let opH = '+', opV = '+';
 
-      if (mode === 'mul') {
-        opH = '×'; opV = '×';
-        const isHard = levelNum >= 18;
-        const minM = isHard ? 3 : 2;
-        const maxM = isHard ? 7 : 4;
-        X = rnd(minM, maxM);
-        Y = rnd(minM, maxM);
-        A = rnd(minM, maxM);
-        B = rnd(minM, maxM);
-        Z = X * Y;
-        C = A * B;
-        D = X * A;
-        E = Y * B;
-        F = Z * C;
-      } else if (mode === 'div') {
-        opH = '÷'; opV = '÷';
-        const B_val = rnd(2, 3);
-        const C_val = rnd(2, 3);
-        const E_val = rnd(2, 4);
-        const F_val = rnd(2, 3);
+      // Generate grid values, re-rolling if needed so there are enough distinct values for all blanks
+      let valMap = {};
+      let attempts = 0;
+      while (attempts < 60) {
+        attempts++;
+        if (mode === 'mul') {
+          opH = '×'; opV = '×';
+          X = rnd(profile.minM, profile.maxM);
+          Y = rnd(profile.minM, profile.maxM);
+          A = rnd(profile.minM, profile.maxM);
+          B = rnd(profile.minM, profile.maxM);
+          Z = X * Y;
+          C = A * B;
+          D = X * A;
+          E = Y * B;
+          F = Z * C;
+        } else if (mode === 'div') {
+          opH = '÷'; opV = '÷';
+          B = rnd(profile.minD, profile.maxD);
+          C = rnd(profile.minD, profile.maxD);
+          A = B * C;
 
-        B = B_val;
-        C = C_val;
-        A = B * C;
+          E = rnd(profile.minD, profile.maxD);
+          F = rnd(profile.minD, profile.maxD);
+          D = E * F;
 
-        E = E_val;
-        F = F_val;
-        D = E * F;
+          Z = C * F;
+          Y = B * E;
+          X = A * D;
+        } else if (mode === 'mul_div') {
+          opH = '×'; opV = '÷';
+          A = rnd(profile.minD, profile.maxD);
+          D = rnd(profile.minD, profile.maxD);
+          X = A * D;
 
-        Z = C * F;
-        Y = B * E;
-        X = A * D;
-      } else if (mode === 'sub') {
-        opH = '−'; opV = '+';
-        const isHard = levelNum >= 18;
-        const minS = isHard ? 10 : 3;
-        const maxS = isHard ? 25 : 9;
-        Y = rnd(minS, maxS);
-        Z = rnd(minS, maxS);
-        X = Y + Z;
+          B = rnd(profile.minD, profile.maxD);
+          E = rnd(profile.minD, profile.maxD);
+          Y = B * E;
 
-        B = rnd(minS, maxS);
-        C = rnd(minS, maxS);
-        A = B + C;
+          Z = X * Y;
+          C = A * B;
+          F = D * E;
+        } else if (mode === 'div_mul') {
+          opH = '÷'; opV = '×';
+          Y = rnd(profile.minD, profile.maxD);
+          Z = rnd(profile.minD, profile.maxD);
+          X = Y * Z;
 
-        D = X + A;
-        E = Y + B;
-        F = Z + C;
-      } else {
-        opH = '+'; opV = '+';
-        const isHard = levelNum >= 18;
-        const minA = isHard ? 12 : 2;
-        const maxA = isHard ? 30 : 9;
-        X = rnd(minA, maxA);
-        Y = rnd(minA, maxA);
-        A = rnd(minA, maxA);
-        B = rnd(minA, maxA);
-        Z = X + Y;
-        C = A + B;
-        D = X + A;
-        E = Y + B;
-        F = Z + C;
+          B = rnd(profile.minD, profile.maxD);
+          C = rnd(profile.minD, profile.maxD);
+          A = B * C;
+
+          D = X * A;
+          E = Y * B;
+          F = Z * C;
+        } else if (mode === 'sub') {
+          opH = '−'; opV = '+';
+          Y = rnd(profile.minVal, profile.maxVal);
+          Z = rnd(profile.minVal, profile.maxVal);
+          X = Y + Z;
+
+          B = rnd(profile.minVal, profile.maxVal);
+          C = rnd(profile.minVal, profile.maxVal);
+          A = B + C;
+
+          D = X + A;
+          E = Y + B;
+          F = Z + C;
+        } else if (mode === 'sub_both') {
+          opH = '+'; opV = '−';
+          A = rnd(profile.minVal, profile.maxVal);
+          D = rnd(profile.minVal, profile.maxVal);
+          X = A + D;
+
+          B = rnd(profile.minVal, profile.maxVal);
+          E = rnd(profile.minVal, profile.maxVal);
+          Y = B + E;
+
+          Z = X + Y;
+          C = A + B;
+          F = D + E;
+        } else {
+          opH = '+'; opV = '+';
+          X = rnd(profile.minVal, profile.maxVal);
+          Y = rnd(profile.minVal, profile.maxVal);
+          A = rnd(profile.minVal, profile.maxVal);
+          B = rnd(profile.minVal, profile.maxVal);
+          Z = X + Y;
+          C = A + B;
+          D = X + A;
+          E = Y + B;
+          F = Z + C;
+        }
+
+        valMap = {
+          '0,0': X, '0,2': Y, '0,4': Z,
+          '2,0': A, '2,2': B, '2,4': C,
+          '4,0': D, '4,2': E, '4,4': F
+        };
+
+        const distinctVals = new Set(Object.values(valMap));
+        if (distinctVals.size >= profile.blankCount) {
+          break;
+        }
       }
 
-      const valMap = {
-        '0,0': X, '0,2': Y, '0,4': Z,
-        '2,0': A, '2,2': B, '2,4': C,
-        '4,0': D, '4,2': E, '4,4': F
-      };
+      // Candidate positions for blanks, shuffled deterministically
+      const allPos = ['0,0', '0,2', '0,4', '2,0', '2,2', '2,4', '4,0', '4,2', '4,4'];
+      for (let i = allPos.length - 1; i > 0; i--) {
+        const j = rnd(0, i);
+        const temp = allPos[i];
+        allPos[i] = allPos[j];
+        allPos[j] = temp;
+      }
 
-      const blankCandidates = ['0,0', '0,2', '2,0', '2,2', '2,4', '4,0', '4,2'];
-      blankCandidates.sort(() => (rnd(0, 10) > 5 ? 1 : -1));
-      const blankCount = (levelNum >= 18) ? 5 : 4;
-      const blankKeys = blankCandidates.slice(0, blankCount);
+      let blankKeys = [];
+      const chosenValues = new Set();
+      
+      let preferredSets = [];
+      if (profile.blankCount === 3) {
+        preferredSets = [
+          ['0,0', '2,2', '4,2'],
+          ['0,2', '2,0', '4,0'],
+          ['0,0', '2,4', '4,2'],
+          ['0,2', '2,2', '4,4'],
+          ['2,0', '2,2', '2,4']
+        ];
+      } else if (profile.blankCount === 4) {
+        preferredSets = [
+          ['0,0', '0,2', '2,2', '4,2'],
+          ['0,2', '2,0', '2,4', '4,0'],
+          ['0,0', '2,0', '2,2', '4,4']
+        ];
+      }
+
+      // Check preferred sets first to see if any has 100% pairwise distinct answers
+      for (const set of preferredSets) {
+        const vals = set.map(k => valMap[k]);
+        if (new Set(vals).size === set.length) {
+          blankKeys = set;
+          vals.forEach(v => chosenValues.add(v));
+          break;
+        }
+      }
+
+      // If no preferred set worked or blankCount > 4, greedily pick blanks with distinct values
+      if (blankKeys.length < profile.blankCount) {
+        blankKeys = [];
+        chosenValues.clear();
+        for (const pos of allPos) {
+          const v = valMap[pos];
+          if (!chosenValues.has(v)) {
+            chosenValues.add(v);
+            blankKeys.push(pos);
+            if (blankKeys.length === profile.blankCount) break;
+          }
+        }
+      }
+
+      // Safety fallback ensuring blankKeys always matches target blankCount
+      if (blankKeys.length < profile.blankCount) {
+        for (const pos of allPos) {
+          if (!blankKeys.includes(pos)) {
+            blankKeys.push(pos);
+            if (blankKeys.length === profile.blankCount) break;
+          }
+        }
+      }
 
       const slots = [];
       const slotIndices = {};
@@ -2965,33 +3837,78 @@ import './index.css';
       ];
 
       const answers = slots.map(s => s.answer);
-      const distractors = [
-        Math.max(1, answers[0] + rnd(-3, 3) || 1),
-        Math.max(1, answers[1] + rnd(1, 4))
+      const targetNumbersCount = profile.trayCount || (profile.blankCount <= 3 ? 5 : profile.blankCount === 4 ? 6 : profile.blankCount === 5 ? 7 : 8);
+
+      // CRUCIAL: 100% of required answers are unconditionally included in numbersSet
+      const numbersSet = new Set(answers);
+
+      // Decoy distractors that are plausible and mathematically distinct
+      const distractorCandidates = [
+        Math.max(1, answers[0] + (rnd(0, 1) === 0 ? 1 : -1)),
+        Math.max(1, (answers[1] || answers[0]) + (rnd(0, 1) === 0 ? 2 : -2)),
+        Math.max(1, (answers[2] || answers[0]) + rnd(1, 4)),
+        Math.max(1, (answers[0] || 5) + rnd(3, 7)),
+        Math.max(1, (answers[answers.length - 1] || 5) + (rnd(0, 1) === 0 ? 3 : -3)),
+        Math.max(1, (answers[1] || 4) + (rnd(0, 1) === 0 ? 4 : -4)),
+        Math.max(1, (answers[2] || 6) + (rnd(0, 1) === 0 ? 5 : -5)),
+        Math.max(1, (answers[0] || 7) + rnd(4, 9)),
+        Math.max(1, (answers[answers.length - 1] || 8) + rnd(2, 6)),
+        Math.max(1, Math.round((answers[0] + (answers[1] || answers[0])) / 2)),
+        Math.max(1, answers[0] + 10),
+        Math.max(1, (answers[answers.length - 1] || 10) + 10)
       ];
-      const numbers = [...new Set([...answers, ...distractors])];
-      while (numbers.length < 6) {
-        numbers.push(rnd(1, 40));
+
+      for (const d of distractorCandidates) {
+        if (numbersSet.size < targetNumbersCount && !numbersSet.has(d)) {
+          numbersSet.add(d);
+        }
       }
-      numbers.sort(() => (rnd(0, 10) > 5 ? 1 : -1));
+
+      let padAttempt = 0;
+      let padCandidate = 1;
+      while (numbersSet.size < targetNumbersCount && padAttempt < 150) {
+        padAttempt++;
+        const fallbackNum = rnd(1, Math.max(30, profile.maxVal * 2));
+        if (!numbersSet.has(fallbackNum)) {
+          numbersSet.add(fallbackNum);
+        } else {
+          while (numbersSet.has(padCandidate)) padCandidate++;
+          numbersSet.add(padCandidate);
+        }
+      }
+
+      const numbers = Array.from(numbersSet);
+      // Fisher-Yates shuffle preserving ALL elements (zero slicing of required answers!)
+      for (let i = numbers.length - 1; i > 0; i--) {
+        const j = rnd(0, i);
+        const temp = numbers[i];
+        numbers[i] = numbers[j];
+        numbers[j] = temp;
+      }
 
       return {
         id: seed,
         cols: 5,
+        level: levelNum,
+        stage: st + 1,
+        totalStages,
+        stageDifficulty: profile.tierName,
+        stageBadgeClass: profile.badgeClass,
         solvedText: `${X} ${opH} ${Y} = ${Z}`,
         hintStep: `Top row: ${X} ${opH} ${Y} = ${Z}`,
         slots,
         rows,
-        numbers: numbers.slice(0, 6)
+        numbers
       };
     }
 
     const puzzleCache = new Map();
-    function getMemoizedPuzzle(levelNum, seed = 0) {
-      const key = `${levelNum}_${seed}`;
+    function getMemoizedPuzzle(levelNum, seed = 0, stageIndex = -1) {
+      const sIdx = stageIndex >= 0 ? stageIndex : (seed >= 1000 ? Math.floor(seed / 1000) : 0);
+      const key = `${levelNum}_${seed}_${sIdx}`;
       if (puzzleCache.has(key)) return puzzleCache.get(key);
-      const result = generateCrossMathPuzzle(levelNum, seed);
-      if (puzzleCache.size > 200) {
+      const result = generateCrossMathPuzzle(levelNum, seed, sIdx);
+      if (puzzleCache.size > 300) {
         const firstKey = puzzleCache.keys().next().value;
         puzzleCache.delete(firstKey);
       }
@@ -3002,7 +3919,20 @@ import './index.css';
     const levelStageSeedsCache = new Map();
     function getStageSeedsForLevel(levelNum) {
       if (levelStageSeedsCache.has(levelNum)) return levelStageSeedsCache.get(levelNum);
-      const seeds = [0];
+      const total = getStageCount(levelNum);
+      const seen = new Set();
+      const seeds = [];
+      for (let st = 0; st < total; st++) {
+        let seed = st * 1000 + 101;
+        let guard = 0;
+        while (guard < 40) {
+          const text = getMemoizedPuzzle(levelNum, seed, st).solvedText;
+          if (!seen.has(text)) { seen.add(text); break; }
+          seed += 1;
+          guard += 1;
+        }
+        seeds.push(seed);
+      }
       levelStageSeedsCache.set(levelNum, seeds);
       return seeds;
     }
@@ -3067,20 +3997,23 @@ import './index.css';
       // Pick 9 unique numbers across all 3 rows
       const used = new Set();
       const pickUnique = (min, max) => {
-        for (let attempt = 0; attempt < 50; attempt++) {
+        for (let attempt = 0; attempt < 80; attempt++) {
           const val = rnd(min, max);
           if (!used.has(val)) {
             used.add(val);
             return val;
           }
         }
-        for (let v = min; v <= 35; v++) {
+        for (let v = min; v <= 40; v++) {
           if (!used.has(v)) {
             used.add(v);
             return v;
           }
         }
-        return 1;
+        let fallback = 1;
+        while (used.has(fallback)) fallback++;
+        used.add(fallback);
+        return fallback;
       };
 
       const genTriplet = (tmpl) => {
@@ -3136,18 +4069,48 @@ import './index.css';
       // 9 interactive receptor slots across 3 rows
       const answers = { 0: A, 1: B, 2: C, 3: D, 4: E, 5: F, 6: G, 7: H, 8: I };
 
-      // Distractors for the number tray
+      // Distractors for the number tray (plausible mathematical decoys)
       const distractors = [
         A + rnd(1, 3),
         Math.max(1, D + (rnd(0, 1) ? 2 : -2)),
-        Math.max(1, G + (rnd(0, 1) ? 1 : -1))
+        Math.max(1, G + (rnd(0, 1) ? 1 : -1)),
+        Math.max(1, B + (rnd(0, 1) ? 3 : -3)),
+        Math.max(1, E + rnd(2, 5)),
+        Math.max(1, H + (rnd(0, 1) ? 2 : -2))
       ];
 
-      const trayPool = [...new Set([A, B, C, D, E, F, G, H, I, ...distractors])];
-      while (trayPool.length < 11) {
-        trayPool.push(rnd(1, 30));
+      // Gradual tray scaling by calendar day (10 to 14 options across 2 balanced rows)
+      let targetDailyTrayCount = 10; // Days 1-6: 10 options (5 + 5 in 2 rows)
+      if (day >= 28) {
+        targetDailyTrayCount = 14; // Days 28-31 (Apex Finale): 14 options (7 + 7 in 2 rows)
+      } else if (day >= 21) {
+        targetDailyTrayCount = 13; // Days 21-27: 13 options (7 + 6 in 2 rows)
+      } else if (day >= 14) {
+        targetDailyTrayCount = 12; // Days 14-20: 12 options (6 + 6 in 2 rows)
+      } else if (day >= 7) {
+        targetDailyTrayCount = 11; // Days 7-13: 11 options (6 + 5 in 2 rows)
       }
-      const trayNumbers = [...new Set(trayPool.slice(0, 12))].sort((x, y) => x - y);
+
+      // Guarantee all 9 answers are present + pad to targetDailyTrayCount unique numbers for balanced 2-row layout
+      const traySet = new Set([A, B, C, D, E, F, G, H, I]);
+      for (const d of distractors) {
+        if (traySet.size < targetDailyTrayCount && !traySet.has(d)) {
+          traySet.add(d);
+        }
+      }
+      let fallbackSeed = 1;
+      let padGuard = 0;
+      while (traySet.size < targetDailyTrayCount && padGuard < 150) {
+        padGuard++;
+        const candidate = rnd(1, 45);
+        if (!traySet.has(candidate)) {
+          traySet.add(candidate);
+        } else {
+          while (traySet.has(fallbackSeed)) fallbackSeed++;
+          traySet.add(fallbackSeed);
+        }
+      }
+      const trayNumbers = Array.from(traySet).sort((x, y) => x - y);
 
       return {
         year,
@@ -3181,6 +4144,22 @@ import './index.css';
       const navigationStackRef = useRef([initialScreen]);
       const [showScreenPicker, setShowScreenPicker] = useState(false);
 
+      // Google AdMob State Management & Dual Native/Web Fallback
+      const [adMobState, setAdMobState] = useState(() => adMobService.getState());
+      useEffect(() => {
+        adMobService.initialize();
+        const unsub = adMobService.subscribe(setAdMobState);
+        return () => unsub();
+      }, []);
+
+      // Google Play In-App Purchase (IAP) & Billing Management
+      const [purchaseState, setPurchaseState] = useState(() => purchaseService.getState());
+      useEffect(() => {
+        purchaseService.initialize();
+        const unsub = purchaseService.subscribe(setPurchaseState);
+        return () => unsub();
+      }, []);
+
       // Sliding-tile loader: appears only when a page takes noticeably long to load
       const isPageLoading = useSmartPageLoader(currentScreen);
       useEffect(() => { prefetchAssetsWhenIdle(); }, []);
@@ -3188,40 +4167,61 @@ import './index.css';
       // Gameplay State & Level Progression (Loaded from URL or LocalStorage)
       const queryParamLevel = (typeof window !== 'undefined' && parseInt(new URLSearchParams(window.location.search).get('level') || '', 10)) || null;
 
+      // Ensure new users start fresh from Level 1, migrating any old legacy dummy defaults (Level 3 with 112 XP)
+      (() => {
+        try {
+          if (typeof localStorage !== 'undefined') {
+            const hasStartedV2 = GameStorage.getItem('newromath_started_v2');
+            if (!hasStartedV2) {
+              GameStorage.setItem('newromath_started_v2', 'true');
+              const oldUnlocked = GameStorage.getItem('newromath_unlocked_level');
+              const oldXp = GameStorage.getItem('newromath_player_xp');
+              // If device has the old hardcoded dummy default of 3 with 112 XP, reset to fresh Level 1
+              if (oldUnlocked === '3' && (oldXp === '112' || !oldXp)) {
+                GameStorage.removeItem('newromath_unlocked_level');
+                GameStorage.removeItem('newromath_player_level');
+                GameStorage.removeItem('newromath_selected_level');
+                GameStorage.removeItem('newromath_player_xp');
+              }
+            }
+          }
+        } catch (e) {}
+      })();
+
       const [unlockedLevelMax, setUnlockedLevelMax] = useState(() => {
         if (queryParamLevel && !isNaN(queryParamLevel)) return Math.max(1, queryParamLevel);
         try {
-          const saved = localStorage.getItem('newromath_unlocked_level');
-          return saved ? Math.max(1, parseInt(saved, 10)) : 3;
+          const saved = GameStorage.getItem('newromath_unlocked_level');
+          return saved ? Math.max(1, parseInt(saved, 10)) : 1;
         } catch (e) {
-          return 3;
+          return 1;
         }
       });
 
-      // Player Global State
+      // Player Global State: New players start at Level 1 with 0 XP
       const [playerLevel, setPlayerLevel] = useState(() => {
         if (queryParamLevel && !isNaN(queryParamLevel)) return Math.max(1, queryParamLevel);
         try {
-          const saved = localStorage.getItem('newromath_player_level');
+          const saved = GameStorage.getItem('newromath_player_level');
           if (saved) return Math.max(1, parseInt(saved, 10));
-          const savedUnlocked = localStorage.getItem('newromath_unlocked_level');
-          return savedUnlocked ? Math.max(1, parseInt(savedUnlocked, 10)) : 3;
+          const savedUnlocked = GameStorage.getItem('newromath_unlocked_level');
+          return savedUnlocked ? Math.max(1, parseInt(savedUnlocked, 10)) : 1;
         } catch (e) {
-          return 3;
+          return 1;
         }
       });
       const [playerXp, setPlayerXp] = useState(() => {
         try {
-          const saved = localStorage.getItem('newromath_player_xp');
-          return saved ? Math.max(0, parseInt(saved, 10)) : 112;
+          const saved = GameStorage.getItem('newromath_player_xp');
+          return saved ? Math.max(0, parseInt(saved, 10)) : 0;
         } catch (e) {
-          return 112;
+          return 0;
         }
       });
       const [xpNeeded, setXpNeeded] = useState(300);
       const [coins, setCoins] = useState(() => {
         try {
-          const saved = localStorage.getItem('newromath_coins');
+          const saved = GameStorage.getItem('newromath_coins');
           return saved ? Math.max(0, parseInt(saved, 10)) : 2450;
         } catch (e) {
           return 2450;
@@ -3229,7 +4229,7 @@ import './index.css';
       });
       const [gems, setGems] = useState(() => {
         try {
-          const saved = localStorage.getItem('newromath_gems');
+          const saved = GameStorage.getItem('newromath_gems');
           return saved ? Math.max(0, parseInt(saved, 10)) : 25;
         } catch (e) {
           return 25;
@@ -3238,14 +4238,43 @@ import './index.css';
       const [selectedLevelNum, setSelectedLevelNum] = useState(() => {
         if (queryParamLevel && !isNaN(queryParamLevel)) return Math.max(1, queryParamLevel);
         try {
-          const saved = localStorage.getItem('newromath_selected_level');
+          const saved = GameStorage.getItem('newromath_selected_level');
           if (saved) return Math.max(1, parseInt(saved, 10));
-          const savedUnlocked = localStorage.getItem('newromath_unlocked_level');
-          return savedUnlocked ? Math.max(1, parseInt(savedUnlocked, 10)) : 3;
+          const savedUnlocked = GameStorage.getItem('newromath_unlocked_level');
+          return savedUnlocked ? Math.max(1, parseInt(savedUnlocked, 10)) : 1;
         } catch (e) {
-          return 3;
+          return 1;
         }
       });
+
+      // 3D Level Gaming Awards & Profile Avatar State
+      const [equippedAvatar, setEquippedAvatar] = useState(() => {
+        try {
+          const saved = GameStorage.getItem('newromath_player_avatar');
+          if (saved) return saved;
+        } catch (e) {}
+        try {
+          const savedUnlocked = parseInt(GameStorage.getItem('newromath_unlocked_level') || '1', 10);
+          if (savedUnlocked > 1) {
+            const highestSolvedIndex = Math.min(savedUnlocked - 2, 24);
+            if (LEVEL_AWARDS[highestSolvedIndex]) {
+              return LEVEL_AWARDS[highestSolvedIndex].icon;
+            }
+          }
+        } catch (e) {}
+        return '/assets/icon_robot_3d.webp';
+      });
+
+      const [awardFilter, setAwardFilter] = useState('all'); // 'all' | 'unlocked' | 'locked'
+
+      useEffect(() => {
+        try {
+          if (equippedAvatar) {
+            GameStorage.setItem('newromath_player_avatar', equippedAvatar);
+          }
+        } catch (e) {}
+      }, [equippedAvatar]);
+
       // Dynamic Calendar & Daily Challenge System
       const calendarDate = useMemo(() => new Date(), []);
       const currentCalendarYear = calendarDate.getFullYear();
@@ -3261,7 +4290,7 @@ import './index.css';
       const [completedDailyDays, setCompletedDailyDays] = useState(() => {
         try {
           const key = `newromath_daily_completed_${currentCalendarYear}_${currentSeasonNum}`;
-          const saved = localStorage.getItem(key);
+          const saved = GameStorage.getItem(key);
           if (saved) return JSON.parse(saved);
           const initial = [];
           for (let i = 1; i < todayCalendarDay; i++) {
@@ -3276,11 +4305,11 @@ import './index.css';
       useEffect(() => {
         try {
           const key = `newromath_daily_completed_${currentCalendarYear}_${currentSeasonNum}`;
-          localStorage.setItem(key, JSON.stringify(completedDailyDays));
+          GameStorage.setItem(key, JSON.stringify(completedDailyDays));
         } catch (e) {}
       }, [completedDailyDays, currentCalendarYear, currentSeasonNum]);
 
-      // Real-time Streak Calculation
+      // Real-time Streak Calculation (Active Streak & Best Monthly Streak)
       const streakDays = useMemo(() => {
         let count = 0;
         let check = completedDailyDays.includes(todayCalendarDay) ? todayCalendarDay : todayCalendarDay - 1;
@@ -3288,35 +4317,49 @@ import './index.css';
           count++;
           check--;
         }
-        return Math.max(1, count);
+        return count;
       }, [completedDailyDays, todayCalendarDay]);
+
+      const bestStreakDays = useMemo(() => {
+        let maxS = 0;
+        let cur = 0;
+        for (let d = 1; d <= daysInCurrentMonth; d++) {
+          if (completedDailyDays.includes(d)) {
+            cur++;
+            if (cur > maxS) maxS = cur;
+          } else {
+            cur = 0;
+          }
+        }
+        return maxS;
+      }, [completedDailyDays, daysInCurrentMonth]);
 
       const [lives, setLives] = useState(3);
       const [selectedCategory, setSelectedCategory] = useState('all');
 
       // Sync state variables to LocalStorage automatically
       useEffect(() => {
-        try { localStorage.setItem('newromath_unlocked_level', unlockedLevelMax.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_unlocked_level', unlockedLevelMax.toString()); } catch (e) {}
       }, [unlockedLevelMax]);
 
       useEffect(() => {
-        try { localStorage.setItem('newromath_player_level', playerLevel.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_player_level', playerLevel.toString()); } catch (e) {}
       }, [playerLevel]);
 
       useEffect(() => {
-        try { localStorage.setItem('newromath_player_xp', playerXp.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_player_xp', playerXp.toString()); } catch (e) {}
       }, [playerXp]);
 
       useEffect(() => {
-        try { localStorage.setItem('newromath_coins', coins.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_coins', coins.toString()); } catch (e) {}
       }, [coins]);
 
       useEffect(() => {
-        try { localStorage.setItem('newromath_gems', gems.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_gems', gems.toString()); } catch (e) {}
       }, [gems]);
 
       useEffect(() => {
-        try { localStorage.setItem('newromath_selected_level', selectedLevelNum.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_selected_level', selectedLevelNum.toString()); } catch (e) {}
       }, [selectedLevelNum]);
 
       // Active player level dynamically reflects the campaign unlocked level
@@ -3326,6 +4369,19 @@ import './index.css';
       const campaignProgressPct = Math.min(100, Math.round((completedLevelsCount / 25) * 100));
       const todayFormattedDate = useMemo(() => {
         return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }, []);
+
+      // Live real-time clock for Continue card
+      const [currentRealTime, setCurrentRealTime] = useState(() => {
+        return new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      });
+
+      useEffect(() => {
+        const updateTime = () => {
+          setCurrentRealTime(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }));
+        };
+        const timerId = setInterval(updateTime, 1000);
+        return () => clearInterval(timerId);
       }, []);
 
       // Dynamic Level XP Target and Current Level Progress in Real-Time
@@ -3349,12 +4405,15 @@ import './index.css';
       const todayCrateKey = `${currentCalendarYear}-${currentSeasonNum}-${todayCalendarDay}`;
       const [dailyGiftClaimed, setDailyGiftClaimed] = useState(() => {
         try {
-          return localStorage.getItem('newromath_daily_crate_last_claimed') === todayCrateKey;
+          return GameStorage.getItem('newromath_daily_crate_last_claimed') === todayCrateKey;
         } catch (e) {
           return false;
         }
       });
       const [rewardToast, setRewardToast] = useState(null);
+      const triggerRewardToast = (msg) => {
+        setRewardToast(msg);
+      };
 
       // Level Entry Fee & Economy Modal States
       const [insufficientFundsModal, setInsufficientFundsModal] = useState({
@@ -3363,6 +4422,12 @@ import './index.css';
         cost: { coins: 100, gems: 10 },
         missingCoins: 0,
         missingGems: 0
+      });
+      const [dailyAdPromptModal, setDailyAdPromptModal] = useState({
+        isOpen: false,
+        targetDay: 1,
+        fee: 50,
+        reason: 'missed_day'
       });
       const [isTimeOver, setIsTimeOver] = useState(false);
       const [isWrongModalOpen, setIsWrongModalOpen] = useState(false);
@@ -3393,64 +4458,74 @@ import './index.css';
         return () => clearInterval(timer);
       }, [adModalOpen, adCountdown]);
 
-      // Global Ad Watch & Reward System
+      // Global Ad Watch & Reward System (Powered by Google AdMob Rewarded Video)
       const handleWatchAd = (type, amount, title, extra = {}) => {
         sound.click();
-        setAdReward({
+        const payload = {
           type,
           amount,
           title: title || 'Quantum Sponsor Booster',
           coinAmount: extra.coinAmount || (type === 'coins' ? amount : 350),
           gemAmount: extra.gemAmount || (type === 'gems' ? amount : 15),
           onComplete: extra.onComplete || null
-        });
-        setAdCountdown(3);
-        setAdModalOpen(true);
+        };
+        setAdReward(payload);
+
+        if (adMobState.isNative) {
+          // Native Android: invoke Google AdMob Rewarded Video Ad directly
+          adMobService.showRewarded(() => {
+            handleClaimAdReward(payload);
+          });
+        } else {
+          // Web / Browser Preview: show interactive AdMob Rewarded Video demo modal
+          setAdModalOpen(true);
+        }
       };
 
-      const handleClaimAdReward = () => {
+      const handleClaimAdReward = (overrideReward = null) => {
+        const reward = overrideReward || adReward;
         sound.correct();
         confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
-        if (adReward.type === 'coins') {
-          const val = adReward.amount || adReward.coinAmount || 250;
+        if (reward.type === 'coins') {
+          const val = reward.amount || reward.coinAmount || 250;
           setCoins(c => {
             const next = c + val;
-            try { localStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
             return next;
           });
           setRewardToast(`🎉 Ad Reward: +${val.toLocaleString()} Coins Collected!`);
-        } else if (adReward.type === 'gems') {
-          const val = adReward.amount || adReward.gemAmount || 15;
+        } else if (reward.type === 'gems') {
+          const val = reward.amount || reward.gemAmount || 15;
           setGems(g => {
             const next = g + val;
-            try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
             return next;
           });
           setRewardToast(`💎 Ad Reward: +${val.toLocaleString()} Gems Collected!`);
-        } else if (adReward.type === 'time') {
-          const extraSec = adReward.amount || 30;
+        } else if (reward.type === 'time') {
+          const extraSec = reward.amount || 30;
           setGameTimer(t => t + extraSec);
           setIsTimeOver(false);
           setRewardToast(`⏱️ Extra Time: +${extraSec}s Added! Mission Resumed!`);
         } else {
-          // 'both' / supply drop
-          const cAmt = adReward.coinAmount || 350;
-          const gAmt = adReward.gemAmount || 15;
+          // 'both' / supply drop / jackpot
+          const cAmt = reward.coinAmount || (reward.type === 'jackpot' ? 600 : 350);
+          const gAmt = reward.gemAmount || (reward.type === 'jackpot' ? 20 : 15);
           setCoins(c => {
             const next = c + cAmt;
-            try { localStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
             return next;
           });
           setGems(g => {
             const next = g + gAmt;
-            try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
             return next;
           });
-          setRewardToast(`⚡ Supply Drop: +${cAmt} 🪙 & +${gAmt} 💎 Added!`);
+          setRewardToast(`🎉 Ad Reward: +${cAmt} 🪙 & +${gAmt} 💎 Added!`);
         }
         setAdModalOpen(false);
-        if (adReward.onComplete) {
-          adReward.onComplete();
+        if (reward.onComplete) {
+          reward.onComplete();
         }
       };
 
@@ -3459,7 +4534,7 @@ import './index.css';
       const [profileDifficulty, setProfileDifficulty] = useState('Easy');
       const [playerName, setPlayerName] = useState(() => {
         try {
-          return localStorage.getItem('newromath_player_name') || 'Guest-JFNZLZ';
+          return GameStorage.getItem('newromath_player_name') || 'Guest-JFNZLZ';
         } catch (e) {
           return 'Guest-JFNZLZ';
         }
@@ -3467,7 +4542,7 @@ import './index.css';
       const [isEditingName, setIsEditingName] = useState(false);
       const [nameInput, setNameInput] = useState(() => {
         try {
-          return localStorage.getItem('newromath_player_name') || 'Guest-JFNZLZ';
+          return GameStorage.getItem('newromath_player_name') || 'Guest-JFNZLZ';
         } catch (e) {
           return 'Guest-JFNZLZ';
         }
@@ -3481,8 +4556,38 @@ import './index.css';
       const [puzzleHistory, setPuzzleHistory] = useState([]);
       const [selectedPuzzleSlot, setSelectedPuzzleSlot] = useState(null);
 
-      // Flying number animation state
-      const [flyingTiles, setFlyingTiles] = useState([]);
+      // Flying number animation state (Object Pooled)
+      const [flyingPool, setFlyingPool] = useState(INITIAL_FLYING_POOL);
+      const spawnFlyingTile = useCallback((tileData) => {
+        setFlyingPool(prevPool => {
+          let slotIdx = prevPool.findIndex(s => !s.active);
+          if (slotIdx === -1) slotIdx = 0;
+          const nextPool = [...prevPool];
+          nextPool[slotIdx] = {
+            ...nextPool[slotIdx],
+            ...tileData,
+            active: true,
+            flightSeq: (nextPool[slotIdx].flightSeq || 0) + 1
+          };
+          return nextPool;
+        });
+      }, []);
+
+      const recycleFlyingTile = useCallback((slotId) => {
+        setFlyingPool(prevPool => {
+          if (!prevPool[slotId]?.active) return prevPool;
+          const nextPool = [...prevPool];
+          nextPool[slotId] = {
+            ...nextPool[slotId],
+            active: false
+          };
+          return nextPool;
+        });
+      }, []);
+
+      const resetFlyingPool = useCallback(() => {
+        setFlyingPool(INITIAL_FLYING_POOL);
+      }, []);
       const [impactSlot, setImpactSlot] = useState(null);
       const pendingNumbersRef = useRef(new Set());
       const pendingSlotsRef = useRef(new Set());
@@ -3504,6 +4609,16 @@ import './index.css';
       const [largeFontEnabled, setLargeFontEnabled] = useState(true);
       const [divisionSymbol, setDivisionSymbol] = useState('÷');
 
+      // Help & Support Interactive State
+      const [helpTab, setHelpTab] = useState('all');
+      const [openFaqIndex, setOpenFaqIndex] = useState(0);
+      const [feedbackCategory, setFeedbackCategory] = useState('Bug Report');
+      const [feedbackEmail, setFeedbackEmail] = useState('');
+      const [feedbackText, setFeedbackText] = useState('');
+      const [feedbackSent, setFeedbackSent] = useState(false);
+      const [feedbackTicketId, setFeedbackTicketId] = useState('');
+      const [copiedSupportEmail, setCopiedSupportEmail] = useState(false);
+
       // Daily Challenge State & Trophy Modal
       const [activeDailyDay, setActiveDailyDay] = useState(todayCalendarDay);
       const [showTrophyModal, setShowTrophyModal] = useState(false);
@@ -3522,6 +4637,7 @@ import './index.css';
       const [dailyGameTimeOver, setDailyGameTimeOver] = useState(false);
       const [dailyHintUsed, setDailyHintUsed] = useState(0);
       const [showDailyInstructionsModal, setShowDailyInstructionsModal] = useState(false);
+      const [showMainInstructionsModal, setShowMainInstructionsModal] = useState(false);
 
       const startDailyChallenge = (dayNum = activeDailyDay) => {
         sound.click();
@@ -3545,8 +4661,61 @@ import './index.css';
       // Leaderboard Tab
       const [leaderboardTab, setLeaderboardTab] = useState('global');
 
-      // History Tab
+      // History Tab and Puzzle Archives
       const [historyTab, setHistoryTab] = useState('history');
+
+      // Persistent Puzzle Records for History
+      const [puzzleRecords, setPuzzleRecords] = useState(() => {
+        try {
+          const stored = GameStorage.getItem('newromath_puzzle_records');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {}
+        return [
+          { id: 'rec-1', eq: '(12 + 8) × 2 - 6 = 34', time: 'Today', level: 3, mode: 'Main Game', solved: true, xp: 45, date: Date.now() - 3600000 },
+          { id: 'rec-2', eq: '(15 - 7) × 3 = 24', time: 'Today', level: 2, mode: 'Main Game', solved: true, xp: 35, date: Date.now() - 7200000 },
+          { id: 'rec-3', eq: '8 + 6 ÷ 2 = 11', time: 'Yesterday', level: 1, mode: 'Main Game', solved: true, xp: 25, date: Date.now() - 86400000 },
+          { id: 'rec-4', eq: '(9 × 4) ÷ 2 = 38', time: 'Yesterday', level: 3, mode: 'Daily Matrix', solved: true, xp: 50, date: Date.now() - 90000000 },
+          { id: 'rec-5', eq: '(14 - 7) × 2 = 14', time: 'Dec 12', level: 2, mode: 'Main Game', solved: false, xp: 0, date: Date.now() - 172800000 },
+          { id: 'rec-6', eq: '12 + 3 ÷ 5 = 9', time: 'Dec 11', level: 1, mode: 'Daily Matrix', solved: false, xp: 0, date: Date.now() - 259200000 },
+        ];
+      });
+
+      // Persistent Saved / Bookmarked Puzzle Formula IDs
+      const [savedPuzzleIds, setSavedPuzzleIds] = useState(() => {
+        try {
+          const stored = GameStorage.getItem('newromath_saved_puzzles');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch (e) {}
+        return ['rec-1', 'rec-2'];
+      });
+
+      const toggleSavePuzzle = (id) => {
+        sound.click();
+        setSavedPuzzleIds(prev => {
+          const exists = prev.includes(id);
+          const next = exists ? prev.filter(x => x !== id) : [...prev, id];
+          try { GameStorage.setItem('newromath_saved_puzzles', JSON.stringify(next)); } catch (e) {}
+          if (!exists) {
+            setRewardToast('🔖 Formula pinned to your Saved Archives!');
+          } else {
+            setRewardToast('Formula unpinned from Saved');
+          }
+          return next;
+        });
+      };
+
+      const handleClearHistory = () => {
+        sound.click();
+        setPuzzleRecords([]);
+        try { GameStorage.setItem('newromath_puzzle_records', JSON.stringify([])); } catch (e) {}
+        setRewardToast('🧹 History records cleared');
+      };
 
       // Statistics Tab
       const [statsTab, setStatsTab] = useState('overview');
@@ -3596,16 +4765,16 @@ import './index.css';
           // Deduct entry fee
           setCoins(c => {
             const nextCoins = c - cost.coins;
-            try { localStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
             return nextCoins;
           });
           setGems(g => {
             const nextGems = g - cost.gems;
-            try { localStorage.setItem('newromath_gems', nextGems.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_gems', nextGems.toString()); } catch (e) {}
             return nextGems;
           });
           sound.click();
-          setRewardToast(`⚡ Mission L${targetLvl} Entry: -${cost.coins} Coins & -${cost.gems} Gems`);
+          setRewardToast(`Mission L${targetLvl} Entry: -${cost.coins} Coins & -${cost.gems} Gems`);
           startNewPuzzle(targetLvl);
         } else {
           sound.wrong();
@@ -3626,7 +4795,7 @@ import './index.css';
         resetPuzzle(selectedLevelNum);
       };
 
-      // Move on to the next puzzle inside the current level (no extra entry fee)
+      // Move on to the next puzzle inside the current level
       const continueToNextStage = () => {
         sound.click();
         setIsCorrectModalOpen(false);
@@ -3634,7 +4803,7 @@ import './index.css';
         navigateTo('game');
       };
 
-      // Retry the same puzzle after a wrong answer (progress in the level is kept)
+      // Retry the same puzzle after a wrong answer
       const retryCurrentStage = () => {
         sound.click();
         setIsWrongModalOpen(false);
@@ -3645,16 +4814,24 @@ import './index.css';
       // Expose for testing and inspection
       window.__triggerTimeout = () => {
         setIsTimeOver(true);
-        sound.wrong();
+        sound.error();
       };
       window.__resetTimeout = restartLevelAfterTimeout;
       window.__triggerWrongModal = () => {
         setIsWrongModalOpen(true);
-        sound.wrong();
+        sound.error();
       };
       window.__triggerCorrectModal = () => {
         setIsCorrectModalOpen(true);
-        sound.correct();
+        sound.success();
+      };
+      window.__showAdMobInterstitial = (force = true) => adMobService.showInterstitial({ force });
+      window.__toggleAdMobBanner = () => {
+        if (adMobState.bannerVisible) {
+          adMobService.hideBanner();
+        } else {
+          adMobService.showBanner();
+        }
       };
       window.__solvePuzzle = () => {
         const solved = {};
@@ -3671,16 +4848,41 @@ import './index.css';
         const targetXp = getLevelTargetXp(lvl);
         const nextXp = customXp !== null ? Math.min(targetXp, Math.max(0, Number(customXp) || 0)) : Math.round(targetXp * 0.35);
         setPlayerXp(nextXp);
-        try { localStorage.setItem('newromath_unlocked_level', lvl.toString()); } catch (e) {}
-        try { localStorage.setItem('newromath_player_level', lvl.toString()); } catch (e) {}
-        try { localStorage.setItem('newromath_selected_level', lvl.toString()); } catch (e) {}
-        try { localStorage.setItem('newromath_player_xp', nextXp.toString()); } catch (e) {}
+        if (lvl > 1 && LEVEL_AWARDS[lvl - 2]) {
+          setEquippedAvatar(LEVEL_AWARDS[lvl - 2].icon);
+          try { GameStorage.setItem('newromath_player_avatar', LEVEL_AWARDS[lvl - 2].icon); } catch (e) {}
+        } else if (lvl === 1) {
+          setEquippedAvatar('/assets/icon_robot_3d.webp');
+          try { GameStorage.setItem('newromath_player_avatar', '/assets/icon_robot_3d.webp'); } catch (e) {}
+        }
+        try { GameStorage.setItem('newromath_unlocked_level', lvl.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_player_level', lvl.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_selected_level', lvl.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_player_xp', nextXp.toString()); } catch (e) {}
       };
       window.__setXp = (amount) => {
         const val = Math.max(0, Number(amount) || 0);
         setPlayerXp(val);
-        try { localStorage.setItem('newromath_player_xp', val.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_player_xp', val.toString()); } catch (e) {}
       };
+      const resetAllProgress = () => {
+        setUnlockedLevelMax(1);
+        setPlayerLevel(1);
+        setSelectedLevelNum(1);
+        setPlayerXp(0);
+        setStageNum(1);
+        setEquippedAvatar('/assets/icon_robot_3d.webp');
+        try {
+          GameStorage.setItem('newromath_unlocked_level', '1');
+          GameStorage.setItem('newromath_player_level', '1');
+          GameStorage.setItem('newromath_selected_level', '1');
+          GameStorage.setItem('newromath_player_xp', '0');
+          GameStorage.setItem('newromath_player_avatar', '/assets/icon_robot_3d.webp');
+        } catch (e) {}
+        resetPuzzle(1, 1);
+        triggerRewardToast('🚀 Campaign reset! Starting fresh from Level 1.');
+      };
+      window.__resetAllProgress = resetAllProgress;
       window.__triggerInsufficientFunds = () => {
         setInsufficientFundsModal({
           isOpen: true,
@@ -3835,8 +5037,8 @@ import './index.css';
         if (!['game', 'hint', 'correct', 'wrong'].includes(currentScreen)) {
           return { slots: [], rows: [], numbers: [], solvedText: '', hintStep: '', cols: 5 };
         }
-        return getMemoizedPuzzle(selectedLevelNum, puzzleSeed);
-      }, [selectedLevelNum, puzzleSeed, currentScreen]);
+        return getMemoizedPuzzle(selectedLevelNum, puzzleSeed, stageNum - 1);
+      }, [selectedLevelNum, puzzleSeed, stageNum, currentScreen]);
 
       // One unique puzzle seed per stage of the selected level (deferred, zero startup delay)
       const stageSeeds = useMemo(() => {
@@ -3854,15 +5056,19 @@ import './index.css';
       const puzzleRows = activePuzzle?.rows || [];
       const puzzleNumbers = activePuzzle?.numbers || [];
 
-      const getLevelTimer = (lvl) => {
-        if (lvl <= 5) return 50;
-        if (lvl <= 10) return 45;
-        if (lvl <= 15) return 40;
-        if (lvl <= 20) return 35;
-        return 30;
+      const getLevelTimer = (lvl, stage = 1) => {
+        const total = getStageCount(lvl);
+        const ratio = total > 1 ? (Math.max(1, stage) - 1) / (total - 1) : 0;
+        let base;
+        if (lvl <= 5) base = 55;
+        else if (lvl <= 10) base = 48;
+        else if (lvl <= 15) base = 42;
+        else if (lvl <= 20) base = 38;
+        else base = 35;
+        return Math.max(25, Math.round(base - ratio * 10));
       };
 
-      const resetPuzzle = (targetLvl = selectedLevelNum) => {
+      const resetPuzzle = (targetLvl = selectedLevelNum, targetStage = stageNum) => {
         puzzleAnswersRef.current = {};
         setPuzzleAnswers({});
         setPuzzleHistory([]);
@@ -3871,9 +5077,9 @@ import './index.css';
         pendingSlotsRef.current.clear();
         setPendingNumbers(new Set());
         setPendingSlots(new Set());
-        setFlyingTiles([]);
+        resetFlyingPool();
         setIsTimeOver(false);
-        setGameTimer(getLevelTimer(targetLvl));
+        setGameTimer(getLevelTimer(targetLvl, targetStage));
       };
 
       const rerollPuzzle = () => {
@@ -3888,46 +5094,50 @@ import './index.css';
         pendingSlotsRef.current.clear();
         setPendingNumbers(new Set());
         setPendingSlots(new Set());
-        setFlyingTiles([]);
+        resetFlyingPool();
         setIsTimeOver(false);
-        setGameTimer(getLevelTimer(selectedLevelNum));
+        setGameTimer(getLevelTimer(selectedLevelNum, stageNum));
         setTimeout(() => setIsSpinningReroll(false), 500);
       };
 
       const startNewPuzzle = (targetLvl = selectedLevelNum) => {
         setSelectedLevelNum(targetLvl);
         setPlayerLevel(prev => Math.max(prev, targetLvl));
-        try { localStorage.setItem('newromath_selected_level', targetLvl.toString()); } catch (e) {}
-        try { localStorage.setItem('newromath_player_level', Math.max(playerLevel, targetLvl).toString()); } catch (e) {}
-        setPuzzleSeed(0);
+        try { GameStorage.setItem('newromath_selected_level', targetLvl.toString()); } catch (e) {}
+        try { GameStorage.setItem('newromath_player_level', Math.max(playerLevel, targetLvl).toString()); } catch (e) {}
+        const seeds = getStageSeedsForLevel(targetLvl);
+        setPuzzleSeed(seeds[0] !== undefined ? seeds[0] : 101);
         setStageNum(1);
         const lvlObj = ALL_LEVELS.find(l => l.num === targetLvl) || ALL_LEVELS[0];
         setProfileDifficulty(lvlObj.diff);
         setIsTimeOver(false);
-        resetPuzzle(targetLvl);
+        resetPuzzle(targetLvl, 1);
         navigateTo('game');
       };
 
       const submitPuzzle = (answers) => {
         const correct = puzzleSlots.every(({ slot, answer }) => answers[slot] === answer);
-        sound.click();
         if (correct) {
-          sound.correct();
+          sound.success();
           confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
           const lvlObj = ALL_LEVELS.find(l => l.num === selectedLevelNum) || { xp: 25, coins: 15 };
           const cost = getLevelEntryCost(selectedLevelNum);
-          const total = 1;
-          const isFinalStage = true;
+          const total = getStageCount(selectedLevelNum);
+          const isFinalStage = stageNum >= total;
           const targetXp = getLevelTargetXp(selectedLevelNum);
-          const earnedXp = targetXp;
-          const earnedCoins = Math.round(cost.coins * 1.8);
-          const earnedGems = Math.round(cost.gems * 1.3) + 2;
+          const earnedXp = isFinalStage ? targetXp : Math.max(1, Math.round(targetXp / total));
+          const earnedCoins = isFinalStage ? Math.round(cost.coins * 1.8) : Math.max(5, Math.round(cost.coins * 0.06));
+          const earnedGems = isFinalStage ? Math.round(cost.gems * 1.3) + 2 : 0;
+
+          if (isFinalStage) {
+            setTimeout(() => sound.fanfare(), 320);
+          }
 
           setLastResult({
             level: selectedLevelNum,
-            stage: 1,
-            total: 1,
-            levelCleared: true,
+            stage: stageNum,
+            total,
+            levelCleared: isFinalStage,
             solvedText: activePuzzle.solvedText,
             coins: earnedCoins,
             gems: earnedGems,
@@ -3937,49 +5147,86 @@ import './index.css';
           // 1. Earn Coins & Diamond Coins in real-time
           setCoins(c => {
             const nextCoins = c + earnedCoins;
-            try { localStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
             return nextCoins;
           });
+          sound.coin();
           if (earnedGems > 0) {
             setGems(g => {
               const nextGems = g + earnedGems;
-              try { localStorage.setItem('newromath_gems', nextGems.toString()); } catch (e) {}
+              try { GameStorage.setItem('newromath_gems', nextGems.toString()); } catch (e) {}
               return nextGems;
             });
+            setTimeout(() => sound.gem(), 120);
           }
 
-          // 2. Level Progression: unlocking next level immediately in real-time
-          const nextUnlocked = Math.min(26, selectedLevelNum + 1);
-          const nextSelected = Math.min(25, selectedLevelNum + 1);
+          if (isFinalStage) {
+            // 2. Level Progression: unlocking next level immediately in real-time
+            const nextUnlocked = Math.min(26, selectedLevelNum + 1);
+            const nextSelected = Math.min(25, selectedLevelNum + 1);
 
-          // 3. Unlock Next Mission
-          setUnlockedLevelMax(prev => {
-            const nextVal = Math.max(prev, nextUnlocked);
-            try { localStorage.setItem('newromath_unlocked_level', nextVal.toString()); } catch (e) {}
-            return nextVal;
-          });
+            // 3. Unlock Next Mission
+            setUnlockedLevelMax(prev => {
+              const nextVal = Math.max(prev, nextUnlocked);
+              try { GameStorage.setItem('newromath_unlocked_level', nextVal.toString()); } catch (e) {}
+              return nextVal;
+            });
 
-          // 4. Update Player Campaign Level
-          setPlayerLevel(prev => {
-            const nextVal = Math.min(25, Math.max(prev, nextSelected));
-            try { localStorage.setItem('newromath_player_level', nextVal.toString()); } catch (e) {}
-            return nextVal;
-          });
+            // 4. Update Player Campaign Level
+            setPlayerLevel(prev => {
+              const nextVal = Math.min(25, Math.max(prev, nextSelected));
+              try { GameStorage.setItem('newromath_player_level', nextVal.toString()); } catch (e) {}
+              return nextVal;
+            });
 
-          // 5. Select Next Mission
-          setSelectedLevelNum(nextSelected);
-          try { localStorage.setItem('newromath_selected_level', nextSelected.toString()); } catch (e) {}
+            // 5. Select Next Mission
+            setSelectedLevelNum(nextSelected);
+            try { GameStorage.setItem('newromath_selected_level', nextSelected.toString()); } catch (e) {}
+
+            // 6. Award Modern 3D Gaming Icon & Auto-apply to Player Profile
+            const earnedAward = LEVEL_AWARDS.find(a => a.level === selectedLevelNum);
+            if (earnedAward) {
+              setEquippedAvatar(earnedAward.icon);
+              try { GameStorage.setItem('newromath_player_avatar', earnedAward.icon); } catch (e) {}
+              triggerRewardToast(`🏆 Level ${selectedLevelNum} Solved! Awarded 3D Avatar: ${earnedAward.title}!`);
+            }
+          } else {
+            // Queue up the next puzzle of this level (different puzzle each stage)
+            const nextStage = stageNum + 1;
+            setStageNum(nextStage);
+            setPuzzleSeed(stageSeeds[nextStage - 1] !== undefined ? stageSeeds[nextStage - 1] : (nextStage - 1) * 1000 + 101);
+          }
 
           // 6. Update Player XP in real-time
           setPlayerXp(prevXp => {
             const totalXp = prevXp + earnedXp;
-            try { localStorage.setItem('newromath_player_xp', totalXp.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_player_xp', totalXp.toString()); } catch (e) {}
             return totalXp;
           });
 
+          // 7. Record Solved Equation to Puzzle History Logs
+          if (activePuzzle?.solvedText) {
+            setPuzzleRecords(prev => {
+              const newRec = {
+                id: `rec-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                eq: activePuzzle.solvedText,
+                time: 'Just Now',
+                level: selectedLevelNum,
+                stage: stageNum,
+                mode: 'Main Game',
+                solved: true,
+                xp: earnedXp,
+                date: Date.now()
+              };
+              const updated = [newRec, ...prev.filter(r => r.eq !== newRec.eq)].slice(0, 50);
+              try { GameStorage.setItem('newromath_puzzle_records', JSON.stringify(updated)); } catch (e) {}
+              return updated;
+            });
+          }
+
           setTimeout(() => setIsCorrectModalOpen(true), 250);
         } else {
-          sound.wrong();
+          sound.error();
           setLives(l => Math.max(0, l - 1));
           setTimeout(() => setIsWrongModalOpen(true), 250);
         }
@@ -4041,23 +5288,31 @@ import './index.css';
           const sRect = sourceEl.getBoundingClientRect();
           const tRect = targetEl.getBoundingClientRect();
 
-          const tileId = 'fly-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
-          const newFlyTile = {
-            id: tileId,
-            number: number,
-            targetSlot: targetSlot,
-            fromX: sRect.left - cRect.left,
-            fromY: sRect.top - cRect.top,
-            fromW: sRect.width,
-            fromH: sRect.height,
-            toX: tRect.left - cRect.left,
-            toY: tRect.top - cRect.top,
-            toW: tRect.width,
-            toH: tRect.height,
-            isReturn: false
-          };
+          const isValidGeom = sRect.width > 0 && tRect.width > 0 &&
+            Number.isFinite(sRect.left) && Number.isFinite(tRect.left) &&
+            Number.isFinite(sRect.top) && Number.isFinite(tRect.top);
 
-          setFlyingTiles(prev => [...prev, newFlyTile]);
+          if (isValidGeom) {
+            const tileId = 'fly-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+            const newFlyTile = {
+              id: tileId,
+              number: number,
+              targetSlot: targetSlot,
+              fromX: sRect.left - cRect.left,
+              fromY: sRect.top - cRect.top,
+              fromW: sRect.width,
+              fromH: sRect.height,
+              toX: tRect.left - cRect.left,
+              toY: tRect.top - cRect.top,
+              toW: tRect.width,
+              toH: tRect.height,
+              isReturn: false
+            };
+
+            spawnFlyingTile(newFlyTile);
+          } else {
+            finalizePlacement(number, targetSlot);
+          }
         } else {
           finalizePlacement(number, targetSlot);
         }
@@ -4074,28 +5329,42 @@ import './index.css';
           const sRect = sourceEl.getBoundingClientRect();
           const tRect = targetEl.getBoundingClientRect();
 
-          const tileId = 'ret-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
-          const returnTile = {
-            id: tileId,
-            number: number,
-            targetSlot: slot,
-            fromX: sRect.left - cRect.left,
-            fromY: sRect.top - cRect.top,
-            fromW: sRect.width,
-            fromH: sRect.height,
-            toX: tRect.left - cRect.left,
-            toY: tRect.top - cRect.top,
-            toW: tRect.width,
-            toH: tRect.height,
-            isReturn: true
-          };
+          const isValidGeom = sRect.width > 0 && tRect.width > 0 &&
+            Number.isFinite(sRect.left) && Number.isFinite(tRect.left) &&
+            Number.isFinite(sRect.top) && Number.isFinite(tRect.top);
 
-          setFlyingTiles(prev => [...prev, returnTile]);
+          if (isValidGeom) {
+            const tileId = 'ret-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+            const returnTile = {
+              id: tileId,
+              number: number,
+              targetSlot: slot,
+              fromX: sRect.left - cRect.left,
+              fromY: sRect.top - cRect.top,
+              fromW: sRect.width,
+              fromH: sRect.height,
+              toX: tRect.left - cRect.left,
+              toY: tRect.top - cRect.top,
+              toW: tRect.width,
+              toH: tRect.height,
+              isReturn: true
+            };
+
+            spawnFlyingTile(returnTile);
+          } else {
+            finalizeReturn(number);
+          }
+        } else {
+          finalizeReturn(number);
         }
       };
 
       const finalizeReturn = (number) => {
-        sound.snap();
+        if (pendingNumbersRef.current.has(number)) {
+          pendingNumbersRef.current.delete(number);
+          setPendingNumbers(new Set(pendingNumbersRef.current));
+        }
+        sound.pop();
         if (hapticsEnabled && typeof navigator !== 'undefined' && navigator.vibrate) {
           try { navigator.vibrate(10); } catch (e) {}
         }
@@ -4419,17 +5688,17 @@ import './index.css';
               {/* Left: Modern Cyber-Arcade Profile & Level Capsule */}
               <div 
                 onClick={() => { sound.click(); navigateTo('profile'); }} 
-                className="group relative cursor-pointer select-none bg-gradient-to-r from-[#0e255a]/95 via-[#0a1a3e]/90 to-[#071330]/85 border border-cyan-400/40 hover:border-cyan-300/80 rounded-2xl p-1 pr-1.5 sm:pr-2.5 flex items-center gap-1.5 sm:gap-2 shadow-[0_4px_16px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md transition-all active:scale-95 min-w-0 shrink"
+                className="group relative cursor-pointer select-none bg-gradient-to-r from-[#14397d]/95 via-[#122f6d]/95 to-[#0e2456]/95 border border-cyan-400/60 hover:border-cyan-300/80 rounded-2xl p-1 pr-1.5 sm:pr-2.5 flex items-center gap-1.5 sm:gap-2 shadow-[0_4px_14px_rgba(0,140,255,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md transition-all active:scale-95 min-w-0 shrink"
                 title="Player Profile"
               >
                 {/* 3D Cyber Avatar Frame */}
                 <div className="relative shrink-0 w-[30px] h-[30px] sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-600 to-indigo-900 p-0.5 shadow-[0_0_10px_rgba(0,229,255,0.6)] group-hover:shadow-[0_0_14px_rgba(0,229,255,0.9)] transition-all">
-                  <div className="w-full h-full rounded-[10px] bg-[#0c1a3a] overflow-hidden flex items-center justify-center">
+                  <div className="w-full h-full rounded-[10px] bg-gradient-to-b from-[#18366d] to-[#0e2147] overflow-hidden flex items-center justify-center">
                     <img 
-                      src="/assets/icon_robot_3d.png" 
+                      src={equippedAvatar || "/assets/icon_robot_3d.webp"} 
                       alt="Player Avatar" 
                       decoding="async"
-                      className="w-full h-full object-cover scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" 
+                      className="w-full h-full object-contain p-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" 
                     />
                   </div>
                   {/* Golden Metallic LV. Badge */}
@@ -4440,22 +5709,26 @@ import './index.css';
 
                 {/* Level Title & Campaign Progress (Completed & Due) */}
                 <div className="flex flex-col justify-center min-w-0">
-                  <div className="flex items-center gap-1 sm:gap-1.5 leading-tight">
+                  <div className="flex items-center gap-1.5 sm:gap-2 leading-tight">
                     <span className="text-white font-black text-[10px] sm:text-[11px] font-display tracking-wide uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate">
                       Level {activePlayerLevel}
                     </span>
-                    <span className="home-hdr-pro-badge px-1 py-0.2 rounded text-[6.5px] sm:text-[7px] font-black uppercase tracking-wider bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 font-mono shrink-0">
-                      PRO
+                    <span className={`home-hdr-pro-badge text-[8px] sm:text-[9px] font-black uppercase tracking-wider font-display shrink-0 select-none ${
+                      purchaseState.isProUser
+                        ? 'text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.7)]'
+                        : 'text-cyan-200/90 drop-shadow-[0_0_6px_rgba(34,211,238,0.5)]'
+                    }`}>
+                      {purchaseState.isProUser ? 'VIP' : 'FREE'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 mt-0.5 sm:mt-1 min-w-0">
-                    <div className="w-[44px] sm:w-[58px] h-1.5 bg-[#050f24] border border-cyan-400/50 rounded-full overflow-hidden p-[1px] shadow-inner relative shrink-0">
+                    <div className="w-[44px] sm:w-[58px] h-1.5 bg-[#0b1c3d] border border-cyan-400/60 rounded-full overflow-hidden p-[1px] shadow-inner relative shrink-0">
                       <div 
                         className="h-full bg-gradient-to-r from-cyan-400 via-sky-300 to-white rounded-full shadow-[0_0_8px_rgba(0,229,255,0.9)] transition-all duration-300" 
                         style={{ width: `${Math.min(100, Math.max(8, campaignProgressPct))}%` }} 
                       />
                     </div>
-                    <span className="home-hdr-xp-text text-cyan-300 font-mono font-bold text-[8px] sm:text-[8.5px] tracking-tight whitespace-nowrap drop-shadow shrink-0">
+                    <span className="home-hdr-xp-text text-cyan-200 font-mono font-bold text-[8px] sm:text-[8.5px] tracking-tight whitespace-nowrap drop-shadow shrink-0">
                       {completedLevelsCount}/{dueLevelsCount}
                     </span>
                   </div>
@@ -4547,7 +5820,7 @@ import './index.css';
             {/* Hero Banner */}
             <div className="relative w-full rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)] border border-cyan-500/20 select-none shrink-0">
               <img 
-                src="/assets/hero_scifi_clean.png" 
+                src="/assets/hero_scifi_clean.webp" 
                 alt="Math Puzzle Hero" 
                 decoding="async"
                 fetchPriority="high"
@@ -4561,7 +5834,7 @@ import './index.css';
               className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0 rounded-2xl overflow-hidden"
             >
               <img 
-                src="/assets/card_daily_clean.png?v=5" 
+                src="/assets/card_daily_clean.webp?v=5" 
                 alt="Daily Challenge" 
                 decoding="async"
                 className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]" 
@@ -4572,23 +5845,18 @@ import './index.css';
                 className="absolute inset-y-0 right-0 left-[41%] flex flex-col justify-between py-2 sm:py-3 pr-2.5 sm:pr-4 pl-1 pointer-events-none"
                 style={{ top: '6%', bottom: '6%' }}
               >
-                {/* Header Row: Calendar Icon + Title + Dynamic Date Badge */}
+                {/* Header Row: Title + Dynamic Date Badge */}
                 <div className="flex items-center justify-between gap-1 min-w-0">
-                  <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_8px_rgba(0,229,255,0.6)] p-0.5 shrink-0 border border-cyan-300/50">
-                      <span className="text-[10px] sm:text-xs leading-none">📅</span>
-                    </div>
-                    <span 
-                      className="text-white font-black tracking-tight leading-tight block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)] truncate"
-                      style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Arial Black', sans-serif", fontSize: 'clamp(12px, 3.4vw, 16px)' }}
-                    >
-                      Daily <span className="text-cyan-300">Challenge</span>
-                    </span>
-                  </div>
+                  <span 
+                    className="text-white font-black tracking-tight leading-tight block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)] truncate"
+                    style={{ fontSize: 'clamp(13px, 3.6vw, 17px)' }}
+                  >
+                    Daily <span className="text-cyan-300">Challenge</span>
+                  </span>
                   
                   {/* Dynamic Date Badge */}
                   <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#0a1e4a]/90 border border-cyan-400/50 text-[8px] sm:text-[9.5px] font-mono font-bold text-cyan-200 shadow-sm shrink-0">
-                    <span>📅</span>
+                    <Calendar className="w-2.5 h-2.5 text-cyan-300 shrink-0" />
                     <span>{todayFormattedDate}</span>
                   </div>
                 </div>
@@ -4596,7 +5864,7 @@ import './index.css';
                 {/* Dynamic Subtitle */}
                 <p 
                   className="text-[#cce9ff] font-medium tracking-tight drop-shadow-[0_1px_2px_rgba(0,10,35,0.85)] truncate leading-tight my-0.5"
-                  style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif", fontSize: 'clamp(8.5px, 2.1vw, 10.5px)' }}
+                  style={{ fontSize: 'clamp(8.5px, 2.1vw, 10.5px)' }}
                 >
                   Solve today's puzzle and get amazing rewards!
                 </p>
@@ -4628,25 +5896,25 @@ import './index.css';
                 className="scifi-card-3d relative w-full cursor-pointer select-none rounded-2xl overflow-hidden"
               >
                 <img 
-                  src="/assets/card_level_clean.png?v=6" 
+                  src="/assets/card_level_clean.webp?v=7" 
                   alt={`Level ${activePlayerLevel}`} 
                   decoding="async"
                   className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_10px_rgba(0,0,0,0.4)]" 
                 />
                 {/* Dynamic Level Overlay for active level - pixel-perfect positioning */}
                 <div 
-                  className="absolute pointer-events-none flex flex-col justify-center select-none"
-                  style={{ top: '48%', transform: 'translateY(-50%)', left: '56%', right: '12%' }}
+                  className="absolute pointer-events-none flex flex-col justify-center items-center text-center select-none"
+                  style={{ top: '50%', transform: 'translateY(-50%)', left: '49%', right: '19%' }}
                 >
                   <span 
-                    className="text-white font-black tracking-tight leading-none block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)]"
-                    style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Arial Black', sans-serif", fontSize: 'clamp(14px, 4vw, 18px)' }}
+                    className="text-white font-black tracking-tight leading-none block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)] whitespace-nowrap"
+                    style={{ fontSize: 'clamp(12px, 3.5vw, 16px)' }}
                   >
                     Level {activePlayerLevel}
                   </span>
                   <span 
-                    className="text-[#d8f2ff] font-bold tracking-tight block drop-shadow-[0_1px_3px_rgba(0,10,35,0.9)] truncate mt-1 leading-tight font-mono"
-                    style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif", fontSize: 'clamp(9px, 2.2vw, 11px)' }}
+                    className="text-[#d8f2ff] font-bold tracking-tight block drop-shadow-[0_1px_3px_rgba(0,10,35,0.9)] truncate mt-1 leading-tight font-mono whitespace-nowrap"
+                    style={{ fontSize: 'clamp(9px, 2.2vw, 11px)' }}
                   >
                     {completedLevelsCount}/{dueLevelsCount}
                   </span>
@@ -4656,14 +5924,32 @@ import './index.css';
               {/* Rewards Card */}
               <div 
                 onClick={() => { sound.click(); navigateTo('rewards'); }}
-                className="scifi-card-3d relative w-full cursor-pointer select-none"
+                className="scifi-card-3d relative w-full cursor-pointer select-none rounded-2xl overflow-hidden"
               >
                 <img 
-                  src="/assets/card_rewards_scifi.png?v=9" 
+                  src="/assets/card_rewards_clean.webp?v=7" 
                   alt="Rewards" 
                   decoding="async"
                   className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_10px_rgba(0,0,0,0.4)]" 
                 />
+                {/* Dynamic Rewards Overlay */}
+                <div 
+                  className="absolute pointer-events-none flex flex-col justify-center items-center text-center select-none"
+                  style={{ top: '50%', transform: 'translateY(-50%)', left: '43%', right: '19%' }}
+                >
+                  <span 
+                    className="text-white font-black tracking-tight leading-none block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)] whitespace-nowrap"
+                    style={{ fontSize: 'clamp(12px, 3.5vw, 16px)' }}
+                  >
+                    Rewards
+                  </span>
+                  <span 
+                    className="text-[#d8f2ff] font-bold tracking-tight block drop-shadow-[0_1px_3px_rgba(0,10,35,0.9)] truncate mt-1 leading-tight font-mono whitespace-nowrap"
+                    style={{ fontSize: 'clamp(8.5px, 2.1vw, 10.5px)' }}
+                  >
+                    Coins & Gems
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -4673,29 +5959,70 @@ import './index.css';
                 sound.click();
                 attemptStartLevel(activePlayerLevel);
               }}
-              className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0"
+              className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0 rounded-2xl overflow-hidden"
             >
               <img 
-                src="/assets/card_continue_clean.png?v=4" 
+                src="/assets/card_continue_clean_bg.webp" 
                 alt="Continue" 
                 loading="lazy"
                 decoding="async"
                 className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]" 
               />
+              {/* Dynamic Continue Overlay */}
+              <div 
+                className="absolute pointer-events-none flex flex-col justify-center select-none"
+                style={{ top: '50%', transform: 'translateY(-50%)', left: '38%', right: '16%' }}
+              >
+                <span 
+                  className="text-white font-black tracking-tight leading-none block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)]"
+                  style={{ fontSize: 'clamp(15px, 4.2vw, 19px)' }}
+                >
+                  Continue
+                </span>
+                <div 
+                  className="flex items-center gap-1.5 mt-1 font-bold tracking-tight text-[#38bdf8] drop-shadow-[0_1px_3px_rgba(0,10,35,0.9)] leading-tight"
+                  style={{ fontSize: 'clamp(9.5px, 2.5vw, 12px)' }}
+                >
+                  <svg className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <span className="font-mono">{currentRealTime}</span>
+                  <span>{ALL_LEVELS.find(l => l.num === activePlayerLevel)?.diff || 'Easy'}</span>
+                </div>
+              </div>
             </div>
 
             {/* 4. New Game Card */}
             <div 
               onClick={() => { sound.click(); navigateTo('levels'); }}
-              className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0"
+              className="scifi-card-3d relative w-full cursor-pointer select-none shrink-0 rounded-2xl overflow-hidden"
             >
               <img 
-                src="/assets/card_newgame_clean.png?v=4" 
+                src="/assets/card_newgame_clean_bg.webp" 
                 alt="New Game" 
                 loading="lazy"
                 decoding="async"
                 className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_10px_rgba(0,0,0,0.4)]" 
               />
+              {/* Dynamic New Game Overlay */}
+              <div 
+                className="absolute pointer-events-none flex flex-col justify-center select-none"
+                style={{ top: '50%', transform: 'translateY(-50%)', left: '28%', right: '16%' }}
+              >
+                <span 
+                  className="text-white font-black tracking-tight leading-none block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)]"
+                  style={{ fontSize: 'clamp(15px, 4.2vw, 19px)' }}
+                >
+                  New Game
+                </span>
+                <span 
+                  className="text-[#e2e8f0] font-bold tracking-tight block drop-shadow-[0_1px_3px_rgba(0,10,35,0.9)] truncate mt-1 leading-tight"
+                  style={{ fontSize: 'clamp(9.5px, 2.4vw, 11.5px)' }}
+                >
+                  Start a fresh challenge
+                </span>
+              </div>
             </div>
 
             {/* 5. Champions Live Reel (Sliding Left to Right, 3D Gaming Style) */}
@@ -4729,9 +6056,14 @@ import './index.css';
                     rank: "Rank #1",
                     rankCol: "from-amber-300 via-amber-400 to-amber-500",
                     rankText: "text-amber-950",
-                    icon: "/assets/icon_trophy_3d.png",
-                    cardBg: "from-[#0d2760] via-[#15367c] to-[#0e2a66]",
-                    borderCol: "border-amber-400/70",
+                    icon: "/assets/awards/award_lvl_25.webp",
+                    cardBg: "from-[#13377a] via-[#1d4f9e] to-[#102e66]",
+                    borderCol: "border-amber-400/90 shadow-[0_4px_16px_rgba(245,158,11,0.3)]",
+                    domeBg: "bg-[radial-gradient(circle_at_50%_25%,#2558b8_0%,#163b82_55%,#0d2354_100%)]",
+                    countryBg: "bg-[#133270]/90 border border-amber-400/40",
+                    countryText: "text-amber-200",
+                    rewardsBg: "bg-[#0e285a]/95 border border-amber-400/60",
+                    cornerColor: "text-amber-300/50",
                     blueprintTag: "ARCH: Φ-1.618",
                     mathFormula: "e^(iπ)+1=0",
                     mathSymbol: "∑",
@@ -4746,9 +6078,14 @@ import './index.css';
                     rank: "Rank #2",
                     rankCol: "from-slate-100 via-slate-200 to-slate-300",
                     rankText: "text-slate-900",
-                    icon: "/assets/icon_robot_3d.png",
-                    cardBg: "from-[#29175a] via-[#3a207a] to-[#22134c]",
-                    borderCol: "border-purple-400/70",
+                    icon: "/assets/awards/award_lvl_23.webp",
+                    cardBg: "from-[#3a1b73] via-[#51239e] to-[#2e155c]",
+                    borderCol: "border-purple-400/90 shadow-[0_4px_16px_rgba(168,85,247,0.3)]",
+                    domeBg: "bg-[radial-gradient(circle_at_50%_25%,#682bc9_0%,#451a87_55%,#260d4d_100%)]",
+                    countryBg: "bg-[#371970]/90 border border-purple-400/40",
+                    countryText: "text-purple-200",
+                    rewardsBg: "bg-[#291354]/95 border border-purple-400/60",
+                    cornerColor: "text-purple-300/50",
                     blueprintTag: "CALC: ∫f(x)dx",
                     mathFormula: "lim 1/x=0",
                     mathSymbol: "∫",
@@ -4763,9 +6100,14 @@ import './index.css';
                     rank: "Rank #3",
                     rankCol: "from-amber-600 via-amber-500 to-yellow-600",
                     rankText: "text-amber-950",
-                    icon: "/assets/icon_chest_3d.png",
-                    cardBg: "from-[#073229] via-[#0b483c] to-[#052922]",
-                    borderCol: "border-emerald-400/70",
+                    icon: "/assets/awards/award_lvl_24.webp",
+                    cardBg: "from-[#094d3c] via-[#0e6952] to-[#073d30]",
+                    borderCol: "border-emerald-400/90 shadow-[0_4px_16px_rgba(16,185,129,0.3)]",
+                    domeBg: "bg-[radial-gradient(circle_at_50%_25%,#158066_0%,#0c5745_55%,#06362b_100%)]",
+                    countryBg: "bg-[#0b4739]/90 border border-emerald-400/40",
+                    countryText: "text-emerald-200",
+                    rewardsBg: "bg-[#07382d]/95 border border-emerald-400/60",
+                    cornerColor: "text-emerald-300/50",
                     blueprintTag: "GEO: a²+b²=c²",
                     mathFormula: "sin²θ+cos²θ=1",
                     mathSymbol: "Δ",
@@ -4780,9 +6122,14 @@ import './index.css';
                     rank: "Rank #4",
                     rankCol: "from-cyan-300 via-cyan-400 to-cyan-500",
                     rankText: "text-cyan-950",
-                    icon: "/assets/icon_gamepad_3d.png",
-                    cardBg: "from-[#4a1e0b] via-[#66280e] to-[#361608]",
-                    borderCol: "border-orange-400/70",
+                    icon: "/assets/awards/award_lvl_22.webp",
+                    cardBg: "from-[#692d0e] via-[#8c3d14] to-[#54240a]",
+                    borderCol: "border-orange-400/90 shadow-[0_4px_16px_rgba(249,115,22,0.3)]",
+                    domeBg: "bg-[radial-gradient(circle_at_50%_25%,#ad4b1b_0%,#783210_55%,#471d08_100%)]",
+                    countryBg: "bg-[#5f280e]/90 border border-orange-400/40",
+                    countryText: "text-orange-200",
+                    rewardsBg: "bg-[#4a1f0a]/95 border border-orange-400/60",
+                    cornerColor: "text-orange-300/50",
                     blueprintTag: "MATRIX: [3×3]",
                     mathFormula: "det(A-λI)=0",
                     mathSymbol: "λ",
@@ -4797,9 +6144,14 @@ import './index.css';
                     rank: "Rank #5",
                     rankCol: "from-fuchsia-300 via-fuchsia-400 to-pink-500",
                     rankText: "text-fuchsia-950",
-                    icon: "/assets/icon_target_3d.png",
-                    cardBg: "from-[#082b4a] via-[#0d3d66] to-[#06223b]",
-                    borderCol: "border-cyan-400/70",
+                    icon: "/assets/awards/award_lvl_15.webp",
+                    cardBg: "from-[#0b426e] via-[#105a96] to-[#083559]",
+                    borderCol: "border-cyan-400/90 shadow-[0_4px_16px_rgba(6,182,212,0.3)]",
+                    domeBg: "bg-[radial-gradient(circle_at_50%_25%,#1972b5_0%,#0f4c7d_55%,#092f4f_100%)]",
+                    countryBg: "bg-[#0d3f66]/90 border border-cyan-400/40",
+                    countryText: "text-cyan-200",
+                    rewardsBg: "bg-[#093252]/95 border border-cyan-400/60",
+                    cornerColor: "text-cyan-300/50",
                     blueprintTag: "TRIG: π≈3.14",
                     mathFormula: "f'(x)=2x+7",
                     mathSymbol: "π",
@@ -4820,26 +6172,31 @@ import './index.css';
                   >
                     <div className="w-[112px] h-[170px] p-2 flex flex-col justify-between relative overflow-hidden pt-3">
                       {/* 1. Mathematical Blueprint Coordinate Grid */}
-                      <div className="absolute inset-0 math-blueprint-grid opacity-25 pointer-events-none" />
+                      <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
 
                       {/* 2. Architectural Drafting Corner Marks (+) */}
-                      <span className="absolute top-1 left-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-                      <span className="absolute top-1 right-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-                      <span className="absolute bottom-1 left-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-                      <span className="absolute bottom-1 right-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+                      <span className={`absolute top-1 left-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                      <span className={`absolute top-1 right-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                      <span className={`absolute bottom-1 left-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                      <span className={`absolute bottom-1 right-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
 
                       {/* Glossy top glass reflection */}
                       <div className="absolute inset-x-0 top-0 h-2/5 bg-gradient-to-b from-white/20 via-white/5 to-transparent rounded-t-[16px] pointer-events-none" />
 
                       {/* Center: 3D Champion Avatar / Icon + Username + Country */}
-                      <div className="flex flex-col items-center justify-center relative z-10 my-auto py-1">
-                        <div className="w-13 h-13 rounded-2xl bg-black/40 border-2 border-cyan-400/50 flex items-center justify-center p-1.5 shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+                      <div className="flex flex-col items-center justify-center relative z-10 my-auto py-0.5">
+                        <div className={`relative w-[40px] h-[40px] rounded-full ${champ.domeBg} shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1.5px_2px_rgba(255,255,255,0.35),inset_0_-2px_3px_rgba(0,0,0,0.45)] flex items-center justify-center p-0.5 overflow-hidden shrink-0`}>
+                          {/* Skeuomorphic Glass Specular Sheen (Curved highlight) */}
+                          <div className="absolute inset-x-0.5 top-0 h-[45%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+
+                          {/* Skeuomorphic Pedestal Contact Shadow */}
+                          <div className="absolute bottom-0.5 w-5 h-1 rounded-full bg-black/55 blur-[1px] pointer-events-none" />
+
+                          {/* 3D Figurine Icon - properly sized for circle */}
                           <img 
                             src={champ.icon} 
                             alt={champ.name} 
-                            loading="lazy"
-                            decoding="async"
-                            className="w-10 h-10 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.7)]" 
+                            className="w-[30px] h-[30px] object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" 
                           />
                         </div>
 
@@ -4849,9 +6206,9 @@ import './index.css';
                         </span>
 
                         {/* Country Name + Flag Pill */}
-                        <div className="flex items-center justify-center gap-1 bg-black/35 border border-cyan-400/30 rounded-full px-1.5 py-0.5 mt-1 max-w-full">
+                        <div className={`flex items-center justify-center gap-1 ${champ.countryBg} rounded-full px-1.5 py-0.5 mt-1 max-w-full shadow-xs`}>
                           <span className="text-[10px] shrink-0 leading-none">{champ.flag}</span>
-                          <span className="text-[8px] text-cyan-200 font-bold tracking-tight truncate leading-none">
+                          <span className={`text-[8px] ${champ.countryText} font-bold tracking-tight truncate leading-none`}>
                             {champ.country}
                           </span>
                         </div>
@@ -4865,13 +6222,13 @@ import './index.css';
                         </div>
 
                         {/* Rewards Capsule (Coins + Gems) */}
-                        <div className="flex items-center justify-center gap-1 bg-[#06142e]/90 border border-amber-400/50 rounded-md py-0.5 px-1 shadow-xs leading-none">
-                          <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coin" className="w-3 h-3 object-contain shrink-0" />
+                        <div className={`flex items-center justify-center gap-1 ${champ.rewardsBg} rounded-md py-0.5 px-1 shadow-xs leading-none`}>
+                          <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain shrink-0" />
                           <span className="text-amber-300 font-black text-[8.5px] font-display">
                             {champ.coins}
                           </span>
                           <span className="text-white/30 text-[7px]">|</span>
-                          <img src="/assets/icon_gem_3d_clean.png" alt="Gem" className="w-2.5 h-2.5 object-contain shrink-0" />
+                          <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-2.5 h-2.5 object-contain shrink-0" />
                           <span className="text-cyan-200 font-black text-[8.5px] font-display">
                             {champ.gems}
                           </span>
@@ -5137,7 +6494,7 @@ import './index.css';
                   const cost = getLevelEntryCost(lvl.num);
                   const theme = getLevelCardTheme(lvl.num, lvl.diff, isLocked);
                   const artIdx = ((lvl.num - 1) % 6) + 1;
-                  const artUrl = `/assets/levels/level_art_${artIdx}.png`;
+                  const artUrl = `/assets/levels/level_art_${artIdx}.webp`;
 
                   return (
                     <div
@@ -5205,37 +6562,34 @@ import './index.css';
                         </span>
                       </div>
 
-                      {/* 3 Stars Rating & Status Pill */}
-                      <div className="flex items-center justify-between gap-1 mb-2">
-                        <div className="flex items-center gap-0.5">
-                          {[1, 2, 3].map((starIdx) => (
-                            <span
-                              key={starIdx}
-                              className={`text-xs ${
-                                isCompleted
-                                  ? 'text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.9)]'
-                                  : 'text-slate-600'
-                              }`}
-                            >
-                              ★
-                            </span>
-                          ))}
-                        </div>
-                        <span className={`text-[8px] sm:text-[8.5px] font-mono font-bold px-1.5 py-0.2 rounded ${
-                          isCompleted
-                            ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
-                            : isUnlocked
-                            ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/40'
-                            : 'bg-slate-900/80 text-slate-400 border border-slate-700/40'
-                        }`}>
-                          {isCompleted ? '✓ Completed' : isUnlocked ? '● Due' : '🔒 Due'}
-                        </span>
+                      {/* 3 Stars Rating */}
+                      <div className="flex items-center gap-0.5 mb-2">
+                        {[1, 2, 3].map((starIdx) => (
+                          <span
+                            key={starIdx}
+                            className={`text-xs ${
+                              isCompleted
+                                ? 'text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.9)]'
+                                : 'text-slate-600'
+                            }`}
+                          >
+                            ★
+                          </span>
+                        ))}
                       </div>
 
                       {/* Bottom Row: Specs Pills & Capsule Play Button */}
                       <div className="flex items-center justify-between gap-1 mt-auto pt-1.5 border-t border-white/5">
-                        {/* Specs Pills: Timer */}
+                        {/* Specs Pills: Games & Timer */}
                         <div className="flex items-center gap-1 shrink-0">
+                          {/* Games Count */}
+                          <span
+                            className="flex items-center gap-0.5 text-[9px] text-white font-mono font-bold bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/25 shadow-xs"
+                            title="Games in this level"
+                          >
+                            <span>🎮</span>
+                            <span>{getStageCount(lvl.num)}</span>
+                          </span>
                           {/* Timer */}
                           <span
                             className="flex items-center gap-0.5 text-[9px] text-white font-mono font-bold bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/25 shadow-xs"
@@ -5290,12 +6644,12 @@ import './index.css';
                       <div className="flex items-center gap-1.5 text-[10px] text-amber-950/85 font-mono font-bold mt-0.5">
                         <span className="flex items-center gap-0.5">
                           Fee:
-                          <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-3 h-3 object-contain inline-block shrink-0" />
+                          <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-3 h-3 object-contain inline-block shrink-0" />
                           {selectedCost.coins}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-0.5">
-                          <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-3 h-3 object-contain inline-block shrink-0" />
+                          <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-3 h-3 object-contain inline-block shrink-0" />
                           {selectedCost.gems}
                         </span>
                         <span className="text-[9px] bg-amber-950/20 px-1 py-0.5 rounded font-sans uppercase font-bold tracking-wider">Play</span>
@@ -5312,48 +6666,58 @@ import './index.css';
       // ========================================================
       // 6. PUZZLE GAMEPLAY (Modern Sci-Fi Arcade Edition)
       const renderGameScreen = () => {
+        const trayCount = puzzleNumbers.length;
+        const blankCount = puzzleSlots.length;
+        const isCompact = blankCount >= 5 || trayCount >= 8;
+        const isVeryCompact = blankCount >= 6 || trayCount >= 10;
+
+        // Dynamic board max-width based on tray count and blank slots to guarantee fit on all mobile screens
+        const gridMaxWidthClass = (() => {
+          if (trayCount >= 11 || blankCount >= 7) return 'max-w-[245px] sm:max-w-[270px]';
+          if (trayCount >= 9 || blankCount >= 6) return 'max-w-[265px] sm:max-w-[290px]';
+          if (trayCount >= 7 || blankCount >= 5) return 'max-w-[285px] sm:max-w-[310px]';
+          if (trayCount >= 6 || blankCount >= 4) return 'max-w-[305px] sm:max-w-[325px]';
+          return 'max-w-[325px] sm:max-w-[340px]';
+        })();
+
+        const gridGapClass = isVeryCompact ? 'gap-0.5 sm:gap-1' : 'gap-1 sm:gap-1.5 md:gap-2';
+
         // Responsive typography helpers that adapt dynamically to digit count and screen viewport
         const getTileTextClass = (val) => {
           const str = String(val ?? '');
           const len = str.length;
           if (len >= 3) {
-            return largeFontEnabled
-              ? 'text-[clamp(10px,2.7vw,13px)] tracking-tight font-black'
-              : 'text-[clamp(9.5px,2.4vw,11.5px)] tracking-tight font-black';
+            return isVeryCompact
+              ? 'text-[clamp(8px,2vw,10px)] tracking-tighter font-black'
+              : isCompact
+              ? 'text-[clamp(8.5px,2.2vw,11px)] tracking-tighter font-black'
+              : (largeFontEnabled ? 'text-[clamp(10px,2.7vw,13px)] tracking-tight font-black' : 'text-[clamp(9.5px,2.4vw,11.5px)] tracking-tight font-black');
           }
           if (len === 2) {
-            return largeFontEnabled
-              ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black'
-              : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black';
+            return isVeryCompact
+              ? 'text-[clamp(10px,2.6vw,12px)] tracking-tight font-black'
+              : isCompact
+              ? 'text-[clamp(11px,2.9vw,13.5px)] tracking-tight font-black'
+              : (largeFontEnabled ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black' : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black');
           }
-          return largeFontEnabled
-            ? 'text-[clamp(16px,4.8vw,22px)] font-black'
-            : 'text-[clamp(14px,4.2vw,19px)] font-black';
+          return isVeryCompact
+            ? 'text-[clamp(11.5px,3.2vw,14.5px)] font-black'
+            : isCompact
+            ? 'text-[clamp(13px,3.8vw,16.5px)] font-black'
+            : (largeFontEnabled ? 'text-[clamp(16px,4.8vw,22px)] font-black' : 'text-[clamp(14px,4.2vw,19px)] font-black');
         };
 
         const getOperatorTextClass = () => {
+          if (isVeryCompact) return 'text-[clamp(10px,2.8vw,13px)] font-black';
+          if (isCompact) return 'text-[clamp(11px,3.2vw,15px)] font-black';
           return largeFontEnabled
             ? 'text-[clamp(14px,4.5vw,20px)] font-black'
             : 'text-[clamp(12px,3.8vw,17px)] font-black';
         };
 
-        const getTrayTextClass = (val) => {
-          const str = String(val ?? '');
-          const len = str.length;
-          if (len >= 3) {
-            return largeFontEnabled
-              ? 'text-[clamp(10px,2.6vw,12px)] tracking-tight font-black'
-              : 'text-[clamp(9.5px,2.3vw,11px)] tracking-tight font-black';
-          }
-          if (len === 2) {
-            return largeFontEnabled
-              ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black'
-              : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black';
-          }
-          return largeFontEnabled
-            ? 'text-[clamp(16px,5vw,22px)] font-black'
-            : 'text-[clamp(14px,4.3vw,19px)] font-black';
-        };
+        const getTrayButtonSizeClass = () => '';
+
+        const getTrayTextClass = (val) => getTileTextClass(val);
 
         return (
           <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
@@ -5363,13 +6727,37 @@ import './index.css';
           >
             {/* Top Navigation & HUD Header */}
             <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2 pb-2 shrink-0">
-              <div className="flex items-center gap-1.5 shrink-0">
+              {/* Left: Back Button */}
+              <div className="flex items-center shrink-0">
                 <button 
                   onClick={() => { sound.click(); navigateTo('levels'); }} 
                   aria-label="Back to levels" 
                   className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   ‹
+                </button>
+              </div>
+
+              {/* Center: Level Mission Pill */}
+              <div className="flex items-center bg-[#0d255a]/75 backdrop-blur-md border border-cyan-400/50 rounded-full px-3 py-1 shadow-inner shrink-0">
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display">
+                  Mission L{selectedLevelNum}
+                </span>
+              </div>
+
+              {/* Right: Info / Instructions & Reroll Button */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button 
+                  onClick={() => {
+                    sound.click();
+                    const proceed = () => setShowMainInstructionsModal(true);
+                    adMobService.showInterstitial({ force: true, onClose: proceed });
+                  }} 
+                  aria-label="Mission Instructions & How to Play" 
+                  title="Mission Instructions" 
+                  className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border border-yellow-200 text-white flex items-center justify-center text-xs font-black shadow-[0_0_12px_rgba(245,158,11,0.5)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  ⓘ
                 </button>
                 <button 
                   onClick={rerollPuzzle} 
@@ -5381,56 +6769,6 @@ import './index.css';
                     ↻
                   </span>
                 </button>
-              </div>
-
-              {/* Level Mission Pill */}
-              <div className="flex items-center bg-[#0d255a]/75 backdrop-blur-md border border-cyan-400/50 rounded-full px-2.5 py-1 shadow-inner shrink-0">
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display">
-                  Mission L{selectedLevelNum}
-                </span>
-              </div>
-
-              {/* Currency Capsules: Gold Coins & Diamonds */}
-              <div className="flex items-center gap-1 shrink-0">
-                {/* Gold Coins */}
-                <div 
-                  onClick={() => { sound.click(); navigateTo('rewards'); }}
-                  className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/60 hover:border-amber-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,230,130,0.3)] transition-all active:scale-95 cursor-pointer"
-                  title="Coins - Tap for Rewards & Shop"
-                  aria-label={`Coin Balance: ${coins}`}
-                >
-                  <img 
-                    src="/assets/icon_gold_coin_3d_clean.png" 
-                    alt="Coin" 
-                    className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_4px_rgba(245,158,11,0.7)] group-hover:scale-110 transition-transform" 
-                  />
-                  <span className="text-amber-300 font-black text-[10px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                    {coins.toLocaleString()}
-                  </span>
-                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
-                    +
-                  </span>
-                </div>
-
-                {/* Diamonds */}
-                <div 
-                  onClick={() => { sound.click(); navigateTo('rewards'); }}
-                  className="group bg-gradient-to-r from-[#071d38]/90 via-[#0a2347]/90 to-[#051429]/90 border border-cyan-400/60 hover:border-cyan-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(186,230,253,0.25)] transition-all active:scale-95 cursor-pointer"
-                  title="Diamonds - Tap for Rewards & Shop"
-                  aria-label={`Diamond Balance: ${gems}`}
-                >
-                  <img 
-                    src="/assets/icon_gem_3d_clean.png" 
-                    alt="Diamond" 
-                    className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_6px_rgba(0,229,255,0.8)] group-hover:scale-110 transition-transform" 
-                  />
-                  <span className="text-cyan-200 font-black text-[10px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.6)]">
-                    {gems.toLocaleString()}
-                  </span>
-                  <span className="w-3 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-[8px] flex items-center justify-center shadow-xs leading-none">
-                    +
-                  </span>
-                </div>
               </div>
             </div>
 
@@ -5488,29 +6826,41 @@ import './index.css';
               <span className="absolute bottom-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
               <span className="absolute bottom-1.5 right-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
 
-              {/* Mission HUD Header: Difficulty, Timer, and Pause */}
-              <div className="relative z-10 flex items-center justify-between px-1 pb-3 text-xs font-bold border-b border-cyan-400/20">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-900/60 border border-emerald-400/50 text-emerald-300 shadow-xs">
-                    {profileDifficulty}
+              {/* Mission HUD Header: Yellow Background Modern 3D Glassmorphism Section */}
+              <div className="relative z-10 flex items-center justify-between px-2.5 py-2 rounded-2xl bg-gradient-to-b from-yellow-300/25 via-amber-400/20 to-yellow-500/15 border border-yellow-300/50 shadow-[0_4px_20px_rgba(245,158,11,0.25),inset_0_1.5px_1.5px_rgba(255,255,255,0.65),inset_0_-1.5px_3px_rgba(180,83,9,0.3)] backdrop-blur-xl mb-2.5 overflow-hidden">
+                {/* Luminous Inner Glow Shimmer */}
+                <div className="absolute -top-6 left-1/4 w-32 h-12 bg-yellow-300/20 rounded-full blur-md pointer-events-none" />
+
+                {/* Left: 3D Difficulty Badge & Stage Counter */}
+                <div className="relative z-10 flex items-center gap-1.5 min-w-0">
+                  <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] transition-all shrink-0">
+                    {activePuzzle?.stageDifficulty || profileDifficulty}
                   </span>
-                  <span className="text-[10px] text-cyan-200/80 font-mono font-bold">PUZZLE {stageNum}/{stageTotal}</span>
+                  <div className="px-2 py-0.5 rounded-lg bg-black/35 border border-yellow-400/30 backdrop-blur-md shadow-inner flex items-center">
+                    <span className="text-[10px] text-yellow-200 font-mono font-black tracking-wider drop-shadow-xs">
+                      GAME {stageNum}/{stageTotal}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div ref={timerContainerRef} className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono font-black text-xs transition-colors ${
-                    gameTimer <= 15
-                      ? 'animate-timer-warning text-red-200 bg-red-950/80 border border-red-500/80'
-                      : 'text-cyan-200 bg-[#0d2861]/70 border border-cyan-400/50 shadow-inner'
-                  }`}>
-                    <span>⏱️</span>
-                    <span ref={timerDisplayRef}>{formatTimer(gameTimer)}</span>
+                {/* Right: 3D Yellow Glass Timer Capsule & 3D Yellow Pause Button */}
+                <div className="relative z-10 flex items-center gap-1.5 shrink-0">
+                  <div 
+                    ref={timerContainerRef} 
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-xl font-mono font-black text-xs transition-all backdrop-blur-md ${
+                      gameTimer <= 15
+                        ? 'animate-timer-warning text-red-100 bg-gradient-to-b from-red-500/80 to-red-800/90 border border-red-300 shadow-[0_0_12px_rgba(239,68,68,0.7),inset_0_1px_1px_rgba(255,255,255,0.5)]'
+                        : 'text-yellow-100 bg-gradient-to-b from-yellow-400/25 via-amber-500/35 to-amber-700/40 border border-yellow-300/60 shadow-[0_2px_8px_rgba(245,158,11,0.3),inset_0_1px_1px_rgba(255,255,255,0.55)]'
+                    }`}
+                  >
+                    <span className="text-xs">⏱️</span>
+                    <span ref={timerDisplayRef} className="drop-shadow-xs">{formatTimer(gameTimer)}</span>
                   </div>
 
                   <button 
                     onClick={() => { sound.click(); setIsGamePaused(v => !v); }} 
                     aria-label={isGamePaused ? 'Resume puzzle' : 'Pause puzzle'} 
-                    className="w-7 h-7 rounded-lg bg-[#0d2861]/80 hover:bg-[#13357b] border border-cyan-400/50 text-cyan-300 flex items-center justify-center text-xs font-black shadow-inner active:scale-95 cursor-pointer transition-all"
+                    className="w-8 h-8 rounded-xl bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 hover:from-yellow-200 hover:via-amber-300 hover:to-amber-400 border border-yellow-100 text-amber-950 flex items-center justify-center text-xs font-black shadow-[0_3px_0_#b45309,0_4px_10px_rgba(245,158,11,0.45),inset_0_1px_2px_rgba(255,255,255,0.85)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] cursor-pointer transition-all"
                   >
                     {isGamePaused ? '▶' : '⏸'}
                   </button>
@@ -5519,9 +6869,9 @@ import './index.css';
 
               {/* Cross-Math 9x9 Puzzle Grid */}
               <div className="relative z-10 flex justify-center pb-2.5 pt-2 sm:pb-3 sm:pt-3">
-                <div className="w-full max-w-[340px] p-0.5 sm:p-1.5">
+                <div className={`w-full ${gridMaxWidthClass} p-0.5 sm:p-1.5 transition-all`}>
                   <div 
-                    className="grid gap-1 sm:gap-1.5 md:gap-2 w-full" 
+                    className={`grid ${gridGapClass} w-full`} 
                     style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
                     role="group" 
                     aria-label="Cross-math puzzle board"
@@ -5578,7 +6928,7 @@ import './index.css';
                             ) : isSelected ? (
                               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping opacity-80" />
                             ) : (
-                              <span className="text-[10px] text-cyan-400/50 font-bold leading-none select-none">◇</span>
+                              <span className={`${isVeryCompact ? 'text-[8px]' : isCompact ? 'text-[9px]' : 'text-[10px]'} text-cyan-400/50 font-bold leading-none select-none`}>◇</span>
                             )}
                             {hasImpact && <span className="slot-impact-wave" />}
                           </button>
@@ -5606,34 +6956,132 @@ import './index.css';
                 </div>
               </div>
 
-              {/* Number Tray Keyboard */}
-              <div className="relative z-10 flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 pt-3 sm:pt-4 border-t border-cyan-400/20 w-full px-0.5">
-                {puzzleNumbers.map(number => {
-                  const isAnswered = Object.values(puzzleAnswers).includes(number);
-                  const isPending = pendingNumbers.has(number);
-                  const used = isAnswered || isPending;
-                  return (
-                    <button
-                      key={number}
-                      ref={el => { if (el) trayRefs.current[number] = el; }}
-                      data-tray-number={number}
-                      onClick={(e) => {
-                        placePuzzleNumber(number, e.currentTarget);
-                      }}
-                      disabled={used || isGamePaused || isTimeOver}
-                      aria-label={`Place number ${number}`}
-                      className={`grid aspect-square min-w-0 flex-1 max-w-[48px] sm:max-w-[54px] place-items-center rounded-xl p-0.5 transition-all select-none overflow-hidden ${
-                        used
-                          ? 'opacity-25 scale-95 border border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed'
-                          : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_3px_0_#064e3b,0_5px_10px_rgba(16,185,129,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
-                      } ${getTrayTextClass(number)}`}
+              {/* Number Tray Keyboard (Aligned with Cross-Math Grid and Responsive on All Android Devices) */}
+              <div className="relative z-10 flex flex-col items-center pt-2 sm:pt-2.5 border-t border-cyan-400/20 w-full px-0.5">
+                <div 
+                  className={`w-full ${gridMaxWidthClass} p-0.5 sm:p-1.5 transition-all flex flex-col items-center gap-1.5 sm:gap-2`}
+                  style={{ '--tray-gap': isVeryCompact ? '2px' : '4px' }}
+                >
+                  {puzzleNumbers.length <= 5 ? (
+                    <div 
+                      className={`grid ${gridGapClass} w-full`} 
+                      style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
+                      role="group" 
+                      aria-label="Available number tiles"
                     >
-                      <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5">
-                        {number}
-                      </span>
-                    </button>
-                  );
-                })}
+                      {puzzleNumbers.map(number => {
+                        const isAnswered = Object.values(puzzleAnswers).includes(number);
+                        const isPending = pendingNumbers.has(number);
+                        const used = isAnswered || isPending;
+                        return (
+                          <button
+                            key={number}
+                            ref={el => { if (el) trayRefs.current[number] = el; }}
+                            data-tray-number={number}
+                            onClick={(e) => {
+                              placePuzzleNumber(number, e.currentTarget);
+                            }}
+                            disabled={used || isGamePaused || isTimeOver}
+                            aria-label={`Place number ${number}`}
+                            className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
+                              used ? 'is-used' : ''
+                            } ${getTileTextClass(number)}`}
+                          >
+                            <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
+                              {number}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <>
+                      {/* Row 1 */}
+                      {(() => {
+                        const row1Numbers = puzzleNumbers.slice(0, Math.ceil(puzzleNumbers.length / 2));
+                        const k1 = row1Numbers.length;
+                        return (
+                          <div 
+                            className={`grid ${gridGapClass} mx-auto`}
+                            style={{ 
+                              gridTemplateColumns: `repeat(${k1}, minmax(0, 1fr))`,
+                              width: k1 === 5 ? '100%' : k1 < 5 ? `calc(${k1 * 20}% - ${(5 - k1) * 0.2} * var(--tray-gap, 4px))` : '100%'
+                            }}
+                            role="group"
+                            aria-label="Available number tiles row 1"
+                          >
+                            {row1Numbers.map(number => {
+                              const isAnswered = Object.values(puzzleAnswers).includes(number);
+                              const isPending = pendingNumbers.has(number);
+                              const used = isAnswered || isPending;
+                              return (
+                                <button
+                                  key={number}
+                                  ref={el => { if (el) trayRefs.current[number] = el; }}
+                                  data-tray-number={number}
+                                  onClick={(e) => {
+                                    placePuzzleNumber(number, e.currentTarget);
+                                  }}
+                                  disabled={used || isGamePaused || isTimeOver}
+                                  aria-label={`Place number ${number}`}
+                                  className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
+                                    used ? 'is-used' : ''
+                                  } ${getTileTextClass(number)}`}
+                                >
+                                  <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
+                                    {number}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })()}
+
+                      {/* Row 2 */}
+                      {(() => {
+                        const row2Numbers = puzzleNumbers.slice(Math.ceil(puzzleNumbers.length / 2));
+                        const k2 = row2Numbers.length;
+                        return (
+                          <div 
+                            className={`grid ${gridGapClass} mx-auto`}
+                            style={{ 
+                              gridTemplateColumns: `repeat(${k2}, minmax(0, 1fr))`,
+                              width: k2 === 5 ? '100%' : k2 < 5 ? `calc(${k2 * 20}% - ${(5 - k2) * 0.2} * var(--tray-gap, 4px))` : '100%'
+                            }}
+                            role="group"
+                            aria-label="Available number tiles row 2"
+                          >
+                            {row2Numbers.map(number => {
+                              const isAnswered = Object.values(puzzleAnswers).includes(number);
+                              const isPending = pendingNumbers.has(number);
+                              const used = isAnswered || isPending;
+                              return (
+                                <button
+                                  key={number}
+                                  ref={el => { if (el) trayRefs.current[number] = el; }}
+                                  data-tray-number={number}
+                                  onClick={(e) => {
+                                    placePuzzleNumber(number, e.currentTarget);
+                                  }}
+                                  disabled={used || isGamePaused || isTimeOver}
+                                  aria-label={`Place number ${number}`}
+                                  className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
+                                    used ? 'is-used' : ''
+                                  } ${getTileTextClass(number)}`}
+                                >
+                                  <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
+                                    {number}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })()}
+                    </>
+                  )}
+                </div>
               </div>
             </section>
 
@@ -5659,7 +7107,7 @@ import './index.css';
 
               {/* 2. Undo Move Button */}
               <button 
-                onClick={() => { sound.click(); undoPuzzleNumber(); }} 
+                onClick={undoPuzzleNumber} 
                 aria-label="Undo last number" 
                 disabled={!puzzleHistory.length} 
                 className={`relative grid h-[54px] w-[54px] place-items-center rounded-2xl transition-all ${
@@ -5684,31 +7132,180 @@ import './index.css';
               <button 
                 onClick={() => { sound.click(); navigateTo('hint'); }} 
                 aria-label="Get a hint" 
-                className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border-2 border-yellow-200 shadow-[0_4px_0_#92400e,0_8px_24px_rgba(245,158,11,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all cursor-pointer"
+                className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 shadow-[0_4px_0_#075985,0_8px_24px_rgba(14,165,233,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#075985] transition-all cursor-pointer"
                 title="Get Hint"
               >
                 <div className="relative flex items-center justify-center">
-                  <span className="absolute w-8 h-8 rounded-full bg-amber-300/40 blur-[3px] animate-pulse pointer-events-none" />
+                  <span className="absolute w-8 h-8 rounded-full bg-cyan-300/40 blur-[3px] animate-pulse pointer-events-none" />
                   <svg className="w-7 h-7 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.95)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2a6.5 6.5 0 0 0-6.5 6.5c0 2.4 1.3 4.4 3.2 5.5v1.5a1.8 1.8 0 0 0 1.8 1.8h3a1.8 1.8 0 0 0 1.8-1.8V14c1.9-1.1 3.2-3.1 3.2-5.5A6.5 6.5 0 0 0 12 2z" fill="#fef08a" stroke="#ffffff" strokeWidth="1.8" />
-                    <path d="M9.5 9.5h5" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M10 12.5h4" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M12 2a6.5 6.5 0 0 0-6.5 6.5c0 2.4 1.3 4.4 3.2 5.5v1.5a1.8 1.8 0 0 0 1.8 1.8h3a1.8 1.8 0 0 0 1.8-1.8V14c1.9-1.1 3.2-3.1 3.2-5.5A6.5 6.5 0 0 0 12 2z" fill="#bae6fd" stroke="#ffffff" strokeWidth="1.8" />
+                    <path d="M9.5 9.5h5" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M10 12.5h4" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
                     <path d="M10 19h4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
                     <path d="M10.5 21.5h3" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </div>
-                <span className="absolute -bottom-2 rounded-full bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-400 border border-amber-950/40 px-2.5 py-0.5 text-[10px] font-black text-amber-950 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_10px_rgba(251,191,36,0.95)] tracking-wider leading-none">
-                  ×1
+                <span className="absolute -bottom-2 rounded-full bg-gradient-to-r from-cyan-200 via-sky-300 to-cyan-400 border border-cyan-950/40 px-2.5 py-0.5 text-[10px] font-black text-cyan-950 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_10px_rgba(56,189,248,0.95)] tracking-wider leading-none">
+                  HINT
                 </span>
               </button>
             </div>
           </div>
 
+          {/* 3D Glassmorphic "Protocol Instructions" Banner Modal for Main Game */}
+          {showMainInstructionsModal && (
+            <div className="fixed inset-0 z-50 bg-[#06122c]/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in zoom-in-95 duration-200">
+              <div className="relative w-full max-w-[315px] sm:max-w-[335px] rounded-[32px] p-3.5 pt-9 sm:pt-10 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible max-h-[78vh] sm:max-h-[80vh] flex flex-col">
+
+                {/* Top Close Button (Top-Right) */}
+                <button
+                  onClick={() => {
+                    sound.click();
+                    setShowMainInstructionsModal(false);
+                  }}
+                  aria-label="Close Instructions"
+                  title="Close Instructions"
+                  className="absolute top-3 right-3 z-30 w-7 h-7 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* 3D Hero + Halo + Arched Banner (Floating Overflow Compact) */}
+                <div className="absolute -top-11 sm:-top-12 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute -bottom-1 w-24 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+                    <div className="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 flex items-center justify-center text-2xl sm:text-3xl shadow-[0_6px_16px_rgba(14,165,233,0.5),inset_0_2px_4px_rgba(255,255,255,0.7)]">
+                      <span className="drop-shadow-md">📐</span>
+                    </div>
+                  </div>
+
+                  {/* Arched 3D Banner "Instructions" */}
+                  <div className="relative -mt-2 w-52 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(29,78,216,0.45)] scale-90">
+                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                      <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
+                      <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
+                      <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#1e40af" />
+                      <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#172554" />
+                      <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#mainInstructionsRibbonGrad)" stroke="#60a5fa" strokeWidth="2" />
+                      <defs>
+                        <linearGradient id="mainInstructionsRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#3b82f6" />
+                          <stop offset="50%" stopColor="#2563eb" />
+                          <stop offset="100%" stopColor="#1d4ed8" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="relative z-10 flex items-center justify-center pb-0.5 select-none">
+                      <span className="font-black text-sm sm:text-base tracking-wide text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.9)] font-display">
+                        Instructions
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="flex items-center justify-center gap-2 my-1 mt-1 shrink-0">
+                  <div className="h-[1.5px] w-8 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  <div className="w-5 h-5 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" />
+                    </svg>
+                  </div>
+                  <div className="h-[1.5px] w-8 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                </div>
+
+                {/* Headline & Description */}
+                <h2 className="text-[#152a55] font-black text-xs sm:text-sm tracking-tight font-display mb-0.5 shrink-0">
+                  Mission L{selectedLevelNum} // How to Play
+                </h2>
+                <p className="text-[#4b618a] text-[9px] sm:text-[9.5px] font-semibold px-2 leading-tight mb-1.5 shrink-0">
+                  Follow these mission rules to solve the math puzzle grid:
+                </p>
+
+                {/* Scrollable Marked Instructions Content */}
+                <div className="flex-1 overflow-y-auto no-scrollbar space-y-1.5 text-left pr-0.5">
+                  
+                  {/* 1. Crossword Calculation */}
+                  <div className="p-1.5 sm:p-2 rounded-xl bg-white/90 border border-blue-200/80 shadow-xs">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-xs">🔢</span>
+                      <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-blue-950 font-display">
+                        1. Equation Balance
+                      </span>
+                    </div>
+                    <p className="text-[8.5px] sm:text-[9px] text-slate-700 font-medium leading-tight">
+                      Fill all blank target slots on the grid. Every equation evaluates sequentially from left-to-right and top-to-bottom to equal the target result.
+                    </p>
+                  </div>
+
+                  {/* 2. Cross Junction Intersections */}
+                  <div className="p-1.5 sm:p-2 rounded-xl bg-[#eff6ff] border border-cyan-300/80 shadow-xs">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-xs">🔗</span>
+                      <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-blue-900 font-display">
+                        2. Intersecting Tiles
+                      </span>
+                    </div>
+                    <p className="text-[8.5px] sm:text-[9px] text-slate-700 font-medium leading-tight">
+                      Number tiles placed at intersection points must satisfy <b>both</b> the horizontal row and vertical column equations simultaneously.
+                    </p>
+                  </div>
+
+                  {/* 3. Tap & Tray Controls */}
+                  <div className="p-1.5 sm:p-2 rounded-xl bg-[#faf5ff] border border-purple-300/80 shadow-xs">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-xs">👆</span>
+                      <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-purple-900 font-display">
+                        3. Number Placement
+                      </span>
+                    </div>
+                    <p className="text-[8.5px] sm:text-[9px] text-slate-700 font-medium leading-tight">
+                      Tap any empty slot on the grid, then tap a number from the green tray below. Use <b>Undo</b> or <b>Reroll ↻</b> anytime!
+                    </p>
+                  </div>
+
+                  {/* 4. Pro Parity Tip */}
+                  <div className="p-1.5 sm:p-2 rounded-xl bg-[#fffbeb] border border-amber-300/80 shadow-xs">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-xs">💡</span>
+                      <span className="text-[9.5px] sm:text-[10px] font-black uppercase text-amber-950 font-display">
+                        4. Tactical Math Tip
+                      </span>
+                    </div>
+                    <p className="text-[8.5px] sm:text-[9px] text-slate-700 font-medium leading-tight">
+                      Remember: <b>Even + Odd = Odd</b> and <b>Even + Even = Even</b>. Check the target numbers to quickly eliminate impossible tiles!
+                    </p>
+                  </div>
+
+                </div>
+
+                {/* Action Controls */}
+                <div className="pt-2 shrink-0">
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      setShowMainInstructionsModal(false);
+                    }}
+                    aria-label="Resume Mission"
+                    className="w-full h-9 sm:h-9.5 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-[0_3px_0_#1e40af,0_6px_16px_rgba(37,99,235,0.4),inset_0_1.5px_2px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-0.5 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
+                  >
+                    <span>✓</span>
+                    <span>Got It! Resume Mission</span>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
           {/* 3D Glassmorphic "Time Out" Banner Modal (Matching Reference Design) */}
           {isTimeOver && (
             <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
               {/* Glassmorphic Popup Card */}
-              <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible">
+              <div className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible">
 
                 {/* Top Close Button (Top-Right) */}
                 <button
@@ -5719,41 +7316,37 @@ import './index.css';
                   }}
                   aria-label="Close"
                   title="Close"
-                  className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                  className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
 
                 {/* 3D Hourglass Hero + Halo + Arched Banner (Floating Overflow) */}
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
                   {/* Cloud base & Splash petals behind hourglass */}
                   <div className="relative flex items-center justify-center">
-                    <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+                    <div className="absolute -bottom-1.5 w-28 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
                     {/* Left Splashes */}
-                    <svg className="absolute -left-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -left-0.5 top-2 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_4px_rgba(56,189,248,0.45)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
-                    <svg className="absolute -left-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -left-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_1.5px_3px_rgba(14,165,233,0.35)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
 
                     {/* Right Splashes */}
-                    <svg className="absolute -right-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -right-0.5 top-2 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_4px_rgba(56,189,248,0.45)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
-                    <svg className="absolute -right-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -right-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_1.5px_3px_rgba(14,165,233,0.35)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
 
-                    {/* Sparkle Stars */}
-                    <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
-                    <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
-
-                    {/* 3D Hourglass SVG Graphic */}
-                    <svg className="w-24 h-24 drop-shadow-[0_8px_16px_rgba(14,165,233,0.45)]" viewBox="0 0 100 100" fill="none">
+                    {/* 3D Hourglass SVG Graphic (Sleek Compact Size) */}
+                    <svg className="w-20 h-20 drop-shadow-[0_6px_14px_rgba(14,165,233,0.4)]" viewBox="0 0 100 100" fill="none">
                       <ellipse cx="50" cy="18" rx="22" ry="7" fill="url(#timeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
                       <ellipse cx="50" cy="16" rx="19" ry="5" fill="#7dd3fc" />
                       <ellipse cx="50" cy="82" rx="22" ry="7" fill="url(#timeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
@@ -5779,8 +7372,8 @@ import './index.css';
                     </svg>
                   </div>
 
-                  {/* Arched 3D Banner "Time Out" */}
-                  <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(29,78,216,0.5)]">
+                  {/* Arched 3D Banner "Time Out" (Clean, Compact, No Stars) */}
+                  <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(29,78,216,0.45)]">
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
                       <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
                       <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
@@ -5795,45 +7388,43 @@ import './index.css';
                         </linearGradient>
                       </defs>
                     </svg>
-                    <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
-                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
-                      <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                    <div className="relative z-10 flex items-center justify-center pb-0.5 select-none">
+                      <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
                         Time <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Out</span>
                       </span>
-                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Clock Divider */}
-                <div className="flex items-center justify-center gap-3 my-3">
-                  <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
-                  <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <div className="flex items-center justify-center gap-2.5 my-2.5">
+                  <div className="h-[1.5px] w-10 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="9" />
                       <path d="M12 7v5l3 2" />
                     </svg>
                   </div>
-                  <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  <div className="h-[1.5px] w-10 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
                 </div>
 
                 {/* Headline & Description */}
-                <h2 className="text-[#152a55] font-black text-xl tracking-tight font-display mb-1">
+                <h2 className="text-[#152a55] font-black text-lg sm:text-xl tracking-tight font-display mb-0.5">
                   Take a short break!
                 </h2>
-                <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-6">
+                <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-5">
                   You can continue the game anytime you're ready.
                 </p>
 
                 {/* Action Controls */}
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {/* Primary 3D Restart Button */}
                   <button
                     onClick={restartLevelAfterTimeout}
                     aria-label="Restart Level"
-                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#1e40af,0_10px_25px_rgba(37,99,235,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
+                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_0_#1e40af,0_8px_20px_rgba(37,99,235,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
                   >
-                    <svg className="w-5 h-5 text-white stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-5 h-5 text-white stroke-[2.8] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                       <path d="M3 3v5h5" />
                     </svg>
@@ -5841,11 +7432,11 @@ import './index.css';
                   </button>
 
                   {/* Secondary Options: +30s Extra Time (Ad) & Level Select */}
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
                     <button
                       onClick={() => handleWatchAd('time', 30, 'Chronometer Extender Sponsor')}
                       aria-label="Extra Time (+30s)"
-                      className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#b45309,0_6px_16px_rgba(245,158,11,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
+                      className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#b45309,0_5px_12px_rgba(245,158,11,0.3)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
                     >
                       <span>⚡</span>
                       <span>+30s Time</span>
@@ -5857,24 +7448,12 @@ import './index.css';
                         navigateTo('levels');
                       }}
                       aria-label="Levels"
-                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
                     >
                       <span>⊞</span>
                       <span>Missions</span>
                     </button>
                   </div>
-                </div>
-
-                {/* Corner Water Droplets Decorations */}
-                <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
-                  <svg className="w-6 h-6 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                  </svg>
-                </div>
-                <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
-                  <svg className="w-6 h-6 text-sky-400 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                  </svg>
                 </div>
 
               </div>
@@ -5885,7 +7464,7 @@ import './index.css';
           {isWrongModalOpen && (
             <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
               {/* Glassmorphic Popup Card */}
-              <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(244,63,94,0.2)] text-center overflow-visible">
+              <div className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(244,63,94,0.2)] text-center overflow-visible">
 
                 {/* Top Close Button (Top-Right) */}
                 <button
@@ -5895,47 +7474,43 @@ import './index.css';
                   }}
                   aria-label="Close"
                   title="Close"
-                  className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-rose-100/90 hover:bg-rose-200 border border-white text-rose-800 flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                  className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-rose-100/90 hover:bg-rose-200 border border-white text-rose-800 flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
 
                 {/* 3D Hero Pod + Halo + Arched Banner (Floating Overflow) */}
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
                   {/* Cloud base & Splash petals behind icon */}
                   <div className="relative flex items-center justify-center">
-                    <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#fecdd3] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+                    <div className="absolute -bottom-1.5 w-28 h-10 bg-gradient-to-t from-[#fecdd3] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
                     {/* Left Splashes */}
-                    <svg className="absolute -left-1 top-2 w-9 h-9 text-[#fb7185] drop-shadow-[0_2px_6px_rgba(251,113,133,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -left-0.5 top-2 w-7 h-7 text-[#fb7185] drop-shadow-[0_2px_4px_rgba(251,113,133,0.45)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
-                    <svg className="absolute -left-4 top-8 w-6 h-6 text-[#f43f5e] drop-shadow-[0_2px_4px_rgba(244,63,94,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -left-3 top-6 w-5 h-5 text-[#f43f5e] drop-shadow-[0_1.5px_3px_rgba(244,63,94,0.35)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
 
                     {/* Right Splashes */}
-                    <svg className="absolute -right-1 top-2 w-9 h-9 text-[#fb7185] drop-shadow-[0_2px_6px_rgba(251,113,133,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -right-0.5 top-2 w-7 h-7 text-[#fb7185] drop-shadow-[0_2px_4px_rgba(251,113,133,0.45)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
-                    <svg className="absolute -right-4 top-8 w-6 h-6 text-[#f43f5e] drop-shadow-[0_2px_4px_rgba(244,63,94,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -right-3 top-6 w-5 h-5 text-[#f43f5e] drop-shadow-[0_1.5px_3px_rgba(244,63,94,0.35)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
 
-                    {/* Sparkle Stars */}
-                    <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
-                    <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
-
-                    {/* 3D Red Alert Sphere Hero */}
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#fb7185] via-[#f43f5e] to-[#be123c] border-4 border-white/90 text-white flex items-center justify-center text-4xl font-black shadow-[0_10px_25px_rgba(225,29,72,0.55),inset_0_3px_5px_rgba(255,255,255,0.8),inset_0_-4px_6px_rgba(159,18,57,0.7)] drop-shadow-[0_8px_16px_rgba(244,63,94,0.45)]">
+                    {/* 3D Red Alert Sphere Hero (Sleek Compact Size) */}
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#fb7185] via-[#f43f5e] to-[#be123c] border-[3px] border-white/95 text-white flex items-center justify-center text-3xl font-black shadow-[0_8px_18px_rgba(225,29,72,0.5),inset_0_2px_4px_rgba(255,255,255,0.8),inset_0_-3px_5px_rgba(159,18,57,0.7)] drop-shadow-[0_6px_14px_rgba(244,63,94,0.35)]">
                       <span className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] select-none">✕</span>
                     </div>
                   </div>
 
-                  {/* Arched 3D Banner "Try Again" */}
-                  <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(190,18,60,0.5)]">
+                  {/* Arched 3D Banner "Try Again" (Clean, Compact, No Stars) */}
+                  <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(190,18,60,0.45)]">
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
                       <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#9f1239" />
                       <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#4c0519" />
@@ -5950,60 +7525,58 @@ import './index.css';
                         </linearGradient>
                       </defs>
                     </svg>
-                    <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
-                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
-                      <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                    <div className="relative z-10 flex items-center justify-center pb-0.5 select-none">
+                      <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
                         Try <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Again</span>
                       </span>
-                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Alert Divider */}
-                <div className="flex items-center justify-center gap-3 my-3">
-                  <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-rose-300 to-rose-400 rounded-full" />
-                  <div className="w-7 h-7 rounded-full bg-rose-100 border-2 border-rose-300 flex items-center justify-center text-rose-600 shadow-inner">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <div className="flex items-center justify-center gap-2.5 my-2.5">
+                  <div className="h-[1.5px] w-10 bg-gradient-to-r from-transparent via-rose-300 to-rose-400 rounded-full" />
+                  <div className="w-6 h-6 rounded-full bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-600 shadow-inner">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="9" />
                       <line x1="12" y1="8" x2="12" y2="12" />
                       <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
                   </div>
-                  <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-rose-300 to-rose-400 rounded-full" />
+                  <div className="h-[1.5px] w-10 bg-gradient-to-l from-transparent via-rose-300 to-rose-400 rounded-full" />
                 </div>
 
                 {/* Headline & Description */}
-                <h2 className="text-[#4c0519] font-black text-xl tracking-tight font-display mb-1">
+                <h2 className="text-[#4c0519] font-black text-lg sm:text-xl tracking-tight font-display mb-0.5">
                   Calculation Error!
                 </h2>
-                <p className="text-[#64748b] text-xs font-semibold px-2 leading-relaxed mb-3">
+                <p className="text-[#64748b] text-xs font-semibold px-2 leading-relaxed mb-2.5">
                   One or more equations don't balance.
                 </p>
 
                 {/* Diagnostic Card */}
-                <div className="bg-rose-50/90 border border-rose-200/80 rounded-2xl p-3 mb-5 shadow-inner">
-                  <span className="text-[10px] font-mono text-rose-700/80 block uppercase tracking-wider font-bold">Diagnostic Analysis</span>
-                  <span className="text-xs font-black text-rose-800">Check number placements & signs</span>
+                <div className="bg-rose-50/90 border border-rose-200/80 rounded-2xl p-2.5 mb-4 shadow-inner">
+                  <span className="text-[9.5px] font-mono text-rose-700/80 block uppercase tracking-wider font-bold">Diagnostic Analysis</span>
+                  <span className="text-[11.5px] font-black text-rose-800">Check number placements & signs</span>
                 </div>
 
                 {/* Action Controls */}
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {/* Primary 3D Retry Button */}
                   <button
                     onClick={retryCurrentStage}
                     aria-label="Retry Puzzle"
-                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#f43f5e] via-[#e11d48] to-[#be123c] border-2 border-rose-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#9f1239,0_10px_25px_rgba(225,29,72,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#9f1239] transition-all cursor-pointer"
+                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#f43f5e] via-[#e11d48] to-[#be123c] border-2 border-rose-200/90 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_0_#9f1239,0_8px_20px_rgba(225,29,72,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#9f1239] transition-all cursor-pointer"
                   >
-                    <svg className="w-5 h-5 text-white stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-5 h-5 text-white stroke-[2.8] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                       <path d="M3 3v5h5" />
                     </svg>
-                    <span>Retry Puzzle ({stageNum}/{stageTotal})</span>
+                    <span>Retry Game ({stageNum}/{stageTotal})</span>
                   </button>
 
                   {/* Secondary Options: Hint & Mission Select */}
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
                     <button
                       onClick={() => {
                         sound.click();
@@ -6011,7 +7584,7 @@ import './index.css';
                         navigateTo('hint');
                       }}
                       aria-label="View Hint"
-                      className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#b45309,0_6px_16px_rgba(245,158,11,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
+                      className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#b45309,0_5px_12px_rgba(245,158,11,0.3)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
                     >
                       <span>💡</span>
                       <span>View Hint</span>
@@ -6023,24 +7596,12 @@ import './index.css';
                         navigateTo('levels');
                       }}
                       aria-label="Missions"
-                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
                     >
                       <span>⊞</span>
                       <span>Missions</span>
                     </button>
                   </div>
-                </div>
-
-                {/* Corner Water Droplets Decorations */}
-                <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
-                  <svg className="w-6 h-6 text-rose-300" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                  </svg>
-                </div>
-                <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
-                  <svg className="w-6 h-6 text-rose-300 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                  </svg>
                 </div>
 
               </div>
@@ -6051,7 +7612,7 @@ import './index.css';
           {isCorrectModalOpen && (
             <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
               {/* Glassmorphic Popup Card */}
-              <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0fdf4]/95 to-[#dcfce7]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(34,197,94,0.2)] text-center overflow-visible">
+              <div className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0fdf4]/95 to-[#dcfce7]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(34,197,94,0.2)] text-center overflow-visible">
 
                 {/* Top Close Button (Top-Right) */}
                 <button
@@ -6061,47 +7622,43 @@ import './index.css';
                   }}
                   aria-label="Close"
                   title="Close"
-                  className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-emerald-100/90 hover:bg-emerald-200 border border-white text-emerald-800 flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                  className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-emerald-100/90 hover:bg-emerald-200 border border-white text-emerald-800 flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
 
                 {/* 3D Hero Pod + Halo + Arched Banner (Floating Overflow) */}
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
                   {/* Cloud base & Splash petals behind icon */}
                   <div className="relative flex items-center justify-center">
-                    <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bbf7d0] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+                    <div className="absolute -bottom-1.5 w-28 h-10 bg-gradient-to-t from-[#bbf7d0] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
                     {/* Left Splashes */}
-                    <svg className="absolute -left-1 top-2 w-9 h-9 text-[#4ade80] drop-shadow-[0_2px_6px_rgba(74,222,128,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -left-0.5 top-2 w-7 h-7 text-[#4ade80] drop-shadow-[0_2px_4px_rgba(74,222,128,0.45)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
-                    <svg className="absolute -left-4 top-8 w-6 h-6 text-[#22c55e] drop-shadow-[0_2px_4px_rgba(34,197,94,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -left-3 top-6 w-5 h-5 text-[#22c55e] drop-shadow-[0_1.5px_3px_rgba(34,197,94,0.35)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
 
                     {/* Right Splashes */}
-                    <svg className="absolute -right-1 top-2 w-9 h-9 text-[#4ade80] drop-shadow-[0_2px_6px_rgba(74,222,128,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -right-0.5 top-2 w-7 h-7 text-[#4ade80] drop-shadow-[0_2px_4px_rgba(74,222,128,0.45)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
-                    <svg className="absolute -right-4 top-8 w-6 h-6 text-[#22c55e] drop-shadow-[0_2px_4px_rgba(34,197,94,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="absolute -right-3 top-6 w-5 h-5 text-[#22c55e] drop-shadow-[0_1.5px_3px_rgba(34,197,94,0.35)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                     </svg>
 
-                    {/* Sparkle Stars */}
-                    <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
-                    <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
-
-                    {/* 3D Emerald Checkmark Sphere Hero */}
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#4ade80] via-[#22c55e] to-[#15803d] border-4 border-white/90 text-white flex items-center justify-center text-4xl font-black shadow-[0_10px_25px_rgba(34,197,94,0.55),inset_0_3px_5px_rgba(255,255,255,0.8),inset_0_-4px_6px_rgba(21,128,61,0.7)] drop-shadow-[0_8px_16px_rgba(34,197,94,0.45)]">
+                    {/* 3D Emerald Checkmark Sphere Hero (Sleek Compact Size) */}
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#4ade80] via-[#22c55e] to-[#15803d] border-[3px] border-white/95 text-white flex items-center justify-center text-3xl font-black shadow-[0_8px_18px_rgba(34,197,94,0.5),inset_0_2px_4px_rgba(255,255,255,0.8),inset_0_-3px_5px_rgba(21,128,61,0.7)] drop-shadow-[0_6px_14px_rgba(34,197,94,0.35)]">
                       <span className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] select-none">✓</span>
                     </div>
                   </div>
 
-                  {/* Arched 3D Banner "Solved!" or "Cleared!" */}
-                  <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(21,128,61,0.5)]">
+                  {/* Arched 3D Banner "Solved!" or "Cleared!" (Clean, Compact, No Stars) */}
+                  <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(21,128,61,0.45)]">
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
                       <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#14532d" />
                       <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#052e16" />
@@ -6116,36 +7673,34 @@ import './index.css';
                         </linearGradient>
                       </defs>
                     </svg>
-                    <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
-                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
-                      <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                    <div className="relative z-10 flex items-center justify-center pb-0.5 select-none">
+                      <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
                         {lastResult.levelCleared ? (
                           <>Level <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Cleared</span></>
                         ) : (
                           <>Puzzle <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Solved</span></>
                         )}
                       </span>
-                      <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Success Divider */}
-                <div className="flex items-center justify-center gap-3 my-3">
-                  <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-emerald-300 to-emerald-400 rounded-full" />
-                  <div className="w-7 h-7 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center text-emerald-600 shadow-inner">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <div className="flex items-center justify-center gap-2.5 my-2.5">
+                  <div className="h-[1.5px] w-10 bg-gradient-to-r from-transparent via-emerald-300 to-emerald-400 rounded-full" />
+                  <div className="w-6 h-6 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 shadow-inner">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 6L9 17l-5-5" />
                     </svg>
                   </div>
-                  <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-emerald-300 to-emerald-400 rounded-full" />
+                  <div className="h-[1.5px] w-10 bg-gradient-to-l from-transparent via-emerald-300 to-emerald-400 rounded-full" />
                 </div>
 
                 {/* Headline & Description */}
-                <h2 className="text-[#052e16] font-black text-xl tracking-tight font-display mb-1">
+                <h2 className="text-[#052e16] font-black text-lg sm:text-xl tracking-tight font-display mb-0.5">
                   {lastResult.levelCleared ? 'Mission Accomplished!' : 'Puzzle Solved!'}
                 </h2>
-                <p className="text-[#334155] text-xs font-semibold px-2 leading-relaxed mb-3">
+                <p className="text-[#334155] text-xs font-semibold px-2 leading-relaxed mb-2.5">
                   {lastResult.levelCleared
                     ? `Level ${lastResult.level} Cleared • All ${lastResult.total} Puzzles Done!`
                     : `Level ${lastResult.level} • Puzzle ${lastResult.stage} of ${lastResult.total} Complete`}
@@ -6153,32 +7708,32 @@ import './index.css';
 
                 {/* Solved Math Box */}
                 {lastResult.solvedText && (
-                  <div className="bg-emerald-50/90 border border-emerald-200/80 rounded-2xl p-2.5 mb-3 shadow-inner">
-                    <span className="text-[10px] font-mono text-emerald-700/80 block uppercase tracking-wider font-bold">Solved Equation</span>
-                    <span className="text-lg font-black font-mono text-emerald-900">{lastResult.solvedText}</span>
+                  <div className="bg-emerald-50/90 border border-emerald-200/80 rounded-2xl p-2 mb-2.5 shadow-inner">
+                    <span className="text-[9.5px] font-mono text-emerald-700/80 block uppercase tracking-wider font-bold">Solved Equation</span>
+                    <span className="text-base sm:text-lg font-black font-mono text-emerald-900">{lastResult.solvedText}</span>
                   </div>
                 )}
 
                 {/* Rewards Capsules */}
-                <div className="flex items-center gap-2 flex-wrap justify-center mb-5">
+                <div className="flex items-center gap-2 flex-wrap justify-center mb-4">
                   <div className="bg-white/90 border border-emerald-300 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
                     <span className="text-amber-500">⭐</span>
                     <span className="text-emerald-950 font-black text-xs">+{lastResult.xp} XP</span>
                   </div>
                   <div className="bg-white/90 border border-amber-300 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
-                    <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-4 h-4 object-contain" />
+                    <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain" />
                     <span className="text-amber-950 font-black text-xs">+{lastResult.coins} Coins</span>
                   </div>
                   {lastResult.gems > 0 && (
                     <div className="bg-white/90 border border-sky-300 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
-                      <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-4 h-4 object-contain" />
+                      <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain" />
                       <span className="text-sky-950 font-black text-xs">+{lastResult.gems} Gems</span>
                     </div>
                   )}
                 </div>
 
                 {/* Action Controls */}
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {/* Primary 3D Next Button */}
                   {lastResult.levelCleared ? (
                     <button
@@ -6188,7 +7743,7 @@ import './index.css';
                         attemptStartLevel(Math.min(25, selectedLevelNum));
                       }}
                       aria-label="Next Mission"
-                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#15803d] border-2 border-emerald-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#14532d,0_10px_25px_rgba(34,197,94,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#14532d] transition-all cursor-pointer"
+                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#15803d] border-2 border-emerald-200/90 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_0_#14532d,0_8px_20px_rgba(34,197,94,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#14532d] transition-all cursor-pointer"
                     >
                       <span>Next Mission (Level {selectedLevelNum}) →</span>
                     </button>
@@ -6196,14 +7751,14 @@ import './index.css';
                     <button
                       onClick={continueToNextStage}
                       aria-label="Next Puzzle"
-                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#15803d] border-2 border-emerald-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#14532d,0_10px_25px_rgba(34,197,94,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#14532d] transition-all cursor-pointer"
+                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#15803d] border-2 border-emerald-200/90 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_0_#14532d,0_8px_20px_rgba(34,197,94,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#14532d] transition-all cursor-pointer"
                     >
-                      <span>Next Puzzle ({stageNum}/{stageTotal}) →</span>
+                      <span>Next Game ({stageNum}/{stageTotal}) →</span>
                     </button>
                   )}
 
                   {/* Secondary Options: Missions & Home */}
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
                     <button
                       onClick={() => {
                         sound.click();
@@ -6211,7 +7766,7 @@ import './index.css';
                         navigateTo('levels');
                       }}
                       aria-label="Missions"
-                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                      className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
                     >
                       <span>⊞</span>
                       <span>Missions</span>
@@ -6223,24 +7778,12 @@ import './index.css';
                         navigateTo('home');
                       }}
                       aria-label="Return to Home"
-                      className="h-10 rounded-2xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-300 text-slate-800 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#cbd5e1] active:translate-y-0.5 active:shadow-[0_1px_0_#cbd5e1] transition-all cursor-pointer"
+                      className="h-10 rounded-2xl bg-slate-100/90 hover:bg-slate-200/90 border border-slate-300 text-slate-800 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#cbd5e1] active:translate-y-0.5 active:shadow-[0_1px_0_#cbd5e1] transition-all cursor-pointer"
                     >
                       <span>🏠</span>
                       <span>Home</span>
                     </button>
                   </div>
-                </div>
-
-                {/* Corner Water Droplets Decorations */}
-                <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
-                  <svg className="w-6 h-6 text-emerald-300" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                  </svg>
-                </div>
-                <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
-                  <svg className="w-6 h-6 text-emerald-300 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                  </svg>
                 </div>
 
               </div>
@@ -6318,6 +7861,26 @@ import './index.css';
         ];
 
         const currentStep = hintSteps[hintActiveStep] || hintSteps[0];
+
+        const handleWatchAdForSolveHint = () => {
+          handleWatchAd('hint', 1, 'Quantum Solver Hint Video', {
+            onComplete: () => {
+              const unfilled = puzzleSlots.find(({ slot }) => puzzleAnswers[slot] === undefined || puzzleAnswers[slot] === null);
+              if (unfilled) {
+                const nextAnswers = { ...puzzleAnswers, [unfilled.slot]: unfilled.answer };
+                puzzleAnswersRef.current = nextAnswers;
+                setPuzzleAnswers(nextAnswers);
+                setRewardToast(`💡 Free Slot Revealed: Slot ${unfilled.slot + 1} = ${unfilled.answer}!`);
+                navigateTo('game');
+                setTimeout(() => {
+                  submitPuzzle(nextAnswers);
+                }, 400);
+              } else {
+                navigateTo('game');
+              }
+            }
+          });
+        };
 
         return (
           <div className="flex-1 bg-black/75 backdrop-blur-sm flex flex-col justify-end select-none relative">
@@ -6425,13 +7988,22 @@ import './index.css';
                 </button>
               </div>
 
-              {/* Resume Button */}
-              <button
-                onClick={() => { sound.click(); navigateTo('game'); }}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 text-white font-black text-sm shadow-[0_0_16px_rgba(0,229,255,0.4)] hover:brightness-110 active:scale-95 transition-all cursor-pointer"
-              >
-                Resume Mission
-              </button>
+              {/* Action Buttons: Free Slot Reveal via Ad & Resume */}
+              <div className="space-y-2 pt-1">
+                <button
+                  onClick={handleWatchAdForSolveHint}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 text-amber-950 font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-200 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span>▶</span>
+                  <span>Reveal 1 Number Free (Watch Ad)</span>
+                </button>
+                <button
+                  onClick={() => { sound.click(); navigateTo('game'); }}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 text-white font-black text-xs uppercase tracking-wider shadow-[0_0_16px_rgba(0,229,255,0.4)] hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                >
+                  Resume Mission
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -6481,12 +8053,12 @@ import './index.css';
                 <span className="text-cyan-200 font-black text-xs">+{lastResult.xp} XP</span>
               </div>
               <div className="bg-black/50 border border-amber-400/60 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
-                <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-4 h-4 object-contain" />
+                <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain" />
                 <span className="text-amber-300 font-black text-xs">+{lastResult.coins} Coins</span>
               </div>
               {lastResult.gems > 0 && (
                 <div className="bg-black/50 border border-cyan-400/60 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
-                  <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-4 h-4 object-contain" />
+                  <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain" />
                   <span className="text-cyan-200 font-black text-xs">+{lastResult.gems} Gems</span>
                 </div>
               )}
@@ -6509,7 +8081,7 @@ import './index.css';
                 onClick={continueToNextStage}
                 className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 hover:brightness-110 text-emerald-950 font-black text-base shadow-[0_6px_20px_rgba(16,185,129,0.5)] active:scale-95 transition-all border border-emerald-300 cursor-pointer"
               >
-                Next Puzzle ({stageNum}/{stageTotal}) →
+                Next Game ({stageNum}/{stageTotal}) →
               </button>
             )}
             <button
@@ -6558,7 +8130,7 @@ import './index.css';
               onClick={retryCurrentStage}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-rose-500 to-red-600 hover:brightness-110 text-white font-black text-base shadow-[0_6px_20px_rgba(244,63,94,0.4)] active:scale-95 transition-all border border-rose-400 cursor-pointer"
             >
-              Retry Puzzle ({stageNum}/{stageTotal})
+              Retry Game ({stageNum}/{stageTotal})
             </button>
             <button
               onClick={() => {
@@ -6583,16 +8155,28 @@ import './index.css';
           confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
           setCoins(c => {
             const next = c + 250;
-            try { localStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
             return next;
           });
           setGems(g => {
             const next = g + 10;
-            try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+            try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
             return next;
           });
-          try { localStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
+          try { GameStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
           setDailyGiftClaimed(true);
+        };
+
+        const handleClaimDailyGiftWithAd = () => {
+          if (dailyGiftClaimed) return;
+          handleWatchAd('both', 0, 'Daily 2X Supply Booster', {
+            coinAmount: 500,
+            gemAmount: 20,
+            onComplete: () => {
+              try { GameStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
+              setDailyGiftClaimed(true);
+            }
+          });
         };
 
         const completedCount = completedDailyDays.filter(d => d <= daysInCurrentMonth).length;
@@ -6600,7 +8184,43 @@ import './index.css';
 
         const isTodaySelected = activeDailyDay === todayCalendarDay;
         const isCompletedDay = completedDailyDays.includes(activeDailyDay);
+        const isPastDay = activeDailyDay < todayCalendarDay;
+        const isMissedDay = isPastDay && !isCompletedDay;
         const isFutureDay = activeDailyDay > todayCalendarDay;
+
+        const handleStartMissedDayWithCoins = () => {
+          sound.click();
+          const fee = 50;
+          if (coins >= fee) {
+            setCoins(c => {
+              const next = c - fee;
+              try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+              return next;
+            });
+            setRewardToast(`Missed Day ${activeDailyDay} Unlocked: -50 Coins`);
+            startDailyChallenge(activeDailyDay);
+          } else {
+            sound.wrong();
+            setDailyAdPromptModal({
+              isOpen: true,
+              targetDay: activeDailyDay,
+              fee: fee,
+              reason: 'missed_day'
+            });
+          }
+        };
+
+        const handleStartMissedDayWithAd = () => {
+          sound.click();
+          handleWatchAd('both', 0, `Unlock Missed Day ${activeDailyDay} Free`, {
+            coinAmount: 150,
+            gemAmount: 10,
+            onComplete: () => {
+              setRewardToast(`Day ${activeDailyDay} Unlocked Free + 150 Coins!`);
+              startDailyChallenge(activeDailyDay);
+            }
+          });
+        };
 
         // Dynamic calendar matrix with padding for starting day of week
         const calendarCells = [
@@ -6610,36 +8230,76 @@ import './index.css';
 
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
-            {/* Mathematical Coordinate Blueprint Overlay */}
-            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
             {/* Mathematical Coordinate Blueprint Overlay & Luminous Glass Underlay */}
             <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/18 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute top-1/3 -right-20 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 left-0 w-80 h-80 bg-indigo-600/18 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute top-1/3 -right-20 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 left-0 w-80 h-80 scifi-ambient-purple rounded-full pointer-events-none" />
 
-            {/* Sticky Modern Sci-Fi Header */}
-            <header className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 px-4 py-3 shrink-0 backdrop-blur-md">
-              <div className="flex items-center justify-between">
-                <button 
-                  onClick={() => { sound.click(); navigateTo('home'); }} 
-                  aria-label="Back to home" 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-xl font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                >
-                  ‹
-                </button>
-                <div className="flex items-center">
-                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-300 via-sky-100 to-white bg-clip-text text-transparent uppercase leading-tight">
+            {/* Sticky Modern Sci-Fi Header with Full Balance System */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 px-3 py-2 shrink-0 backdrop-blur-md">
+              <div className="flex items-center justify-between gap-1.5 max-w-md mx-auto w-full">
+                <div className="flex items-center gap-2 min-w-0">
+                  <button 
+                    onClick={() => { sound.click(); navigateTo('home'); }} 
+                    aria-label="Back to home" 
+                    className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-lg font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                  >
+                    ‹
+                  </button>
+                  <h1 className="text-xs sm:text-sm font-black font-display tracking-wider bg-gradient-to-r from-cyan-300 via-sky-100 to-white bg-clip-text text-transparent uppercase leading-tight truncate">
                     Daily Challenge
                   </h1>
                 </div>
-                <button 
-                  onClick={() => { sound.click(); setShowTrophyModal(true); }} 
-                  aria-label="Awards & Achievements" 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                >
-                  🏆
-                </button>
+
+                {/* Currency Capsules & Trophy Button */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Coins Capsule */}
+                  <div 
+                    onClick={() => {
+                      sound.click();
+                      if (coins < 50) {
+                        setDailyAdPromptModal({
+                          isOpen: true,
+                          targetDay: activeDailyDay,
+                          fee: 50,
+                          reason: 'low_balance'
+                        });
+                      } else {
+                        navigateTo('rewards');
+                      }
+                    }}
+                    className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/50 hover:border-amber-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,230,130,0.25)] transition-all active:scale-95 cursor-pointer"
+                    title="Coins - Tap to Open Shop or Watch Ad for Free Coins"
+                  >
+                    <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3.5 h-3.5 object-contain shrink-0 drop-shadow-[0_1px_3px_rgba(245,158,11,0.6)]" />
+                    <span className="text-amber-300 font-black text-[10.5px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                      {coins.toLocaleString()}
+                    </span>
+                    <span className="w-3.5 h-3.5 rounded-full bg-amber-400 text-slate-950 text-[9px] font-black flex items-center justify-center leading-none">+</span>
+                  </div>
+
+                  {/* Gems Capsule */}
+                  <div 
+                    onClick={() => { sound.click(); navigateTo('rewards'); }}
+                    className="group bg-gradient-to-r from-[#031c26]/90 via-[#072d3d]/90 to-[#02141c]/90 border border-cyan-400/50 hover:border-cyan-300 rounded-xl px-1.5 py-1 flex items-center gap-1 shadow-[0_4px_12px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(103,232,249,0.25)] transition-all active:scale-95 cursor-pointer"
+                    title="Gems - Tap to Open Rewards & Shop"
+                  >
+                    <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-3.5 h-3.5 object-contain shrink-0 drop-shadow-[0_1px_3px_rgba(6,182,212,0.6)]" />
+                    <span className="text-cyan-300 font-black text-[10.5px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                      {gems.toLocaleString()}
+                    </span>
+                  </div>
+
+                  {/* Trophy Button */}
+                  <button 
+                    onClick={() => { sound.click(); setShowTrophyModal(true); }} 
+                    aria-label="Awards & Achievements" 
+                    className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-sm font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                  >
+                    🏆
+                  </button>
+                </div>
               </div>
             </header>
 
@@ -6656,7 +8316,7 @@ import './index.css';
                     <div className="relative shrink-0">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400/25 via-amber-500/15 to-yellow-600/25 border border-amber-300/60 flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.35),inset_0_1.5px_0_rgba(255,255,255,0.35)] backdrop-blur-md">
                         <img 
-                          src="/assets/icon_trophy_3d.png" 
+                          src="/assets/icon_trophy_3d.webp" 
                           alt="Monthly Trophy" 
                           className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(255,200,0,0.5)]" 
                         />
@@ -6679,18 +8339,29 @@ import './index.css';
                   </div>
 
                   {/* Streak Flame Pill */}
-                  <div className="shrink-0 flex flex-col items-center justify-center px-2.5 py-1.5 rounded-2xl bg-white/[0.08] border border-orange-400/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md">
-                    <span className="text-base leading-none">🔥</span>
+                  {/* Streak Flame Pill */}
+                  <div 
+                    onClick={() => {
+                      if (streakDays === 0) {
+                        setRewardToast("Streak broken! Complete today's mission or recover missed days to rebuild your streak.");
+                      } else {
+                        setRewardToast(`🔥 Active Streak: ${streakDays} Consecutive Days!`);
+                      }
+                    }}
+                    className="shrink-0 flex flex-col items-center justify-center px-3 py-1.5 rounded-2xl bg-white/[0.08] border border-orange-400/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md cursor-pointer active:scale-95 transition-transform"
+                    title="Consecutive Daily Challenges Completed"
+                  >
+                    <span className="text-base leading-none drop-shadow-[0_2px_6px_rgba(249,115,22,0.6)]">🔥</span>
                     <span className="text-xs font-black text-orange-300 font-display mt-0.5 leading-none">
                       {streakDays}d
                     </span>
-                    <span className="text-[8px] text-orange-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                    <span className="text-[8px] text-orange-200/80 font-bold uppercase tracking-tight mt-0.5">
                       Streak
                     </span>
                   </div>
                 </div>
 
-                {/* Progress Bar */}
+                {/* Progress Bar with Milestone Stats */}
                 <div className="relative z-10 mt-3 pt-3 border-t border-white/10">
                   <div className="flex items-center justify-between text-[10.5px] font-bold mb-1">
                     <span className="text-cyan-200">Monthly Progress</span>
@@ -6703,6 +8374,10 @@ import './index.css';
                       className="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-300 shadow-[0_0_10px_rgba(251,191,36,0.7)] transition-all duration-500"
                       style={{ width: `${monthlyProgressPct}%` }}
                     />
+                  </div>
+                  <div className="flex items-center justify-between text-[8.5px] text-slate-300/80 font-medium mt-1">
+                    <span>{completedCount} Days Completed (★)</span>
+                    <span>{Math.max(0, daysInCurrentMonth - completedCount)} Days Remaining</span>
                   </div>
                 </div>
               </div>
@@ -6730,17 +8405,18 @@ import './index.css';
                   ))}
                 </div>
 
-                {/* Dynamic Days Matrix Grid */}
+                {/* Dynamic Days Matrix Grid with Clear Completed & Incomplete Badges */}
                 <div className="grid grid-cols-7 gap-1.5 text-center">
                   {calendarCells.map((day, i) => {
                     if (!day) {
-                      return <div key={i} className="h-10" />;
+                      return <div key={i} className="h-11" />;
                     }
 
                     const isPast = day < todayCalendarDay;
                     const isCurrent = day === todayCalendarDay;
                     const isFuture = day > todayCalendarDay;
                     const isDone = completedDailyDays.includes(day);
+                    const isMissed = isPast && !isDone;
                     const isSelected = activeDailyDay === day;
 
                     return (
@@ -6750,32 +8426,47 @@ import './index.css';
                           sound.tap();
                           setActiveDailyDay(day);
                         }}
-                        className={`relative h-10 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group active:scale-95 ${
+                        className={`relative h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer group active:scale-95 ${
                           isSelected
-                            ? 'bg-gradient-to-b from-cyan-400/45 via-blue-500/55 to-indigo-600/65 border-2 border-cyan-200 text-white shadow-[0_0_16px_rgba(0,229,255,0.8),inset_0_1px_0_rgba(255,255,255,0.5)] scale-105 z-10 backdrop-blur-md'
+                            ? 'bg-gradient-to-b from-cyan-400/50 via-blue-600/60 to-indigo-700/70 border-2 border-cyan-200 text-white shadow-[0_0_18px_rgba(0,229,255,0.85),inset_0_1px_0_rgba(255,255,255,0.6)] scale-105 z-10 backdrop-blur-md ring-2 ring-cyan-300/40'
                             : isCurrent
-                            ? 'bg-gradient-to-b from-cyan-500/25 to-blue-700/40 border-2 border-cyan-400/90 text-cyan-200 shadow-[0_0_10px_rgba(0,229,255,0.45),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md'
+                            ? isDone
+                              ? 'bg-gradient-to-b from-emerald-500/30 to-teal-700/45 border-2 border-emerald-300 text-emerald-100 shadow-[0_0_12px_rgba(16,185,129,0.5),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md'
+                              : 'bg-gradient-to-b from-cyan-500/30 to-blue-700/45 border-2 border-cyan-400 text-cyan-200 shadow-[0_0_14px_rgba(0,229,255,0.6),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md animate-pulse'
                             : isDone
-                            ? 'bg-emerald-500/15 border border-emerald-400/45 text-emerald-300 hover:border-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md'
-                            : isPast
-                            ? 'bg-white/[0.07] hover:bg-white/[0.12] border border-amber-400/35 text-amber-200/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md'
+                            ? 'bg-gradient-to-b from-emerald-500/20 via-emerald-600/15 to-[#072418]/60 border border-emerald-400/60 text-emerald-300 hover:border-emerald-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md'
+                            : isMissed
+                            ? 'bg-gradient-to-b from-rose-500/20 via-red-900/20 to-[#180812]/70 border border-rose-500/50 text-rose-300 hover:border-rose-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_0_8px_rgba(244,63,94,0.2)] backdrop-blur-md'
                             : 'bg-white/[0.03] border border-white/10 text-slate-500 backdrop-blur-sm'
                         }`}
                       >
-                        <span className={`text-xs font-black font-display leading-none ${
-                          isSelected ? 'text-white' : isCurrent ? 'text-cyan-200' : isDone ? 'text-emerald-200' : isPast ? 'text-amber-200' : 'text-slate-400'
+                        <span className={`text-[11.5px] font-black font-display leading-none ${
+                          isSelected 
+                            ? 'text-white' 
+                            : isCurrent 
+                            ? (isDone ? 'text-emerald-100' : 'text-cyan-200') 
+                            : isDone 
+                            ? 'text-emerald-200' 
+                            : isMissed 
+                            ? 'text-rose-200' 
+                            : 'text-slate-400'
                         }`}>
                           {day}
                         </span>
 
                         {/* Status Dots / Badges */}
                         {isDone && (
-                          <span className="text-[8px] text-amber-300 leading-none mt-0.5">
-                            ★
-                          </span>
+                          <div className="flex items-center justify-center text-[8.5px] text-amber-300 leading-none mt-0.5 font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                            <span>★</span>
+                          </div>
+                        )}
+                        {isMissed && (
+                          <div className="flex items-center justify-center text-[9px] text-rose-400 leading-none mt-0.5 font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                            <span>✕</span>
+                          </div>
                         )}
                         {!isDone && isCurrent && (
-                          <span className="text-[7.5px] font-black uppercase text-cyan-300 leading-none mt-0.5">
+                          <span className="text-[7.5px] font-black uppercase text-cyan-300 bg-cyan-500/25 px-1 py-0.2 rounded border border-cyan-400/40 leading-none mt-0.5">
                             TODAY
                           </span>
                         )}
@@ -6788,30 +8479,69 @@ import './index.css';
                     );
                   })}
                 </div>
+
+                {/* Status Legend Indicator */}
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2.5 mt-2.5 border-t border-white/10 text-[9px] font-bold">
+                  <div className="flex items-center gap-1.5 text-emerald-300">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
+                    <span>Completed (★)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-rose-300">
+                    <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_#f43f5e]" />
+                    <span>Missed / Incomplete (✕)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-cyan-300">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />
+                    <span>Today</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <span className="w-2 h-2 rounded-full bg-slate-500" />
+                    <span>Locked (🔒)</span>
+                  </div>
+                </div>
               </div>
 
               {/* 3. Selected Day Mission Card (Glassmorphic) */}
               <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/65 to-[#071536]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-white/[0.10] border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-sm backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
-                      🎯
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ${
+                      isCompletedDay
+                        ? 'bg-emerald-500/25 border border-emerald-400/50 text-emerald-300'
+                        : isMissedDay
+                        ? 'bg-rose-500/25 border border-rose-400/50 text-rose-300'
+                        : isTodaySelected
+                        ? 'bg-cyan-500/25 border border-cyan-400/50 text-cyan-300'
+                        : 'bg-white/[0.10] border border-white/20 text-slate-400'
+                    }`}>
+                      {isCompletedDay ? '★' : isMissedDay ? '✕' : isTodaySelected ? '🎯' : '🔒'}
                     </div>
-                    <h3 className="text-xs sm:text-sm font-black font-display text-white tracking-wide">
-                      {isTodaySelected ? "Today's Mission" : `Day ${activeDailyDay} Mission`}
-                    </h3>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-black font-display text-white tracking-wide">
+                        {isTodaySelected ? "Today's Mission" : `Day ${activeDailyDay} Mission`}
+                      </h3>
+                      <span className="text-[9px] text-slate-300 font-mono">
+                        {currentMonthShort} {activeDailyDay}, {currentCalendarYear}
+                      </span>
+                    </div>
                   </div>
 
-                  <span className={`text-[9.5px] font-black uppercase px-2 py-0.5 rounded-full border backdrop-blur-md ${
+                  <span className={`text-[9.5px] font-black uppercase px-2.5 py-0.5 rounded-full border backdrop-blur-md ${
                     isTodaySelected && !isCompletedDay
                       ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_8px_rgba(0,229,255,0.4),inset_0_1px_0_rgba(255,255,255,0.2)]'
                       : isCompletedDay
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
-                      : isFutureDay
-                      ? 'bg-white/[0.05] text-slate-400 border-white/10'
-                      : 'bg-amber-500/20 text-amber-300 border-amber-400/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[0_0_8px_rgba(16,185,129,0.3),inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      : isMissedDay
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-400/50 shadow-[0_0_8px_rgba(244,63,94,0.3),inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      : 'bg-white/[0.05] text-slate-400 border-white/10'
                   }`}>
-                    {isTodaySelected && !isCompletedDay ? 'ACTIVE NOW' : isCompletedDay ? 'COMPLETED (3★)' : isFutureDay ? 'LOCKED' : 'AVAILABLE'}
+                    {isTodaySelected && !isCompletedDay 
+                      ? 'ACTIVE NOW' 
+                      : isCompletedDay 
+                      ? 'COMPLETED (3★)' 
+                      : isMissedDay 
+                      ? 'INCOMPLETE / MISSED' 
+                      : 'LOCKED'}
                   </span>
                 </div>
 
@@ -6831,6 +8561,22 @@ import './index.css';
                     <span className="text-xs font-black text-cyan-300 font-display block mt-0.5">+20 Gems</span>
                   </div>
                 </div>
+
+                {/* If Missed Day: Streak Repair Banner */}
+                {isMissedDay && (
+                  <div className="mt-2.5 p-2 rounded-2xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🩹</span>
+                      <div className="text-left">
+                        <span className="text-[10px] text-amber-200 font-bold block leading-tight">Streak Repair Available</span>
+                        <span className="text-[8.5px] text-amber-300/80 leading-none">Recover this date to restore your streak progress</span>
+                      </div>
+                    </div>
+                    <span className="text-[9.5px] font-black text-amber-300 font-mono bg-amber-400/20 px-2 py-0.5 rounded-md border border-amber-400/40">
+                      50 🪙 or Free Ad
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* 4. Daily Supply Crate (Glassmorphic) */}
@@ -6849,38 +8595,69 @@ import './index.css';
                   </div>
                 </div>
 
-                <button
-                  onClick={handleClaimDailyGift}
-                  disabled={dailyGiftClaimed}
-                  className={`px-3 py-1.5 rounded-xl font-black text-xs transition-all cursor-pointer ${
-                    dailyGiftClaimed
-                      ? 'bg-white/[0.05] text-slate-500 border border-white/10 cursor-not-allowed backdrop-blur-sm'
-                      : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-[0_0_14px_rgba(251,191,36,0.6),inset_0_1px_0_rgba(255,255,255,0.4)] active:scale-95'
-                  }`}
-                >
-                  {dailyGiftClaimed ? 'CLAIMED ✓' : 'CLAIM FREE'}
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={handleClaimDailyGift}
+                    disabled={dailyGiftClaimed}
+                    className={`px-2.5 py-1.5 rounded-xl font-black text-[11px] transition-all cursor-pointer ${
+                      dailyGiftClaimed
+                        ? 'bg-white/[0.05] text-slate-500 border border-white/10 cursor-not-allowed backdrop-blur-sm'
+                        : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-[0_0_10px_rgba(251,191,36,0.6)] active:scale-95'
+                    }`}
+                  >
+                    {dailyGiftClaimed ? 'CLAIMED ✓' : 'CLAIM'}
+                  </button>
+                  {!dailyGiftClaimed && (
+                    <button
+                      onClick={handleClaimDailyGiftWithAd}
+                      className="px-2.5 py-1.5 rounded-xl font-black text-[11px] bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 text-emerald-950 shadow-[0_0_12px_rgba(16,185,129,0.5)] active:scale-95 transition-all cursor-pointer border border-emerald-300 flex items-center gap-1"
+                      title="Watch Ad to Double Daily Reward"
+                    >
+                      <span>▶</span>
+                      <span>2X AD</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* 5. Primary Action Launch Button (Glassmorphic Cyber) */}
-              <div className="pt-1.5">
-                <button
-                  onClick={() => startDailyChallenge(activeDailyDay)}
-                  disabled={isFutureDay}
-                  className={`w-full py-3.5 rounded-2xl font-black font-display text-sm uppercase tracking-wider transition-all flex items-center justify-center ${
-                    isFutureDay
-                      ? 'bg-white/[0.05] text-slate-500 border border-white/10 cursor-not-allowed backdrop-blur-sm'
-                      : 'bg-gradient-to-r from-cyan-500/90 via-blue-600/95 to-indigo-600/90 border border-white/30 text-white shadow-[0_12px_28px_rgba(0,229,255,0.45),inset_0_1.5px_0_rgba(255,255,255,0.4)] hover:shadow-[0_14px_32px_rgba(0,229,255,0.65)] active:scale-98 cursor-pointer backdrop-blur-md'
-                  }`}
-                >
-                  <span>
-                    {isFutureDay 
-                      ? `LOCKED • UNLOCKS ${currentMonthShort.toUpperCase()} ${activeDailyDay}` 
-                      : isCompletedDay 
-                      ? `REPLAY DAY ${activeDailyDay} ›` 
-                      : `START DAY ${activeDailyDay} ›`}
-                  </span>
-                </button>
+              <div className="pt-1.5 space-y-2">
+                {isMissedDay ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      onClick={handleStartMissedDayWithCoins}
+                      className="w-full py-3.5 rounded-2xl font-black font-display text-xs uppercase tracking-wider bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 border-2 border-amber-200/90 text-amber-950 shadow-[0_4px_0_#b45309,0_8px_20px_rgba(245,158,11,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#b45309] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-4 h-4 object-contain" />
+                      <span>Recover (50 🪙)</span>
+                    </button>
+                    <button
+                      onClick={handleStartMissedDayWithAd}
+                      className="w-full py-3.5 rounded-2xl font-black font-display text-xs uppercase tracking-wider bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-600 border-2 border-emerald-200/90 text-white shadow-[0_4px_0_#065f46,0_8px_20px_rgba(16,185,129,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <span>▶</span>
+                      <span>Watch Ad to Play Free</span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => startDailyChallenge(activeDailyDay)}
+                    disabled={isFutureDay}
+                    className={`w-full py-3.5 rounded-2xl font-black font-display text-sm uppercase tracking-wider transition-all flex items-center justify-center ${
+                      isFutureDay
+                        ? 'bg-white/[0.05] text-slate-500 border border-white/10 cursor-not-allowed backdrop-blur-sm'
+                        : 'bg-gradient-to-r from-cyan-500/90 via-blue-600/95 to-indigo-600/90 border border-white/30 text-white shadow-[0_12px_28px_rgba(0,229,255,0.45),inset_0_1.5px_0_rgba(255,255,255,0.4)] hover:shadow-[0_14px_32px_rgba(0,229,255,0.65)] active:scale-98 cursor-pointer backdrop-blur-md'
+                    }`}
+                  >
+                    <span>
+                      {isFutureDay 
+                        ? `LOCKED • UNLOCKS ${currentMonthShort.toUpperCase()} ${activeDailyDay}` 
+                        : isCompletedDay 
+                        ? `REPLAY DAY ${activeDailyDay} ›` 
+                        : `START DAY ${activeDailyDay} ›`}
+                    </span>
+                  </button>
+                )}
               </div>
 
             </div>
@@ -6891,7 +8668,7 @@ import './index.css';
                 <div className="w-full max-w-sm rounded-[32px] bg-gradient-to-b from-white/[0.14] via-[#0f2868]/85 to-[#06122d]/90 border border-white/25 p-5 shadow-[0_25px_60px_rgba(0,0,0,0.7),inset_0_1.5px_0_rgba(255,255,255,0.3)] backdrop-blur-2xl relative text-white animate-in fade-in zoom-in-95 duration-200">
                   <div className="text-center mb-4">
                     <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-400/20 border border-amber-300/50 flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md mb-2">
-                      <img src="/assets/icon_trophy_3d.png" alt="Cup" className="w-12 h-12 object-contain" />
+                      <img src="/assets/icon_trophy_3d.webp" alt="Cup" className="w-12 h-12 object-contain" />
                     </div>
                     <h3 className="text-lg font-black font-display text-white uppercase tracking-wider">
                       {currentMonthName} Cup
@@ -6934,6 +8711,134 @@ import './index.css';
                   >
                     Close
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Modern Not Enough Coins / Watch Ad Modal */}
+            {dailyAdPromptModal.isOpen && (
+              <div 
+                className="fixed inset-0 z-50 bg-[#06122c]/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200"
+                onClick={() => setDailyAdPromptModal(prev => ({ ...prev, isOpen: false }))}
+              >
+                <div 
+                  className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible"
+                  onClick={e => e.stopPropagation()}
+                >
+                  {/* Top Close Button */}
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      setDailyAdPromptModal(prev => ({ ...prev, isOpen: false }));
+                    }}
+                    aria-label="Close"
+                    className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+
+                  {/* 3D Floating Hero: Coin Pod + Splash Petals + Arched 3D Banner */}
+                  <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
+                    <div className="relative flex items-center justify-center">
+                      <div className="absolute -bottom-2 w-28 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                      {/* 3D Circular Gloss Pod for Coin */}
+                      <div className="relative w-16 h-16 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-white/90 shadow-[0_8px_20px_rgba(14,165,233,0.45),inset_0_2px_4px_rgba(255,255,255,0.7)] flex items-center justify-center">
+                        <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-10 h-10 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
+                        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white flex items-center justify-center shadow-md">
+                          <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                            <path d="M12 7v6M12 17h.01" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Arched 3D Banner "Need Coins" */}
+                    <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(29,78,216,0.45)]">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                        <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
+                        <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
+                        <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#1e40af" />
+                        <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#172554" />
+                        <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#fundsRibbonGrad)" stroke="#60a5fa" strokeWidth="2" />
+                      </svg>
+                      <div className="relative z-10 flex items-center justify-center pb-1 select-none">
+                        <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
+                          Need <span className="text-[#fde047] drop-shadow-[0_1.5px_3px_rgba(180,83,9,0.8)]">Coins</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Headline & Description */}
+                  <h2 className="text-[#152a55] font-black text-xl tracking-tight font-display mb-1 mt-1">
+                    Not Enough Coins!
+                  </h2>
+                  <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-3">
+                    {dailyAdPromptModal.reason === 'missed_day'
+                      ? `Recovering missed Day ${dailyAdPromptModal.targetDay} requires ${dailyAdPromptModal.fee} Coins. Watch a quick ad to claim +150 Coins and unlock it free!`
+                      : 'You need more Coins to unlock Daily Challenge missions. Watch a quick ad to claim free coins!'}
+                  </p>
+
+                  {/* Balance Status Meter */}
+                  <div className="mb-4 text-left">
+                    <div className="flex items-center gap-2.5 rounded-2xl px-3 py-2 bg-rose-50/90 border border-rose-300/80 shadow-sm">
+                      <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-7 h-7 object-contain shrink-0 drop-shadow-sm" />
+                      <div className="flex-1 min-w-0">
+                        <div className="h-2 rounded-full bg-slate-200 overflow-hidden border border-slate-300/60">
+                          <div 
+                            className="h-full rounded-full bg-gradient-to-r from-rose-500 to-amber-500 transition-all duration-500"
+                            style={{ width: `${Math.min(100, Math.max(8, Math.round((coins / dailyAdPromptModal.fee) * 100)))}%` }}
+                          />
+                        </div>
+                        <div className="mt-1 flex items-center justify-between font-mono font-black text-[11px] leading-none">
+                          <span className="text-rose-700">{coins.toLocaleString()} Coins</span>
+                          <span className="text-slate-500">/ {dailyAdPromptModal.fee} Needed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Controls */}
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        const targetDay = dailyAdPromptModal.targetDay;
+                        setDailyAdPromptModal(prev => ({ ...prev, isOpen: false }));
+                        handleWatchAd('both', 0, 'Daily Challenge Coin Sponsor', {
+                          coinAmount: 150,
+                          gemAmount: 10,
+                          onComplete: () => {
+                            setRewardToast(`+150 Coins & +10 Diamonds Claimed! Unlocking Day ${targetDay}...`);
+                            setTimeout(() => {
+                              startDailyChallenge(targetDay);
+                            }, 500);
+                          }
+                        });
+                      }}
+                      className="w-full rounded-2xl py-3 bg-gradient-to-b from-emerald-400 via-emerald-500 to-teal-600 border-2 border-emerald-200/90 shadow-[0_4px_0_#065f46,0_8px_20px_rgba(16,185,129,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all cursor-pointer flex items-center justify-center gap-2 text-white font-black text-xs uppercase tracking-wide"
+                    >
+                      <svg className="w-5 h-5 text-white stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2.5" y="5" width="19" height="14" rx="3.5" />
+                        <path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor" />
+                      </svg>
+                      <span>Watch Ad to Unlock Free (+150 🪙)</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        setDailyAdPromptModal(prev => ({ ...prev, isOpen: false }));
+                        navigateTo('rewards');
+                      }}
+                      className="w-full py-2.5 rounded-2xl bg-white/80 hover:bg-white border border-blue-200 text-blue-900 font-bold text-xs tracking-wide transition-all cursor-pointer"
+                    >
+                      Visit Coin Store & Shop
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -6994,6 +8899,82 @@ import './index.css';
 
         // Numbers currently placed in any slot (to dim in tray)
         const placedValues = Object.values(dailyGameAnswers);
+        const dailyTrayCount = trayNumbers.length;
+        const dailyRow1Items = Math.ceil(dailyTrayCount / 2);
+        const dailyRow2Items = dailyTrayCount - dailyRow1Items;
+
+        // Responsive element sizing based on tray number count & mobile screen
+        const dailySlotSizeClass = (() => {
+          if (dailyTrayCount >= 13) return 'w-7 h-7 sm:w-8.5 sm:h-8.5 rounded-lg';
+          if (dailyTrayCount >= 11) return 'w-8 h-8 sm:w-9.5 sm:h-9.5 rounded-lg sm:rounded-xl';
+          if (dailyTrayCount >= 10) return 'w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl';
+          return 'w-9 h-9 sm:w-11 sm:h-11 rounded-xl';
+        })();
+
+        const dailyParenSizeClass = (() => {
+          if (dailyTrayCount >= 13) return 'w-2 sm:w-2.5 text-xs sm:text-sm';
+          if (dailyTrayCount >= 11) return 'w-2.5 sm:w-3 text-sm sm:text-base';
+          return 'w-3 sm:w-4 text-base sm:text-lg';
+        })();
+
+        const dailyOpSizeClass = (() => {
+          if (dailyTrayCount >= 13) return 'w-3.5 sm:w-4 text-xs sm:text-sm';
+          if (dailyTrayCount >= 11) return 'w-4 sm:w-4.5 text-sm sm:text-base';
+          return 'w-4.5 sm:w-5.5 text-base sm:text-lg';
+        })();
+
+        const dailySlotTextClass = (val) => {
+          const str = String(val ?? '');
+          const len = str.length;
+          if (dailyTrayCount >= 13) {
+            if (len >= 3) return 'text-[9px] tracking-tight';
+            if (len === 2) return 'text-[11px] tracking-tight';
+            return 'text-xs sm:text-sm';
+          }
+          if (dailyTrayCount >= 11) {
+            if (len >= 3) return 'text-[10px] tracking-tight';
+            if (len === 2) return 'text-xs tracking-tight';
+            return 'text-sm sm:text-base';
+          }
+          if (dailyTrayCount >= 10) {
+            if (len >= 3) return 'text-[11px] tracking-tight';
+            if (len === 2) return 'text-sm tracking-tight';
+            return 'text-base sm:text-lg';
+          }
+          if (len >= 3) return 'text-xs sm:text-sm tracking-tight';
+          return 'text-base sm:text-lg';
+        };
+
+        const getDailyTrayButtonSizeClass = (itemsInRow) => {
+          if (itemsInRow <= 4) {
+            return 'max-w-[46px] sm:max-w-[50px] h-[44px] sm:h-[48px] rounded-xl';
+          }
+          if (itemsInRow === 5) {
+            return 'max-w-[40px] sm:max-w-[45px] h-[39px] sm:h-[44px] rounded-xl';
+          }
+          if (itemsInRow === 6) {
+            return 'max-w-[36px] sm:max-w-[40px] h-[35px] sm:h-[39px] rounded-lg sm:rounded-xl';
+          }
+          return 'max-w-[31px] sm:max-w-[35px] h-[31px] sm:h-[35px] rounded-md sm:rounded-lg';
+        };
+
+        const getDailyTrayTextClass = (val, itemsInRow) => {
+          const str = String(val ?? '');
+          const len = str.length;
+          if (itemsInRow >= 7) {
+            if (len >= 3) return 'text-[8.5px] tracking-tighter font-black';
+            if (len === 2) return 'text-[10px] tracking-tight font-black';
+            return 'text-[11px] font-black';
+          }
+          if (itemsInRow === 6) {
+            if (len >= 3) return 'text-[9.5px] tracking-tighter font-black';
+            if (len === 2) return 'text-[11px] tracking-tight font-black';
+            return 'text-xs sm:text-sm font-black';
+          }
+          if (len >= 3) return 'text-[10px] tracking-tight font-black';
+          if (len === 2) return 'text-xs sm:text-sm tracking-tight font-black';
+          return 'text-xs sm:text-sm font-black';
+        };
 
         // Responsive typography helpers
         const getTileTextClass = (val) => {
@@ -7064,7 +9045,7 @@ import './index.css';
                 const next = Array.from(new Set([...prev, dailyGameDay]));
                 try {
                   const key = `newromath_daily_completed_${currentCalendarYear}_${currentSeasonNum}`;
-                  localStorage.setItem(key, JSON.stringify(next));
+                  GameStorage.setItem(key, JSON.stringify(next));
                 } catch (e) {}
                 return next;
               });
@@ -7072,12 +9053,12 @@ import './index.css';
               // Award Rewards (+150 Coins & +20 Gems)
               setCoins(c => {
                 const next = c + 150;
-                try { localStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+                try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
                 return next;
               });
               setGems(g => {
                 const next = g + 20;
-                try { localStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+                try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
                 return next;
               });
 
@@ -7118,7 +9099,7 @@ import './index.css';
         // Undo last placed number
         const undoDailyNumber = () => {
           if (!dailyGameHistory.length) return;
-          sound.click();
+          sound.pop();
           const lastSlot = dailyGameHistory[dailyGameHistory.length - 1];
           setDailyGameHistory(prev => prev.slice(0, -1));
           setDailyGameAnswers(prev => {
@@ -7187,7 +9168,7 @@ import './index.css';
               }}
               aria-label={`Daily Slot ${slotTag}${val !== undefined ? `, ${val}` : ''}`}
               aria-pressed={isSelected}
-              className={`relative flex items-center justify-center transition-all select-none cursor-pointer w-9 h-9 sm:w-11 sm:h-11 aspect-square rounded-xl shrink-0 ${
+              className={`relative flex items-center justify-center transition-all select-none cursor-pointer aspect-square shrink-0 ${dailySlotSizeClass} ${
                 isSelected
                   ? 'bg-amber-400/25 border-2 border-yellow-300 shadow-[0_0_16px_rgba(251,191,36,0.9),inset_0_0_8px_rgba(251,191,36,0.4)] scale-105 z-20'
                   : isFilled
@@ -7200,15 +9181,15 @@ import './index.css';
               }`}
             >
               {isFilled ? (
-                <span className="font-black text-white text-base sm:text-lg leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className={`font-black text-white leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${dailySlotTextClass(val)}`}>
                   {val}
                 </span>
               ) : isSelected ? (
-                <span className="text-amber-300 font-mono font-black text-[11px] sm:text-xs tracking-tight leading-none drop-shadow-[0_0_8px_rgba(251,191,36,0.9)] animate-pulse">
+                <span className="text-amber-300 font-mono font-black text-[10px] sm:text-xs tracking-tight leading-none drop-shadow-[0_0_8px_rgba(251,191,36,0.9)] animate-pulse">
                   {slotTag}
                 </span>
               ) : (
-                <span className={`font-mono font-black text-[11px] sm:text-xs tracking-tight leading-none ${
+                <span className={`font-mono font-black text-[10px] sm:text-xs tracking-tight leading-none ${
                   slotTheme === 'alpha'
                     ? 'text-cyan-200 drop-shadow-[0_0_6px_rgba(0,229,255,0.85)]'
                     : slotTheme === 'beta'
@@ -7226,8 +9207,8 @@ import './index.css';
           <div 
             className={`flex items-center justify-center select-none font-black shrink-0 ${
               isParen
-                ? 'w-3 sm:w-4 text-sky-200/85 text-base sm:text-lg font-bold'
-                : 'w-4.5 sm:w-5.5 text-cyan-200 text-base sm:text-lg drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]'
+                ? `${dailyParenSizeClass} text-sky-200/85 font-bold`
+                : `${dailyOpSizeClass} text-cyan-200 drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]`
             }`}
           >
             <span>{symbol}</span>
@@ -7236,13 +9217,13 @@ import './index.css';
 
         const renderFixedTarget = (val, isCorrect = false) => (
           <div 
-            className={`flex items-center justify-center select-none font-black w-9 h-9 sm:w-11 sm:h-11 aspect-square rounded-xl shrink-0 transition-all ${
+            className={`flex items-center justify-center select-none font-black aspect-square shrink-0 transition-all ${dailySlotSizeClass} ${
               isCorrect
                 ? 'bg-gradient-to-b from-[#059669] via-[#047857] to-[#064e3b] border-2 border-emerald-300 text-white shadow-[0_4px_0_#022c22,0_0_14px_rgba(16,185,129,0.7),inset_0_1px_2px_rgba(255,255,255,0.6)]'
                 : 'bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#173887] border-2 border-cyan-300 text-white shadow-[0_4px_0_#0b1d4d,0_6px_12px_rgba(0,0,0,0.45),inset_0_1px_2px_rgba(255,255,255,0.6)]'
             } ${getTileTextClass(val)}`}
           >
-            <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-none text-sm sm:text-base font-black">{val}</span>
+            <span className={`drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-none font-black ${dailySlotTextClass(val)}`}>{val}</span>
           </div>
         );
 
@@ -7257,8 +9238,8 @@ import './index.css';
                 className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1 sm:gap-2 px-3 sm:px-3.5 pt-2 pb-2 shrink-0 w-[calc(100%+1.5rem)]"
                 style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0px))' }}
               >
-                {/* 1. Left Navigation Controls (True 1:1 Circular Icon Buttons) */}
-                <div className="flex items-center gap-1.5 shrink-0">
+                {/* 1. Left Navigation Controls: Back Button */}
+                <div className="flex items-center shrink-0">
                   <button 
                     onClick={() => { sound.click(); navigateTo('daily'); }} 
                     aria-label="Back to daily hub" 
@@ -7269,6 +9250,17 @@ import './index.css';
                       <path d="M15 18l-6-6 6-6" />
                     </svg>
                   </button>
+                </div>
+
+                {/* 2. Center Daily Mission Pill (Compact & Responsive) */}
+                <div className="flex items-center justify-center bg-[#0d255a]/80 backdrop-blur-md border border-cyan-400/50 rounded-full px-2.5 sm:px-3 py-1 shadow-inner shrink min-w-0">
+                  <span className="text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display truncate">
+                    DAILY #{protocolId}
+                  </span>
+                </div>
+
+                {/* 3. Right Navigation Controls: Reset Daily Puzzle Button */}
+                <div className="flex items-center shrink-0">
                   <button 
                     onClick={handleDailyReroll} 
                     aria-label="Reset daily puzzle" 
@@ -7280,56 +9272,6 @@ import './index.css';
                       <path d="M21 3v5h-5" />
                     </svg>
                   </button>
-                </div>
-
-                {/* 2. Center Daily Mission Pill (Compact & Responsive) */}
-                <div className="flex items-center justify-center bg-[#0d255a]/80 backdrop-blur-md border border-cyan-400/50 rounded-full px-2 sm:px-2.5 py-1 shadow-inner shrink min-w-0">
-                  <span className="text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display truncate">
-                    DAILY #{protocolId}
-                  </span>
-                </div>
-
-                {/* 3. Right Currency Capsules: Gold Coins & Diamonds */}
-                <div className="flex items-center gap-1 shrink-0">
-                  {/* Gold Coins */}
-                  <div 
-                    onClick={() => { sound.click(); navigateTo('rewards'); }}
-                    className="group bg-gradient-to-r from-[#1b1c08]/90 via-[#272106]/90 to-[#121102]/90 border border-amber-400/60 hover:border-amber-300 rounded-xl px-1.5 py-0.5 sm:py-1 flex items-center gap-1 shadow-sm transition-all active:scale-95 cursor-pointer"
-                    title="Coins - Tap for Rewards & Shop"
-                    aria-label={`Coin Balance: ${coins}`}
-                  >
-                    <img 
-                      src="/assets/icon_gold_coin_3d_clean.png" 
-                      alt="Coin" 
-                      className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_4px_rgba(245,158,11,0.7)] group-hover:scale-110 transition-transform" 
-                    />
-                    <span className="text-amber-300 font-black text-[9.5px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                      {coins.toLocaleString()}
-                    </span>
-                    <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[8px] flex items-center justify-center shadow-xs leading-none shrink-0">
-                      +
-                    </span>
-                  </div>
-
-                  {/* Diamonds */}
-                  <div 
-                    onClick={() => { sound.click(); navigateTo('rewards'); }}
-                    className="group bg-gradient-to-r from-[#071d38]/90 via-[#0a2347]/90 to-[#051429]/90 border border-cyan-400/60 hover:border-cyan-300 rounded-xl px-1.5 py-0.5 sm:py-1 flex items-center gap-1 shadow-sm transition-all active:scale-95 cursor-pointer"
-                    title="Diamonds - Tap for Rewards & Shop"
-                    aria-label={`Diamond Balance: ${gems}`}
-                  >
-                    <img 
-                      src="/assets/icon_gem_3d_clean.png" 
-                      alt="Diamond" 
-                      className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_2px_6px_rgba(0,229,255,0.8)] group-hover:scale-110 transition-transform" 
-                    />
-                    <span className="text-cyan-200 font-black text-[9.5px] sm:text-[11px] font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.6)]">
-                      {gems.toLocaleString()}
-                    </span>
-                    <span className="w-3 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black text-[8px] flex items-center justify-center shadow-xs leading-none shrink-0">
-                      +
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -7344,29 +9286,38 @@ import './index.css';
                 <span className="absolute bottom-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
                 <span className="absolute bottom-1.5 right-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
 
-                {/* Mission HUD Header: Difficulty, Timer, and Pause */}
-                <div className="relative z-10 flex items-center justify-between px-1 pb-2.5 text-xs font-bold border-b border-cyan-400/20 mb-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-900/60 border border-emerald-400/50 text-emerald-300 shadow-xs">
+                {/* Mission HUD Header: Yellow Background Modern 3D Glassmorphism Section */}
+                <div className="relative z-10 flex items-center justify-between px-2.5 py-2 rounded-2xl bg-gradient-to-b from-yellow-300/25 via-amber-400/20 to-yellow-500/15 border border-yellow-300/50 shadow-[0_4px_20px_rgba(245,158,11,0.25),inset_0_1.5px_1.5px_rgba(255,255,255,0.65),inset_0_-1.5px_3px_rgba(180,83,9,0.3)] backdrop-blur-xl mb-2.5 overflow-hidden">
+                  {/* Luminous Inner Glow Shimmer */}
+                  <div className="absolute -top-6 left-1/4 w-32 h-12 bg-yellow-300/20 rounded-full blur-md pointer-events-none" />
+
+                  {/* Left: 3D Difficulty Badge & Day Counter */}
+                  <div className="relative z-10 flex items-center gap-1.5 min-w-0">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] transition-all shrink-0">
                       {difficulty}
                     </span>
-                    <span className="text-[10px] text-cyan-200/80 font-mono font-bold">DAY {dailyGameDay}</span>
+                    <div className="px-2 py-0.5 rounded-lg bg-black/35 border border-yellow-400/30 backdrop-blur-md shadow-inner flex items-center">
+                      <span className="text-[10px] text-yellow-200 font-mono font-black tracking-wider drop-shadow-xs">
+                        DAY {dailyGameDay}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <div className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono font-black text-xs transition-colors ${
+                  {/* Right: 3D Yellow Glass Timer Capsule & 3D Yellow Pause Button */}
+                  <div className="relative z-10 flex items-center gap-1.5 shrink-0">
+                    <div className={`flex items-center gap-1 px-2.5 py-1 rounded-xl font-mono font-black text-xs transition-all backdrop-blur-md ${
                       dailyGameTimer <= 15
-                        ? 'animate-timer-warning text-red-200 bg-red-950/80 border border-red-500/80'
-                        : 'text-cyan-200 bg-[#0d2861]/70 border border-cyan-400/50 shadow-inner'
+                        ? 'animate-timer-warning text-red-100 bg-gradient-to-b from-red-500/80 to-red-800/90 border border-red-300 shadow-[0_0_12px_rgba(239,68,68,0.7),inset_0_1px_1px_rgba(255,255,255,0.5)]'
+                        : 'text-yellow-100 bg-gradient-to-b from-yellow-400/25 via-amber-500/35 to-amber-700/40 border border-yellow-300/60 shadow-[0_2px_8px_rgba(245,158,11,0.3),inset_0_1px_1px_rgba(255,255,255,0.55)]'
                     }`}>
-                      <span>⏱️</span>
-                      <span>{formatTimer(dailyGameTimer)}</span>
+                      <span className="text-xs">⏱️</span>
+                      <span className="drop-shadow-xs">{formatTimer(dailyGameTimer)}</span>
                     </div>
 
                     <button 
                       onClick={() => { sound.click(); setIsDailyGamePaused(v => !v); }} 
                       aria-label={isDailyGamePaused ? 'Resume puzzle' : 'Pause puzzle'} 
-                      className="w-7 h-7 rounded-lg bg-[#0d2861]/80 hover:bg-[#13357b] border border-cyan-400/50 text-cyan-300 flex items-center justify-center text-xs font-black shadow-inner active:scale-95 cursor-pointer transition-all"
+                      className="w-8 h-8 rounded-xl bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 hover:from-yellow-200 hover:via-amber-300 hover:to-amber-400 border border-yellow-100 text-amber-950 flex items-center justify-center text-xs font-black shadow-[0_3px_0_#b45309,0_4px_10px_rgba(245,158,11,0.45),inset_0_1px_2px_rgba(255,255,255,0.85)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] cursor-pointer transition-all"
                     >
                       {isDailyGamePaused ? '▶' : '⏸'}
                     </button>
@@ -7391,19 +9342,19 @@ import './index.css';
 
                   {/* Connector 1: Link Operator between Alpha and Beta (Column 2) */}
                   <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full py-0 pointer-events-none select-none">
-                    <div className="w-3 sm:w-4" />
-                    <div className="w-9 sm:w-11" />
-                    <div className="w-4.5 sm:w-5.5" />
-                    <div className="w-9 sm:w-11 flex items-center justify-center">
+                    <div className={dailyParenSizeClass} />
+                    <div className={dailySlotSizeClass} />
+                    <div className={dailyOpSizeClass} />
+                    <div className={`${dailySlotSizeClass} flex items-center justify-center`}>
                       <span className="text-cyan-200 text-base sm:text-lg font-black leading-none drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]">
                         {colLink.op1}
                       </span>
                     </div>
-                    <div className="w-3 sm:w-4" />
-                    <div className="w-4.5 sm:w-5.5" />
-                    <div className="w-9 sm:w-11" />
-                    <div className="w-4.5 sm:w-5.5" />
-                    <div className="w-9 sm:w-11" />
+                    <div className={dailyParenSizeClass} />
+                    <div className={dailyOpSizeClass} />
+                    <div className={dailySlotSizeClass} />
+                    <div className={dailyOpSizeClass} />
+                    <div className={dailySlotSizeClass} />
                   </div>
 
                   {/* Row 2: Core Beta Equation */}
@@ -7421,19 +9372,19 @@ import './index.css';
 
                   {/* Connector 2: Link Operator between Beta and Gamma (Column 2) */}
                   <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full py-0 pointer-events-none select-none">
-                    <div className="w-3 sm:w-4" />
-                    <div className="w-9 sm:w-11" />
-                    <div className="w-4.5 sm:w-5.5" />
-                    <div className="w-9 sm:w-11 flex items-center justify-center">
+                    <div className={dailyParenSizeClass} />
+                    <div className={dailySlotSizeClass} />
+                    <div className={dailyOpSizeClass} />
+                    <div className={`${dailySlotSizeClass} flex items-center justify-center`}>
                       <span className="text-cyan-200 text-base sm:text-lg font-black leading-none drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]">
                         {colLink.op2}
                       </span>
                     </div>
-                    <div className="w-3 sm:w-4" />
-                    <div className="w-4.5 sm:w-5.5" />
-                    <div className="w-9 sm:w-11" />
-                    <div className="w-4.5 sm:w-5.5" />
-                    <div className="w-9 sm:w-11" />
+                    <div className={dailyParenSizeClass} />
+                    <div className={dailyOpSizeClass} />
+                    <div className={dailySlotSizeClass} />
+                    <div className={dailyOpSizeClass} />
+                    <div className={dailySlotSizeClass} />
                   </div>
 
                   {/* Row 3: Core Gamma Equation */}
@@ -7476,8 +9427,8 @@ import './index.css';
 
                 {/* Number Tray Keyboard (3D Green Tiles in 2 Balanced Rows for All Android Screens) */}
                 <div className="relative z-10 flex flex-col items-center gap-1.5 pt-2.5 mt-1 border-t border-cyan-400/20 w-full px-0.5">
-                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full">
-                    {trayNumbers.slice(0, Math.ceil(trayNumbers.length / 2)).map(number => {
+                  <div className={`flex items-center justify-center ${dailyRow1Items >= 7 ? 'gap-0.5 sm:gap-1' : 'gap-1 sm:gap-1.5'} w-full`}>
+                    {trayNumbers.slice(0, dailyRow1Items).map(number => {
                       const used = placedValues.includes(number);
                       return (
                         <button
@@ -7485,21 +9436,21 @@ import './index.css';
                           onClick={() => placeDailyNumber(number)}
                           disabled={used || isDailyGamePaused || dailyGameTimeOver}
                           aria-label={`Place number ${number}`}
-                          className={`grid aspect-square min-w-0 flex-1 max-w-[42px] sm:max-w-[46px] place-items-center rounded-xl p-0.5 transition-all select-none overflow-hidden ${
+                          className={`grid aspect-square min-w-0 flex-1 ${getDailyTrayButtonSizeClass(dailyRow1Items)} place-items-center p-0.5 transition-all select-none overflow-hidden ${
                             used
                               ? 'opacity-25 scale-95 border border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed'
                               : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_3px_0_#064e3b,0_5px_10px_rgba(16,185,129,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
-                          } ${getTrayTextClass(number)}`}
+                          } ${getDailyTrayTextClass(number, dailyRow1Items)}`}
                         >
-                          <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5 text-xs sm:text-sm">
+                          <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5">
                             {number}
                           </span>
                         </button>
                       );
                     })}
                   </div>
-                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 w-full">
-                    {trayNumbers.slice(Math.ceil(trayNumbers.length / 2)).map(number => {
+                  <div className={`flex items-center justify-center ${dailyRow2Items >= 7 ? 'gap-0.5 sm:gap-1' : 'gap-1 sm:gap-1.5'} w-full`}>
+                    {trayNumbers.slice(dailyRow1Items).map(number => {
                       const used = placedValues.includes(number);
                       return (
                         <button
@@ -7507,13 +9458,13 @@ import './index.css';
                           onClick={() => placeDailyNumber(number)}
                           disabled={used || isDailyGamePaused || dailyGameTimeOver}
                           aria-label={`Place number ${number}`}
-                          className={`grid aspect-square min-w-0 flex-1 max-w-[42px] sm:max-w-[46px] place-items-center rounded-xl p-0.5 transition-all select-none overflow-hidden ${
+                          className={`grid aspect-square min-w-0 flex-1 ${getDailyTrayButtonSizeClass(dailyRow2Items)} place-items-center p-0.5 transition-all select-none overflow-hidden ${
                             used
                               ? 'opacity-25 scale-95 border border-slate-700 bg-slate-800/40 text-slate-500 cursor-not-allowed'
                               : 'bg-gradient-to-b from-[#1fc786] via-[#10b981] to-[#047857] border-2 border-emerald-300 text-white font-black shadow-[0_3px_0_#064e3b,0_5px_10px_rgba(16,185,129,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#064e3b] cursor-pointer hover:scale-105'
-                          } ${getTrayTextClass(number)}`}
+                          } ${getDailyTrayTextClass(number, dailyRow2Items)}`}
                         >
-                          <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5 text-xs sm:text-sm">
+                          <span className="leading-none flex items-center justify-center font-black truncate max-w-full px-0.5">
                             {number}
                           </span>
                         </button>
@@ -7568,7 +9519,11 @@ import './index.css';
 
                 {/* 3. Instructions & Rules Button (Pointed by User Red Arrow) */}
                 <button 
-                  onClick={() => { sound.click(); setShowDailyInstructionsModal(true); }} 
+                  onClick={() => {
+                    sound.click();
+                    const proceed = () => setShowDailyInstructionsModal(true);
+                    adMobService.showInterstitial({ force: true, onClose: proceed });
+                  }} 
                   aria-label="Mission Instructions & How to Play" 
                   className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border-2 border-yellow-200 shadow-[0_4px_0_#92400e,0_8px_24px_rgba(245,158,11,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all cursor-pointer"
                   title="Mission Instructions"
@@ -7613,10 +9568,6 @@ import './index.css';
                     <div className="relative flex items-center justify-center">
                       <div className="absolute -bottom-1 w-24 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
-                      {/* Sparkle Stars */}
-                      <div className="absolute -top-2 -left-2 text-amber-400 font-bold text-base select-none">✦</div>
-                      <div className="absolute -top-1.5 -right-2 text-amber-400 font-bold text-base select-none">✦</div>
-
                       {/* 3D Blueprint / Brain Hologram Icon */}
                       <div className="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 flex items-center justify-center text-2xl sm:text-3xl shadow-[0_6px_16px_rgba(14,165,233,0.5),inset_0_2px_4px_rgba(255,255,255,0.7)]">
                         <span className="drop-shadow-md">📘</span>
@@ -7639,12 +9590,10 @@ import './index.css';
                           </linearGradient>
                         </defs>
                       </svg>
-                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
-                        <span className="text-amber-300 text-xs filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
+                      <div className="relative z-10 flex items-center justify-center pb-0.5 select-none">
                         <span className="font-black text-sm sm:text-base tracking-wide text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.9)] font-display">
                           Instructions
                         </span>
-                        <span className="text-amber-300 text-xs filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                       </div>
                     </div>
                   </div>
@@ -7790,7 +9739,7 @@ import './index.css';
             {/* 3D Glassmorphic "Time Out" Banner Modal (Identical to Image 2 Reference) */}
             {dailyGameTimeOver && (
               <div className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
-                <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible">
+                <div className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible">
 
                   {/* Top Close Button */}
                   <button
@@ -7801,40 +9750,36 @@ import './index.css';
                     }}
                     aria-label="Close"
                     title="Close"
-                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                    className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                   </button>
 
                   {/* 3D Hourglass Hero + Halo + Arched Banner */}
-                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                  <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
                     <div className="relative flex items-center justify-center">
-                      <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+                      <div className="absolute -bottom-1.5 w-28 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
                       {/* Left Splashes */}
-                      <svg className="absolute -left-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -left-0.5 top-2 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_4px_rgba(56,189,248,0.45)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
-                      <svg className="absolute -left-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -left-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_1.5px_3px_rgba(14,165,233,0.35)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
 
                       {/* Right Splashes */}
-                      <svg className="absolute -right-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -right-0.5 top-2 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_4px_rgba(56,189,248,0.45)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
-                      <svg className="absolute -right-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -right-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_1.5px_3px_rgba(14,165,233,0.35)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
 
-                      {/* Sparkle Stars */}
-                      <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
-                      <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
-
-                      {/* 3D Hourglass SVG Graphic */}
-                      <svg className="w-24 h-24 drop-shadow-[0_8px_16px_rgba(14,165,233,0.45)]" viewBox="0 0 100 100" fill="none">
+                      {/* 3D Hourglass SVG Graphic (Sleek Compact Size) */}
+                      <svg className="w-20 h-20 drop-shadow-[0_6px_14px_rgba(14,165,233,0.4)]" viewBox="0 0 100 100" fill="none">
                         <ellipse cx="50" cy="18" rx="22" ry="7" fill="url(#dailyTimeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
                         <ellipse cx="50" cy="16" rx="19" ry="5" fill="#7dd3fc" />
                         <ellipse cx="50" cy="82" rx="22" ry="7" fill="url(#dailyTimeOutHgBlue)" stroke="#38bdf8" strokeWidth="2" />
@@ -7860,8 +9805,8 @@ import './index.css';
                       </svg>
                     </div>
 
-                    {/* Arched 3D Banner "Time Out" */}
-                    <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(29,78,216,0.5)]">
+                    {/* Arched 3D Banner "Time Out" (Clean, Compact, No Stars) */}
+                    <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(29,78,216,0.45)]">
                       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
                         <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
                         <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
@@ -7876,38 +9821,36 @@ import './index.css';
                           </linearGradient>
                         </defs>
                       </svg>
-                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
-                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
-                        <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                      <div className="relative z-10 flex items-center justify-center pb-0.5 select-none">
+                        <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
                           Time <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Out</span>
                         </span>
-                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Clock Divider */}
-                  <div className="flex items-center justify-center gap-3 my-3 mt-4">
-                    <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
-                    <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <div className="flex items-center justify-center gap-2.5 my-2.5 mt-3">
+                    <div className="h-[1.5px] w-10 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                    <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="9" />
                         <path d="M12 7v5l3 2" />
                       </svg>
                     </div>
-                    <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                    <div className="h-[1.5px] w-10 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
                   </div>
 
                   {/* Headline & Description */}
-                  <h2 className="text-[#152a55] font-black text-xl tracking-tight font-display mb-1">
+                  <h2 className="text-[#152a55] font-black text-lg sm:text-xl tracking-tight font-display mb-0.5">
                     Take a short break!
                   </h2>
-                  <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-6">
+                  <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-5">
                     You can continue the game anytime you're ready.
                   </p>
 
                   {/* Action Controls */}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {/* Primary 3D Restart Button */}
                     <button
                       onClick={() => {
@@ -7915,9 +9858,9 @@ import './index.css';
                         startDailyChallenge(dailyGameDay);
                       }}
                       aria-label="Restart Daily Challenge"
-                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-base flex items-center justify-center gap-2 shadow-[0_5px_0_#1e40af,0_10px_25px_rgba(37,99,235,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
+                      className="w-full h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_0_#1e40af,0_8px_20px_rgba(37,99,235,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer"
                     >
-                      <svg className="w-5 h-5 text-white stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                      <svg className="w-5 h-5 text-white stroke-[2.8] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                         <path d="M3 3v5h5" />
                       </svg>
@@ -7925,7 +9868,7 @@ import './index.css';
                     </button>
 
                     {/* Secondary Options: +30s Extra Time & Daily Hub */}
-                    <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div className="grid grid-cols-2 gap-2 pt-0.5">
                       <button
                         onClick={() => {
                           sound.click();
@@ -7933,7 +9876,7 @@ import './index.css';
                           setDailyGameTimeOver(false);
                         }}
                         aria-label="Extra Time (+30s)"
-                        className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#b45309,0_6px_16px_rgba(245,158,11,0.35)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
+                        className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#b45309,0_5px_12px_rgba(245,158,11,0.3)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
                       >
                         <span>⚡</span>
                         <span>+30s Time</span>
@@ -7945,9 +9888,9 @@ import './index.css';
                           navigateTo('daily');
                         }}
                         aria-label="Daily Hub"
-                        className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_3px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
+                        className="h-10 rounded-2xl bg-blue-100/90 hover:bg-blue-200/90 border border-blue-300 text-blue-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#93c5fd] active:translate-y-0.5 active:shadow-[0_1px_0_#93c5fd] transition-all cursor-pointer"
                       >
-                        <span>⊞</span>
+                        <span>📅</span>
                         <span>Daily Hub</span>
                       </button>
                     </div>
@@ -7959,25 +9902,21 @@ import './index.css';
             {/* 3D Glassmorphic "Daily Cleared" Victory Banner Modal */}
             {dailyGameVictoryModal && (
               <div className="fixed inset-0 z-50 bg-[#06122c]/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
-                <div className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0fdf4]/95 to-[#dcfce7]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(6,78,59,0.5),inset_0_2px_4px_rgba(255,255,255,0.95)] text-center overflow-visible">
+                <div className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0fdf4]/95 to-[#dcfce7]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(6,78,59,0.5),inset_0_2px_4px_rgba(255,255,255,0.95)] text-center overflow-visible">
 
                   {/* Floating 3D Trophy / Star + Arched Ribbon */}
-                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                  <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
                     <div className="relative flex items-center justify-center">
-                      <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bbf7d0] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+                      <div className="absolute -bottom-1.5 w-28 h-10 bg-gradient-to-t from-[#bbf7d0] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
-                      {/* Golden Sparkles */}
-                      <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-xl select-none animate-pulse">✦</div>
-                      <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-xl select-none animate-pulse">✦</div>
-
-                      {/* 3D Trophy Graphic */}
-                      <div className="w-20 h-20 rounded-3xl bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 border-2 border-yellow-200 flex items-center justify-center text-4xl shadow-[0_10px_25px_rgba(245,158,11,0.5),inset_0_2px_4px_rgba(255,255,255,0.8)]">
+                      {/* 3D Trophy Graphic (Sleek Compact Size) */}
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 border-2 border-yellow-200 flex items-center justify-center text-3xl shadow-[0_8px_18px_rgba(245,158,11,0.45),inset_0_2px_4px_rgba(255,255,255,0.8)]">
                         🏆
                       </div>
                     </div>
 
-                    {/* Arched 3D Banner "Daily Cleared" */}
-                    <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(5,150,105,0.5)]">
+                    {/* Arched 3D Banner "Daily Cleared" (Clean, Compact, No Stars) */}
+                    <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(5,150,105,0.45)]">
                       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
                         <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#047857" />
                         <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#064e3b" />
@@ -7992,38 +9931,36 @@ import './index.css';
                           </linearGradient>
                         </defs>
                       </svg>
-                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
-                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
-                        <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
+                      <div className="relative z-10 flex items-center justify-center pb-0.5 select-none">
+                        <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
                           Daily <span className="text-[#fef08a] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Cleared</span>
                         </span>
-                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Headline */}
-                  <h2 className="text-[#064e3b] font-black text-xl tracking-tight font-display mt-3 mb-1">
+                  <h2 className="text-[#064e3b] font-black text-lg sm:text-xl tracking-tight font-display mt-2 mb-0.5">
                     Protocol Synchronized!
                   </h2>
-                  <p className="text-[#047857] text-xs font-semibold px-2 leading-relaxed mb-4">
+                  <p className="text-[#047857] text-xs font-semibold px-2 leading-relaxed mb-3">
                     Day {dailyGameDay} Quantum Matrix Cleared (3★)
                   </p>
 
                   {/* Rewards Section */}
-                  <div className="grid grid-cols-2 gap-2 my-3">
-                    <div className="p-2.5 rounded-2xl bg-amber-50 border border-amber-300 shadow-sm flex flex-col items-center">
-                      <span className="text-[10px] text-amber-800 font-bold uppercase">Reward</span>
-                      <span className="text-sm font-black text-amber-600 font-display mt-0.5">+150 Coins 🪙</span>
+                  <div className="grid grid-cols-2 gap-2 my-2.5">
+                    <div className="p-2 rounded-2xl bg-amber-50 border border-amber-300 shadow-sm flex flex-col items-center">
+                      <span className="text-[9.5px] text-amber-800 font-bold uppercase">Reward</span>
+                      <span className="text-xs sm:text-sm font-black text-amber-600 font-display mt-0.5">+150 Coins 🪙</span>
                     </div>
-                    <div className="p-2.5 rounded-2xl bg-cyan-50 border border-cyan-300 shadow-sm flex flex-col items-center">
-                      <span className="text-[10px] text-cyan-800 font-bold uppercase">Bonus</span>
-                      <span className="text-sm font-black text-cyan-600 font-display mt-0.5">+20 Gems 💎</span>
+                    <div className="p-2 rounded-2xl bg-cyan-50 border border-cyan-300 shadow-sm flex flex-col items-center">
+                      <span className="text-[9.5px] text-cyan-800 font-bold uppercase">Bonus</span>
+                      <span className="text-xs sm:text-sm font-black text-cyan-600 font-display mt-0.5">+20 Gems 💎</span>
                     </div>
                   </div>
 
                   {/* Streak Card */}
-                  <div className="p-2 rounded-xl bg-orange-100/80 border border-orange-300 text-xs text-orange-900 font-bold mb-4 flex items-center justify-center gap-1.5">
+                  <div className="p-2 rounded-xl bg-orange-100/80 border border-orange-300 text-xs text-orange-900 font-bold mb-3.5 flex items-center justify-center gap-1.5">
                     <span>🔥</span>
                     <span>Streak Extended: {streakDays} Consecutive Days!</span>
                   </div>
@@ -8035,7 +9972,7 @@ import './index.css';
                       setDailyGameVictoryModal(false);
                       navigateTo('daily');
                     }}
-                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] border-2 border-emerald-200/90 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center shadow-[0_5px_0_#064e3b,0_10px_25px_rgba(16,185,129,0.45),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#064e3b] transition-all cursor-pointer"
+                    className="w-full h-12 rounded-full bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] border-2 border-emerald-200/90 text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center shadow-[0_4px_0_#064e3b,0_8px_20px_rgba(16,185,129,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#064e3b] transition-all cursor-pointer"
                   >
                     Collect Rewards & Return to Hub
                   </button>
@@ -8097,13 +10034,12 @@ import './index.css';
         const overallMastery = Math.min(100, Math.max(40, Math.round((activePlayerLevel / 25) * 100)));
         const totalTimeHours = Math.floor(activePlayerLevel * 0.5 + 4);
         const totalTimeMinutes = Math.round((activePlayerLevel * 7) % 60);
-
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
             {/* Mathematical Coordinate Blueprint Overlay */}
             <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 right-0 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
 
             {/* Sticky Modern Sci-Fi Header */}
             <header className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 px-4 pt-3 pb-2.5 shrink-0 backdrop-blur-md">
@@ -8632,18 +10568,18 @@ import './index.css';
           { rank: 8, name: 'Guest-FCNUD', flag: '🇺🇸', score: '2,053,538', title: 'Matrix Master' },
         ];
         const podium = [
-          { rank: 2, name: 'Guest-7MUET', flag: '🇱🇦', score: '2,385,400', medal: '🥈', avatar: '🤖' },
-          { rank: 1, name: 'RW', flag: '🇬🇧', score: '2,490,680', medal: '🥇', avatar: '⚡' },
-          { rank: 3, name: 'Guest-JFTL4', flag: '🇩🇪', score: '2,290,150', medal: '🥉', avatar: '🎯' },
+          { rank: 2, name: 'Guest-7MUET', flag: '🇱🇦', score: '2,385,400', medal: '🥈', avatar: '/assets/awards/award_lvl_23.webp' },
+          { rank: 1, name: 'RW', flag: '🇬🇧', score: '2,490,680', medal: '🥇', avatar: '/assets/awards/award_lvl_25.webp' },
+          { rank: 3, name: 'Guest-JFTL4', flag: '🇩🇪', score: '2,290,150', medal: '🥉', avatar: '/assets/awards/award_lvl_24.webp' },
         ];
 
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
             {/* Mathematical Coordinate Blueprint Overlay & Luminous Glass Underlay */}
             <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/18 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute top-1/3 -right-20 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 left-0 w-80 h-80 bg-indigo-600/18 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute top-1/3 -right-20 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 left-0 w-80 h-80 scifi-ambient-purple rounded-full pointer-events-none" />
 
             {/* Sticky Modern Frosted Glass Header */}
             <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
@@ -8680,7 +10616,11 @@ import './index.css';
                     <div className="relative mb-2 flex flex-col items-center">
                       <span className="text-xl -mb-1 filter drop-shadow">🥈</span>
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-200/90 via-sky-300/80 to-slate-400/90 border-2 border-white/90 p-0.5 shadow-[0_0_16px_rgba(56,189,248,0.5),inset_0_1px_0_rgba(255,255,255,0.4)] backdrop-blur-md flex items-center justify-center text-xl relative">
-                        <span>{podium[0].avatar}</span>
+                        {podium[0].avatar.startsWith('/') ? (
+                          <img src={podium[0].avatar} alt="" className="w-9 h-9 object-contain drop-shadow-md" />
+                        ) : (
+                          <span>{podium[0].avatar}</span>
+                        )}
                         <span className="absolute -bottom-1 -right-1 text-xs">{podium[0].flag}</span>
                       </div>
                       <span className="text-[11px] font-black text-white truncate max-w-[80px] mt-1.5 block drop-shadow-sm">
@@ -8704,7 +10644,11 @@ import './index.css';
                     <div className="relative mb-2 flex flex-col items-center">
                       <span className="text-2xl -mb-1 animate-bounce filter drop-shadow-[0_0_10px_rgba(251,191,36,0.9)]">👑</span>
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-yellow-100 p-0.5 shadow-[0_0_24px_rgba(251,191,36,0.7),inset_0_1.5px_0_rgba(255,255,255,0.5)] backdrop-blur-md flex items-center justify-center text-2xl relative">
-                        <span>{podium[1].avatar}</span>
+                        {podium[1].avatar.startsWith('/') ? (
+                          <img src={podium[1].avatar} alt="" className="w-11 h-11 object-contain drop-shadow-md" />
+                        ) : (
+                          <span>{podium[1].avatar}</span>
+                        )}
                         <span className="absolute -bottom-1 -right-1 text-sm">{podium[1].flag}</span>
                       </div>
                       <span className="text-xs font-black text-amber-200 truncate max-w-[90px] mt-1.5 block drop-shadow-sm">
@@ -8728,7 +10672,11 @@ import './index.css';
                     <div className="relative mb-2 flex flex-col items-center">
                       <span className="text-xl -mb-1 filter drop-shadow">🥉</span>
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600/90 via-orange-500/80 to-amber-700/90 border-2 border-orange-200/90 p-0.5 shadow-[0_0_16px_rgba(249,115,22,0.45),inset_0_1px_0_rgba(255,255,255,0.35)] backdrop-blur-md flex items-center justify-center text-xl relative">
-                        <span>{podium[2].avatar}</span>
+                        {podium[2].avatar.startsWith('/') ? (
+                          <img src={podium[2].avatar} alt="" className="w-9 h-9 object-contain drop-shadow-md" />
+                        ) : (
+                          <span>{podium[2].avatar}</span>
+                        )}
                         <span className="absolute -bottom-1 -right-1 text-xs">{podium[2].flag}</span>
                       </div>
                       <span className="text-[11px] font-black text-white truncate max-w-[80px] mt-1.5 block drop-shadow-sm">
@@ -8743,7 +10691,6 @@ import './index.css';
                       <div className="w-7 h-7 rounded-full bg-gradient-to-b from-orange-300 to-amber-600 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
                         3
                       </div>
-                      <span className="text-[9px] font-mono font-black text-amber-300 tracking-wider">BRONZE</span>
                     </div>
                   </div>
                 </div>
@@ -8829,68 +10776,290 @@ import './index.css';
       };
 
       // ========================================================
-      // 14. PUZZLE HISTORY / SAVED (Pixel Perfect to Screen 14)
-      // ==========================================
+      // 14. PUZZLE HISTORY & SAVED ARCHIVES (Modern Sci-Fi Glassmorphism Edition)
+      // ========================================================
       const renderHistoryScreen = () => {
-        const historyItems = [
-          { eq: '(12 + 8) × 2 - 6 = 34', time: 'Today • Level 3', solved: true },
-          { eq: '(15 - 7) × 3 = 24', time: 'Today • Level 2', solved: true },
-          { eq: '8 + 6 ÷ 2 = 11', time: 'Yesterday • Level 1', solved: true },
-          { eq: '(9 × 4) ÷ 2 = 38', time: 'Yesterday • Level 3', solved: true },
-          { eq: '(14 - 7) × 2 = 14', time: 'Dec 12 • Level 2', solved: false },
-          { eq: '12 + 3 ÷ 5 = 9', time: 'Dec 11 • Level 1', solved: false },
-        ];
+        // Filter based on active tab
+        const isSavedTab = historyTab === 'saved';
+        const displayList = isSavedTab
+          ? puzzleRecords.filter(item => savedPuzzleIds.includes(item.id))
+          : puzzleRecords;
+
+        const totalSolved = puzzleRecords.filter(r => r.solved).length;
+        const savedCount = savedPuzzleIds.length;
+        const accuracyRate = puzzleRecords.length > 0 
+          ? Math.round((totalSolved / puzzleRecords.length) * 100) 
+          : 100;
+
+        const handleCopyEquation = (eq) => {
+          sound.click();
+          if (navigator?.clipboard?.writeText) {
+            navigator.clipboard.writeText(eq).catch(() => {});
+          }
+          setRewardToast(`📋 Formula copied: ${eq}`);
+        };
 
         return (
-          <div className="flex-1 flex flex-col bg-slate-50 select-none overflow-hidden">
-            <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3">
-              <StatusBar />
+          <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlays */}
+            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute top-1/3 -right-20 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 left-0 w-80 h-80 scifi-ambient-purple rounded-full pointer-events-none" />
 
-              {/* Header */}
-              <div className="flex items-center gap-3 pt-1 pb-3">
-                <button onClick={() => navigateTo('home')} className="p-1 text-slate-600 hover:text-slate-900">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => { sound.click(); navigateTo('home'); }} 
+                  aria-label="Back to home" 
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center text-xl font-bold shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  ‹
                 </button>
-                <h1 className="text-base font-black font-display text-slate-900">Puzzle History</h1>
-              </div>
 
-              {/* Filter Tabs */}
-              <div className="flex items-center gap-2 mb-4">
-                {['History', 'Saved'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setHistoryTab(tab.toLowerCase())}
-                    className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                      historyTab === tab.toLowerCase()
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+                <div className="flex flex-col items-center">
+                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase flex items-center gap-1.5">
+                    <span className="drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">📜</span>
+                    <span>Puzzle Archives</span>
+                  </h1>
+                  <span className="text-[10px] font-mono text-cyan-300/80 tracking-widest uppercase">
+                    {isSavedTab ? 'Saved Quantum Formulas' : 'Neural Mission Logs'}
+                  </span>
+                </div>
 
-              {/* History Items */}
-              <div className="space-y-2.5 pb-4">
-                {historyItems.map((item, i) => (
-                  <div key={i} className="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-mono text-xs">
-                        🔢
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold font-mono text-slate-800 block">{item.eq}</span>
-                        <span className="text-[10px] text-slate-400">{item.time}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {item.solved && <span className="text-emerald-500 font-bold text-xs">✓</span>}
-                      <span className="text-slate-300 text-sm">🔖</span>
-                    </div>
+                <button 
+                  onClick={() => {
+                    sound.click();
+                    if (!isSavedTab) {
+                      if (puzzleRecords.length > 0) {
+                        handleClearHistory();
+                      } else {
+                        setRewardToast('No history records to clear');
+                      }
+                    } else {
+                      setRewardToast(`🔖 Total Saved Formulas: ${savedCount}`);
+                    }
+                  }} 
+                  aria-label={!isSavedTab ? "Clear History" : "Saved Count"} 
+                  title={!isSavedTab ? "Clear History Logs" : "Saved Formulas Info"}
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center text-xs font-bold shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  {!isSavedTab ? (
+                    <svg className="w-4 h-4 text-rose-300/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </header>
+
+            {/* Scrollable Arena Body */}
+            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-3.5 relative z-10">
+
+              {/* Glassmorphic Metrics Telemetry Card */}
+              <div className="relative rounded-2xl p-3 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_12px_30px_rgba(2,10,32,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl overflow-hidden">
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+                <div className="relative z-10 grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-white/[0.06] border border-white/10 rounded-xl p-2 backdrop-blur-md shadow-inner">
+                    <span className="text-[9px] uppercase font-bold text-cyan-300 block tracking-wider">Total Solved</span>
+                    <span className="text-base font-black font-mono text-white block mt-0.5">
+                      {totalSolved}
+                    </span>
                   </div>
-                ))}
+                  <div className="bg-white/[0.06] border border-white/10 rounded-xl p-2 backdrop-blur-md shadow-inner">
+                    <span className="text-[9px] uppercase font-bold text-amber-300 block tracking-wider">Saved</span>
+                    <span className="text-base font-black font-mono text-amber-300 block mt-0.5">
+                      {savedCount}
+                    </span>
+                  </div>
+                  <div className="bg-white/[0.06] border border-white/10 rounded-xl p-2 backdrop-blur-md shadow-inner">
+                    <span className="text-[9px] uppercase font-bold text-emerald-300 block tracking-wider">Accuracy</span>
+                    <span className="text-base font-black font-mono text-emerald-300 block mt-0.5">
+                      {accuracyRate}%
+                    </span>
+                  </div>
+                </div>
               </div>
+
+              {/* Segmented Dual Glass Tab Switcher */}
+              <div className="p-1.5 rounded-2xl bg-white/[0.08] border border-white/15 backdrop-blur-xl flex items-center gap-1.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.3)]">
+                <button
+                  onClick={() => { sound.click(); setHistoryTab('history'); }}
+                  className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    !isSavedTab
+                      ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white shadow-[0_4px_16px_rgba(6,182,212,0.45),inset_0_1px_1px_rgba(255,255,255,0.4)]'
+                      : 'text-cyan-200/70 hover:text-white hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>History</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                    !isSavedTab ? 'bg-white/20 text-white' : 'bg-white/10 text-cyan-300'
+                  }`}>
+                    {puzzleRecords.length}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => { sound.click(); setHistoryTab('saved'); }}
+                  className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    isSavedTab
+                      ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-[0_4px_16px_rgba(245,158,11,0.45),inset_0_1px_1px_rgba(255,255,255,0.4)]'
+                      : 'text-cyan-200/70 hover:text-white hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill={isSavedTab ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  <span>Saved</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                    isSavedTab ? 'bg-white/20 text-white' : 'bg-white/10 text-amber-300'
+                  }`}>
+                    {savedCount}
+                  </span>
+                </button>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-2.5">
+                {displayList.map((item) => {
+                  const isSaved = savedPuzzleIds.includes(item.id);
+                  return (
+                    <div 
+                      key={item.id} 
+                      onClick={() => handleCopyEquation(item.eq)}
+                      className={`relative rounded-2xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d2258]/65 to-[#06143c]/80 border transition-all backdrop-blur-xl group overflow-hidden shadow-[0_8px_24px_rgba(2,10,32,0.4),inset_0_1px_0_rgba(255,255,255,0.18)] cursor-pointer hover:scale-[1.01] active:scale-[0.99] ${
+                        isSaved 
+                          ? 'border-amber-400/45 hover:border-amber-400/75 shadow-[0_8px_24px_rgba(245,158,11,0.12)]' 
+                          : 'border-white/15 hover:border-cyan-400/40'
+                      }`}
+                    >
+                      <div className="absolute inset-0 math-blueprint-grid opacity-10 pointer-events-none" />
+                      
+                      {/* Luminous Ambient Glow for Saved Items */}
+                      {isSaved && (
+                        <div className="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none" />
+                      )}
+
+                      <div className="relative z-10 flex items-center justify-between gap-3">
+                        {/* Left: 3D Holographic Math Tile Icon */}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center font-mono font-black text-sm shrink-0 shadow-lg backdrop-blur-md ${
+                            isSaved
+                              ? 'bg-gradient-to-br from-amber-500/30 to-amber-700/50 border-amber-400/60 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.35)]'
+                              : 'bg-gradient-to-br from-cyan-500/25 to-blue-600/40 border-cyan-400/40 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                          }`}>
+                            <span className="text-base select-none">🔢</span>
+                          </div>
+
+                          {/* Equation and Metadata */}
+                          <div className="min-w-0">
+                            <div className="text-xs sm:text-sm font-black font-mono tracking-wide text-white drop-shadow-[0_0_8px_rgba(56,189,248,0.45)] truncate">
+                              {item.eq}
+                            </div>
+                            <div className="flex items-center flex-wrap gap-1.5 mt-1">
+                              <span className="text-[10px] text-slate-300 font-medium flex items-center gap-1">
+                                <svg className="w-3 h-3 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {item.time}
+                              </span>
+                              <span className="text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-950/80 border border-cyan-400/30 text-cyan-300">
+                                Level {item.level}
+                              </span>
+                              {item.mode && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-md font-sans font-bold bg-white/[0.08] text-slate-300 border border-white/10 uppercase">
+                                  {item.mode}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {item.inProgress && (
+                            <div 
+                              title="In Progress"
+                              className="px-2 py-1 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[11px] font-bold font-mono flex items-center gap-1"
+                            >
+                              <span>⚡</span>
+                            </div>
+                          )}
+
+                          {/* Interactive Bookmark / Save Toggle */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSavePuzzle(item.id);
+                            }}
+                            aria-label={isSaved ? "Remove from saved" : "Save formula"}
+                            title={isSaved ? "Saved in Archives (Tap to Unpin)" : "Pin to Saved Archives"}
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md ${
+                              isSaved
+                                ? 'bg-gradient-to-b from-amber-500/30 to-amber-700/50 border border-amber-400/60 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.45)] hover:scale-110 active:scale-95'
+                                : 'bg-white/[0.08] border border-white/20 text-slate-400 hover:text-amber-300 hover:border-amber-400/40 hover:bg-white/[0.14] hover:scale-105 active:scale-95'
+                            }`}
+                          >
+                            <svg 
+                              className="w-4 h-4 transition-transform group-hover:scale-110" 
+                              fill={isSaved ? "currentColor" : "none"} 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Empty State when no items in tab */}
+              {displayList.length === 0 && (
+                <div className="py-12 px-6 rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/15 backdrop-blur-xl text-center shadow-[0_12px_32px_rgba(2,10,32,0.4)] flex flex-col items-center">
+                  <div className={`w-16 h-16 rounded-3xl border flex items-center justify-center text-3xl mb-4 shadow-xl ${
+                    isSavedTab
+                      ? 'bg-gradient-to-b from-amber-500/20 to-orange-600/20 border-amber-400/30 text-amber-300 shadow-[0_0_24px_rgba(245,158,11,0.25)]'
+                      : 'bg-gradient-to-b from-cyan-500/20 to-blue-600/20 border-cyan-400/30 text-cyan-300 shadow-[0_0_24px_rgba(6,182,212,0.25)]'
+                  }`}>
+                    {isSavedTab ? '🔖' : '📜'}
+                  </div>
+                  <h3 className="text-base font-extrabold text-white font-display mb-1">
+                    {isSavedTab ? 'No Saved Formulas Yet' : 'No History Logs Recorded'}
+                  </h3>
+                  <p className="text-xs text-slate-300 max-w-xs leading-relaxed mb-6">
+                    {isSavedTab 
+                      ? 'Tap the bookmark ribbon on any equation from the History tab to pin it here for rapid study.'
+                      : 'Complete math puzzles in Campaign or Daily Challenge to record equations in your neural archives.'}
+                  </p>
+                  {isSavedTab ? (
+                    <button
+                      onClick={() => { sound.click(); setHistoryTab('history'); }}
+                      className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs shadow-[0_4px_16px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    >
+                      Browse History Archives
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => { sound.click(); navigateTo('game'); }}
+                      className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs shadow-[0_4px_16px_rgba(6,182,212,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    >
+                      Launch A Puzzle Mission
+                    </button>
+                  )}
+                </div>
+              )}
+
             </div>
           </div>
         );
@@ -8910,35 +11079,37 @@ import './index.css';
           const trimmed = nameInput.trim();
           if (trimmed) {
             setPlayerName(trimmed);
-            try { localStorage.setItem('newromath_player_name', trimmed); } catch (err) {}
+            try { GameStorage.setItem('newromath_player_name', trimmed); } catch (err) {}
           }
           setIsEditingName(false);
         };
 
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
-            {/* Mathematical Coordinate Blueprint Overlay */}
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlay */}
             <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 right-0 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
 
-            {/* Sticky Modern Sci-Fi Header */}
-            <header className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 px-4 py-3 shrink-0">
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <button 
                   onClick={() => { sound.click(); navigateTo('home'); }} 
                   aria-label="Back to home" 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-xl font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
-                  ‹
+                  <ChevronLeft className="w-5 h-5 text-cyan-200" />
                 </button>
-                <div />
+                <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase">
+                  Player Profile
+                </h1>
                 <button 
                   onClick={() => { sound.click(); navigateTo('settings'); }} 
                   aria-label="Settings" 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
-                  ⚙
+                  <SettingsIcon className="w-4 h-4 text-cyan-200" />
                 </button>
               </div>
             </header>
@@ -8946,288 +11117,339 @@ import './index.css';
             {/* Scrollable Profile Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-4 relative z-10">
 
-              {/* 1. Cyber-Cadet Hero Identity Card */}
-              <div className="relative rounded-3xl p-4 bg-gradient-to-b from-[#102761]/95 via-[#0b1c48]/90 to-[#071330]/95 border border-cyan-400/40 shadow-[0_12px_32px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.15)] overflow-hidden">
+              {/* Glassmorphic Player Identity Card */}
+              <div className="relative rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl overflow-hidden">
                 <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
 
-                {/* Top: Avatar & Name Details */}
-                <div className="relative z-10 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {/* 3D Cadet Avatar with Golden Level Badge */}
-                    <div className="relative shrink-0">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#193d88] via-[#0e255a] to-[#081538] border-2 border-cyan-400/80 p-1 shadow-[0_0_16px_rgba(0,229,255,0.4)] flex items-center justify-center overflow-hidden">
-                        <img 
-                          src="/assets/icon_robot_3d.png" 
-                          alt="Cadet Avatar" 
-                          className="w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]" 
-                        />
-                      </div>
-                      <div className="absolute -bottom-2 -right-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black text-[9px] px-1.5 py-0.5 rounded-full border border-white/70 shadow-sm leading-none">
-                        LV.{activePlayerLevel}
-                      </div>
+                {/* Avatar & Player Details */}
+                <div className="relative z-10 flex items-center gap-3.5">
+                  <div className="relative shrink-0">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-[#18366d] to-[#0e2147] border-2 border-cyan-300/60 p-1.5 shadow-[0_0_16px_rgba(0,229,255,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md flex items-center justify-center overflow-hidden">
+                      <img 
+                        src={equippedAvatar || "/assets/icon_robot_3d.webp"} 
+                        alt="Player Avatar" 
+                        className="w-full h-full object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.65)] transition-transform duration-300 hover:scale-110" 
+                      />
                     </div>
-
-                    {/* Name, Status & Country */}
-                    <div className="min-w-0">
-                      {isEditingName ? (
-                        <form onSubmit={handleSaveName} className="flex items-center gap-1.5 mb-1">
-                          <input 
-                            type="text" 
-                            value={nameInput} 
-                            onChange={(e) => setNameInput(e.target.value)} 
-                            maxLength={15}
-                            autoFocus
-                            className="bg-[#06142e] border border-cyan-400 rounded-lg px-2 py-0.5 text-xs text-white font-bold outline-none w-28"
-                          />
-                          <button type="submit" className="bg-cyan-500 hover:bg-cyan-400 text-black text-[10px] font-black px-2 py-1 rounded-md">
-                            OK
-                          </button>
-                        </form>
-                      ) : (
-                        <div className="flex items-center gap-1.5">
-                          <h2 className="text-base sm:text-lg font-black font-display text-white tracking-wide truncate">
-                            {playerName}
-                          </h2>
-                          <button 
-                            onClick={() => { setNameInput(playerName); setIsEditingName(true); }}
-                            aria-label="Edit Name"
-                            className="w-5 h-5 rounded-md bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-[10px] flex items-center justify-center hover:bg-cyan-800 transition-colors cursor-pointer"
-                          >
-                            ✎
-                          </button>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[10px] bg-gradient-to-r from-blue-600/80 to-indigo-600/80 border border-blue-400/40 text-cyan-200 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
-                          {activePlayerLevel >= 25 ? 'GRAND MASTER' : activePlayerLevel >= 10 ? 'CYBER VETERAN' : 'PRO CADET'}
-                        </span>
-                        <span className="text-xs text-slate-300">🇺🇸 USA</span>
-                      </div>
+                    <div className="absolute -bottom-1.5 -right-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black text-[9px] px-1.5 py-0.5 rounded-full border border-white/70 shadow-sm leading-none">
+                      LV.{activePlayerLevel}
                     </div>
                   </div>
 
-                  {/* Right: 3D Trophy Crest */}
-                  <div className="relative shrink-0 flex flex-col items-center justify-center px-2 py-1.5 rounded-2xl bg-gradient-to-b from-[#1b4394]/60 to-[#0c204d]/80 border border-cyan-400/40 shadow-inner">
-                    <img src="/assets/icon_trophy_3d.png" alt="Trophy" className="w-8 h-8 object-contain drop-shadow-[0_2px_6px_rgba(255,200,0,0.5)]" />
-                    <span className="text-[8.5px] font-black text-amber-300 uppercase tracking-tight mt-0.5">
-                      RANK #{playerRank}
-                    </span>
+                  <div className="min-w-0 flex-1">
+                    {isEditingName ? (
+                      <form onSubmit={handleSaveName} className="flex items-center gap-1.5 mb-1">
+                        <input 
+                          type="text" 
+                          value={nameInput} 
+                          onChange={(e) => setNameInput(e.target.value)} 
+                          maxLength={15}
+                          autoFocus
+                          className="bg-black/40 border border-cyan-300/60 rounded-xl px-2.5 py-1 text-xs text-white font-bold outline-none w-32 shadow-inner"
+                        />
+                        <button type="submit" className="bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-xl shadow-xs cursor-pointer">
+                          OK
+                        </button>
+                      </form>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-base sm:text-lg font-black font-display text-white tracking-wide truncate">
+                          {playerName}
+                        </h2>
+                        <button 
+                          onClick={() => { setNameInput(playerName); setIsEditingName(true); }}
+                          aria-label="Edit Name"
+                          className="w-6 h-6 rounded-lg bg-white/[0.1] border border-white/20 text-cyan-300 flex items-center justify-center hover:bg-white/[0.2] transition-colors cursor-pointer"
+                        >
+                          <Pencil className="w-3 h-3 text-cyan-300" />
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[10px] bg-cyan-400/15 border border-cyan-300/30 text-cyan-200 px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider backdrop-blur-sm">
+                        {activePlayerLevel >= 25 ? 'GRANDMASTER' : activePlayerLevel >= 15 ? 'MASTER CADET' : activePlayerLevel >= 5 ? 'CHALLENGER' : 'ROOKIE CADET'}
+                      </span>
+                      {(() => {
+                        const activeAward = LEVEL_AWARDS.find(a => a.icon === equippedAvatar);
+                        return activeAward ? (
+                          <span className="text-[9.5px] bg-amber-400/20 border border-amber-300/40 text-amber-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm">
+                            <Sparkles className="w-2.5 h-2.5 text-amber-300" />
+                            <span className="truncate max-w-[120px]">{activeAward.title}</span>
+                          </span>
+                        ) : null;
+                      })()}
+                    </div>
                   </div>
                 </div>
 
-                {/* Middle: Dynamic Neon XP Progress */}
-                <div className="relative z-10 mt-4 bg-[#06122d]/80 border border-cyan-500/25 rounded-2xl p-2.5">
+                {/* Level Progress */}
+                <div className="relative z-10 mt-3.5 bg-white/[0.06] border border-white/10 rounded-2xl p-2.5 backdrop-blur-md">
                   <div className="flex items-center justify-between text-[10.5px] font-bold mb-1.5">
-                    <span className="text-cyan-300 flex items-center gap-1">
-                      <span>⚡</span> Level {activePlayerLevel} Progress
+                    <span className="text-cyan-300 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
+                      <span>Level {activePlayerLevel} Progress</span>
                     </span>
                     <span className="text-sky-200 font-mono">
-                      {playerXp} / {xpNeeded} XP ({Math.min(100, Math.round((playerXp / xpNeeded) * 100))}%)
+                      {playerXp} / {xpNeeded} XP
                     </span>
                   </div>
-                  <div className="w-full h-3 rounded-full bg-[#030919] border border-cyan-500/40 overflow-hidden p-0.5 shadow-inner">
+                  <div className="w-full h-2.5 rounded-full bg-black/40 border border-white/15 overflow-hidden p-0.5 shadow-inner">
                     <div 
-                      className="h-full rounded-full bg-gradient-to-r from-[#00d2ff] via-[#2f75f7] to-[#a855f7] shadow-[0_0_12px_rgba(0,210,255,0.8)] transition-all duration-500"
-                      style={{ width: `${Math.min(100, Math.max(12, Math.round((playerXp / xpNeeded) * 100)))}%` }}
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 shadow-[0_0_10px_rgba(0,229,255,0.7)] transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.max(10, Math.round((playerXp / xpNeeded) * 100)))}%` }}
                     />
                   </div>
                 </div>
 
-                {/* Bottom: 4 Treasury & Metric Pillars */}
-                <div className="relative z-10 grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-cyan-400/15">
-                  {/* 1. Coins */}
-                  <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#09183d]/90 border border-amber-400/30 shadow-xs">
-                    <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-4 h-4 object-contain mb-0.5" />
+                {/* Treasury & Metric Pillars */}
+                <div className="relative z-10 grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-white/10">
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain mb-0.5" />
                     <span className="text-xs font-black text-amber-300 font-display leading-none">
                       {coins.toLocaleString()}
                     </span>
-                    <span className="text-[8.5px] text-amber-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                    <span className="text-[8px] text-amber-200/70 font-semibold uppercase tracking-tight mt-0.5">
                       Coins
                     </span>
                   </div>
 
-                  {/* 2. Gems */}
-                  <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#09183d]/90 border border-cyan-400/30 shadow-xs">
-                    <img src="/assets/icon_gem_3d_clean.png" alt="Gems" className="w-4 h-4 object-contain mb-0.5" />
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain mb-0.5" />
                     <span className="text-xs font-black text-cyan-300 font-display leading-none">
                       {gems}
                     </span>
-                    <span className="text-[8.5px] text-cyan-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                    <span className="text-[8px] text-cyan-200/70 font-semibold uppercase tracking-tight mt-0.5">
                       Diamonds
                     </span>
                   </div>
 
-                  {/* 3. Streak */}
-                  <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#09183d]/90 border border-orange-400/30 shadow-xs">
-                    <span className="text-sm mb-0.5">🔥</span>
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <Flame className="w-4 h-4 text-orange-400 mb-0.5 shrink-0" />
                     <span className="text-xs font-black text-orange-300 font-display leading-none">
                       {streakDays}d
                     </span>
-                    <span className="text-[8.5px] text-orange-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                    <span className="text-[8px] text-orange-200/70 font-semibold uppercase tracking-tight mt-0.5">
                       Streak
                     </span>
                   </div>
 
-                  {/* 4. Level */}
-                  <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#09183d]/90 border border-purple-400/30 shadow-xs">
-                    <img src="/assets/icon_star_3d.png" alt="Level" className="w-4 h-4 object-contain mb-0.5" />
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <img src="/assets/icon_star_3d.webp" alt="Level" className="w-4 h-4 object-contain mb-0.5" />
                     <span className="text-xs font-black text-purple-300 font-display leading-none">
                       Lv.{activePlayerLevel}
                     </span>
-                    <span className="text-[8.5px] text-purple-200/70 font-semibold uppercase tracking-tight mt-0.5">
-                      Tier
+                    <span className="text-[8px] text-purple-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                      Level
                     </span>
                   </div>
                 </div>
               </div>
 
+              {/* Glassmorphic Gameplay Statistics Card */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                    Gameplay Statistics
+                  </h3>
+                </div>
 
-
-              {/* 4. Cyber Performance Statistics Cards */}
-              {/* Card 1: Battle Records */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-sm">
-                      🎮
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] text-slate-300 uppercase font-bold">Puzzles Solved</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     </div>
-                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
-                      Battle Performance
-                    </h3>
+                    <span className="text-base font-black text-emerald-300 font-display block">{gamesWon}</span>
                   </div>
-                  <span className="text-[10px] text-cyan-300/70 font-mono">
-                    Win Rate: <strong className="text-emerald-300">{winRate}%</strong>
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-[#050f26]/80 border border-cyan-400/20 rounded-xl p-2 text-center">
-                    <span className="text-[9px] text-sky-300/80 uppercase font-bold block">Puzzles Played</span>
-                    <span className="text-sm font-black text-white font-display block mt-0.5">{gamesStarted}</span>
-                  </div>
-                  <div className="bg-[#050f26]/80 border border-cyan-400/20 rounded-xl p-2 text-center">
-                    <span className="text-[9px] text-emerald-300/80 uppercase font-bold block">Puzzles Solved</span>
-                    <span className="text-sm font-black text-emerald-300 font-display block mt-0.5">{gamesWon}</span>
-                  </div>
-                  <div className="bg-[#050f26]/80 border border-cyan-400/20 rounded-xl p-2 text-center">
-                    <span className="text-[9px] text-amber-300/80 uppercase font-bold block">Total Score</span>
-                    <span className="text-sm font-black text-amber-300 font-display block mt-0.5">{totalScore}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 2: Speed & Precision */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-sm">
-                      ⏱️
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] text-slate-300 uppercase font-bold">Puzzles Played</span>
+                      <Gamepad2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                     </div>
-                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
-                      Speed & Precision
-                    </h3>
+                    <span className="text-base font-black text-white font-display block">{gamesStarted}</span>
                   </div>
-                  <span className="text-[10px] text-sky-300/70 font-mono">Real-time Metrics</span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-[#050f26]/80 border border-cyan-400/20 rounded-xl p-2 flex items-center justify-between">
-                    <span className="text-[10px] text-sky-200 font-semibold">Best Time</span>
-                    <span className="text-xs font-black text-emerald-300 font-mono">00:38s</span>
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] text-slate-300 uppercase font-bold">Win Accuracy</span>
+                      <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    </div>
+                    <span className="text-base font-black text-cyan-300 font-display block">{winRate}%</span>
                   </div>
-                  <div className="bg-[#050f26]/80 border border-cyan-400/20 rounded-xl p-2 flex items-center justify-between">
-                    <span className="text-[10px] text-sky-200 font-semibold">Average Pace</span>
-                    <span className="text-xs font-black text-cyan-300 font-mono">01:14s</span>
-                  </div>
-                  <div className="bg-[#050f26]/80 border border-cyan-400/20 rounded-xl p-2 flex items-center justify-between">
-                    <span className="text-[10px] text-sky-200 font-semibold">Max Streak</span>
-                    <span className="text-xs font-black text-orange-300 font-mono">{streakDays} Days</span>
-                  </div>
-                  <div className="bg-[#050f26]/80 border border-cyan-400/20 rounded-xl p-2 flex items-center justify-between">
-                    <span className="text-[10px] text-sky-200 font-semibold">Hints Consumed</span>
-                    <span className="text-xs font-black text-purple-300 font-mono">3 Hints</span>
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] text-slate-300 uppercase font-bold">Total Score</span>
+                      <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    </div>
+                    <span className="text-base font-black text-amber-300 font-display block">{totalScore}</span>
                   </div>
                 </div>
               </div>
 
-              {/* 5. Honors & Badges Showcase */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🏅</span>
-                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
-                      Cadet Honors & Badges
-                    </h3>
-                  </div>
-                  <span className="text-[10px] text-amber-300 font-bold">3 / 4 Unlocked</span>
-                </div>
+              {/* Glassmorphic Level Awards & 3D Trophies Gallery Card */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="absolute inset-0 math-blueprint-grid opacity-10 pointer-events-none" />
 
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Badge 1 */}
-                  <div className="flex items-center gap-2.5 p-2 rounded-xl bg-[#06142e]/90 border border-amber-400/40 shadow-xs">
-                    <img src="/assets/icon_brain_3d.png" alt="Badge" className="w-7 h-7 object-contain shrink-0 drop-shadow" />
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-black text-white truncate">Logic Prodigy</div>
-                      <div className="text-[9px] text-amber-300 font-semibold">Master Level 3</div>
+                {/* Header: Title + Progress counter */}
+                <div className="relative z-10 flex items-center justify-between mb-2 px-1">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                        3D Level Awards & Avatars
+                      </h3>
+                      <span className="text-[9px] bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-0.5 rounded-full font-black">
+                        {completedLevelsCount}/25 UNLOCKED
+                      </span>
                     </div>
-                  </div>
-
-                  {/* Badge 2 */}
-                  <div className="flex items-center gap-2.5 p-2 rounded-xl bg-[#06142e]/90 border border-cyan-400/40 shadow-xs">
-                    <img src="/assets/icon_stopwatch_3d.png" alt="Badge" className="w-7 h-7 object-contain shrink-0 drop-shadow" />
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-black text-white truncate">Speed Demon</div>
-                      <div className="text-[9px] text-cyan-300 font-semibold">Under 45s</div>
-                    </div>
-                  </div>
-
-                  {/* Badge 3 */}
-                  <div className="flex items-center gap-2.5 p-2 rounded-xl bg-[#06142e]/90 border border-purple-400/40 shadow-xs">
-                    <img src="/assets/icon_gem_3d_clean.png" alt="Badge" className="w-7 h-7 object-contain shrink-0 drop-shadow" />
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-black text-white truncate">Gem Tycoon</div>
-                      <div className="text-[9px] text-purple-300 font-semibold">25+ Diamonds</div>
-                    </div>
-                  </div>
-
-                  {/* Badge 4 (Locked) */}
-                  <div className="flex items-center gap-2.5 p-2 rounded-xl bg-[#06142e]/50 border border-slate-600/30 opacity-70">
-                    <div className="w-7 h-7 rounded-lg bg-slate-800/80 flex items-center justify-center text-sm shrink-0">
-                      🔒
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-black text-slate-300 truncate">Grand Master</div>
-                      <div className="text-[9px] text-slate-400 font-semibold">Reach Level 25</div>
-                    </div>
+                    <p className="text-[10px] text-slate-300 mt-0.5">
+                      Solved levels unlock modern 3D avatars. Tap any unlocked avatar to equip.
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              {/* 6. Action Controls */}
-              <div className="flex items-center gap-3 pt-2">
-                <button 
-                  onClick={() => {
-                    sound.tap();
-                    if (confirm('Reset your profile game statistics?')) {
-                      sound.click();
-                      alert('Statistics have been reset.');
-                    }
-                  }}
-                  className="flex-1 py-2.5 px-3 rounded-xl border border-rose-500/40 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 active:scale-95 text-xs font-bold font-display uppercase tracking-wider transition-all text-center shadow-[0_0_10px_rgba(244,63,94,0.2)] cursor-pointer"
-                >
-                  Reset Stats
-                </button>
-                <button 
-                  onClick={() => {
-                    sound.click();
-                    confetti({ particleCount: 40, spread: 60 });
-                    alert(`Profile of ${playerName} ready to share!`);
-                  }}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black font-display text-xs uppercase tracking-wider active:scale-95 transition-all text-center shadow-[0_4px_16px_rgba(0,210,255,0.4)] cursor-pointer"
-                >
-                  Share Profile
-                </button>
+                {/* Filter Tabs: All, Unlocked, Locked */}
+                <div className="relative z-10 flex items-center gap-1.5 p-1 bg-black/30 border border-white/10 rounded-2xl mb-3.5 backdrop-blur-md">
+                  <button
+                    onClick={() => { sound.click(); setAwardFilter('all'); }}
+                    className={`flex-1 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer ${
+                      awardFilter === 'all'
+                        ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    All (25)
+                  </button>
+                  <button
+                    onClick={() => { sound.click(); setAwardFilter('unlocked'); }}
+                    className={`flex-1 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer ${
+                      awardFilter === 'unlocked'
+                        ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    Unlocked ({completedLevelsCount})
+                  </button>
+                  <button
+                    onClick={() => { sound.click(); setAwardFilter('locked'); }}
+                    className={`flex-1 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer ${
+                      awardFilter === 'locked'
+                        ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    Locked ({25 - completedLevelsCount})
+                  </button>
+                </div>
+
+                {/* Grid of Award Badges */}
+                <div className="relative z-10 grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                  {LEVEL_AWARDS.filter(award => {
+                    const isUnlocked = award.level < unlockedLevelMax;
+                    if (awardFilter === 'unlocked') return isUnlocked;
+                    if (awardFilter === 'locked') return !isUnlocked;
+                    return true;
+                  }).map(award => {
+                    const isUnlocked = award.level < unlockedLevelMax;
+                    const isEquipped = (equippedAvatar === award.icon);
+
+                    return (
+                      <div
+                        key={award.level}
+                        onClick={() => {
+                          if (isUnlocked) {
+                            sound.pop();
+                            setEquippedAvatar(award.icon);
+                            try { GameStorage.setItem('newromath_player_avatar', award.icon); } catch (e) {}
+                            setRewardToast(`🎉 Equipped Level ${award.level} "${award.title}" avatar!`);
+                          } else {
+                            sound.click();
+                            setRewardToast(`🔒 Locked: Solve Level ${award.level} to unlock "${award.title}"!`);
+                          }
+                        }}
+                        className={`relative group rounded-2xl p-2 flex flex-col items-center text-center transition-all cursor-pointer active:scale-95 border ${
+                          isEquipped
+                            ? 'bg-gradient-to-b from-cyan-950/70 via-[#0d2a63]/70 to-[#07163c]/80 border-cyan-300 shadow-[0_0_16px_rgba(0,229,255,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] ring-2 ring-cyan-400/60'
+                            : isUnlocked
+                              ? 'bg-gradient-to-b from-white/[0.12] to-white/[0.04] border-white/20 hover:bg-white/[0.18] hover:border-cyan-300/60 shadow-[0_4px_12px_rgba(0,0,0,0.25)]'
+                              : 'bg-black/40 border-white/10 opacity-75 hover:opacity-90'
+                        }`}
+                      >
+                        {/* Level Header Pill */}
+                        <div className="w-full flex items-center justify-between mb-1 px-0.5">
+                          <span className={`text-[8.5px] font-black font-display tracking-tight px-1.5 py-0.2 rounded-md ${
+                            isEquipped
+                              ? 'bg-cyan-400 text-slate-950 shadow-xs'
+                              : isUnlocked
+                                ? 'bg-white/20 text-white'
+                                : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            LV.{award.level}
+                          </span>
+                          {isEquipped ? (
+                            <span className="text-[7px] font-black uppercase tracking-tight bg-cyan-400 text-slate-950 px-1 py-0.2 rounded font-display shadow-xs">
+                              ACTIVE
+                            </span>
+                          ) : isUnlocked ? (
+                            <span className="text-[7.5px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-400/40 px-1 py-0.2 rounded">
+                              EQUIP
+                            </span>
+                          ) : (
+                            <Lock className="w-3 h-3 text-amber-300/80" />
+                          )}
+                        </div>
+
+                        {/* 3D Skeuomorphic Gaming Medallion */}
+                        <div className={`relative w-12 h-12 my-1 rounded-full overflow-hidden flex items-center justify-center p-1.5 shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1.5px_2px_rgba(255,255,255,0.25),inset_0_-2px_3px_rgba(0,0,0,0.45)] border ${
+                          isEquipped 
+                            ? 'border-cyan-300 ring-2 ring-cyan-400/60 bg-gradient-to-b from-[#18366d] to-[#0e2147]' 
+                            : isUnlocked 
+                              ? 'border-white/25 bg-gradient-to-b from-[#163366]/90 via-[#0f244d]/90 to-[#081533]/95 hover:border-cyan-300/60' 
+                              : 'border-white/10 bg-black/60 opacity-60'
+                        }`}>
+                          {/* Skeuomorphic Glass Specular Sheen */}
+                          <div className="absolute inset-x-0.5 top-0 h-[45%] bg-gradient-to-b from-white/35 via-white/5 to-transparent rounded-t-full pointer-events-none z-20" />
+
+                          {isUnlocked ? (
+                            <img
+                              src={award.icon}
+                              alt={award.title}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.7)] relative z-10 transition-transform duration-200 group-hover:scale-115"
+                            />
+                          ) : (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                              <img
+                                src={award.icon}
+                                alt={award.title}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-full h-full object-contain grayscale opacity-25 filter blur-[0.4px] brightness-50"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center z-30">
+                                <div className="w-6 h-6 rounded-full bg-black/80 border border-white/30 flex items-center justify-center shadow-lg">
+                                  <Lock className="w-3.5 h-3.5 text-amber-300" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Award Title */}
+                        <span className={`text-[10px] font-black font-display tracking-tight leading-tight line-clamp-1 mt-1 w-full text-center ${
+                          isEquipped ? 'text-cyan-200' : isUnlocked ? 'text-white' : 'text-slate-400'
+                        }`}>
+                          {award.title}
+                        </span>
+
+                        {/* Short Status */}
+                        <span className="text-[8px] text-slate-400 line-clamp-1 mt-0.5 w-full text-center">
+                          {isEquipped ? 'Equipped Avatar' : isUnlocked ? 'Tap to equip' : `Solve Lvl ${award.level}`}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
             </div>
@@ -9239,18 +11461,28 @@ import './index.css';
       // 16. SETTINGS SCREEN (Cyber Arcade Modernization)
       // ========================================================
       const renderSettingsScreen = () => {
-        const CyberToggle = ({ checked, onChange, label, sublabel, icon }) => (
+        const GlassToggle = ({ checked, onChange, label, sublabel, icon: IconComponent, iconColor = 'text-cyan-300', iconBg = 'bg-cyan-500/20 border-cyan-400/40' }) => (
           <div 
             onClick={() => {
               sound.click();
               onChange(!checked);
             }}
-            className="flex items-center justify-between p-3 rounded-xl bg-[#071536]/80 border border-cyan-400/20 hover:border-cyan-400/40 hover:bg-[#091b42]/80 transition-all cursor-pointer group active:scale-[0.99]"
+            className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 hover:border-white/30 hover:bg-white/[0.1] transition-all cursor-pointer group active:scale-[0.99] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
           >
             <div className="flex items-center gap-3 min-w-0 pr-3">
-              {icon && (
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 border transition-all ${checked ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 shadow-[0_0_8px_rgba(0,229,255,0.25)]' : 'bg-slate-800/40 border-slate-700/50 text-slate-400'}`}>
-                  {icon}
+              {IconComponent && (
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border transition-all ${
+                  checked 
+                    ? `${iconBg} ${iconColor} shadow-[0_0_8px_rgba(0,229,255,0.25)]` 
+                    : 'bg-white/[0.06] border-white/15 text-slate-400'
+                }`}>
+                  {React.isValidElement(IconComponent) ? (
+                    IconComponent
+                  ) : typeof IconComponent === 'function' ? (
+                    <IconComponent className="w-4 h-4" />
+                  ) : (
+                    IconComponent
+                  )}
                 </div>
               )}
               <div className="min-w-0">
@@ -9265,49 +11497,50 @@ import './index.css';
               </div>
             </div>
             
-            {/* Cyber Neon Pill Toggle */}
+            {/* Samsung One UI Style Switch Toggle */}
             <div 
-              className={`relative shrink-0 w-12 h-6 rounded-full transition-all duration-300 border p-0.5 ${
+              className={`relative shrink-0 w-11 h-6 rounded-full transition-all duration-300 border p-0.5 ${
                 checked 
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 border-cyan-300 shadow-[0_0_12px_rgba(0,229,255,0.6)]' 
-                  : 'bg-[#030919] border-slate-700/80 shadow-inner'
+                  ? 'bg-gradient-to-r from-cyan-400 to-blue-600 border-cyan-300 shadow-[0_0_12px_rgba(0,229,255,0.6)]' 
+                  : 'bg-black/40 border-white/20 shadow-inner'
               }`}
             >
               <div 
-                className={`w-5 h-5 rounded-full bg-white transition-all duration-300 shadow-md flex items-center justify-center text-[9px] font-black ${
+                className={`w-5 h-5 rounded-full bg-white transition-all duration-300 shadow-md flex items-center justify-center ${
                   checked 
-                    ? 'translate-x-6 text-cyan-600' 
+                    ? 'translate-x-5 text-cyan-600' 
                     : 'translate-x-0 text-slate-400'
                 }`}
               >
-                {checked ? '✓' : ''}
+                {checked && <Check className="w-3 h-3 text-cyan-600 stroke-[3]" />}
               </div>
             </div>
           </div>
         );
 
-        const CyberNavRow = ({ label, sublabel, icon, onClick, badge }) => (
+        const GlassNavRow = ({ label, sublabel, icon: IconComponent, iconColor = 'text-cyan-300', iconBg = 'bg-cyan-500/20 border-cyan-400/40', onClick }) => (
           <button 
             onClick={() => {
               sound.click();
               onClick();
             }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-[#071536]/80 border border-cyan-400/20 hover:border-cyan-400/40 hover:bg-[#0c2254]/80 transition-all cursor-pointer group active:scale-[0.99] text-left"
+            className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 hover:border-white/30 hover:bg-white/[0.1] transition-all cursor-pointer group active:scale-[0.99] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] text-left"
           >
             <div className="flex items-center gap-3 min-w-0 pr-3">
-              {icon && (
-                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center text-sm shrink-0 text-cyan-300 group-hover:scale-105 group-hover:border-cyan-400/60 transition-transform">
-                  {icon}
+              {IconComponent && (
+                <div className={`w-8 h-8 rounded-xl ${iconBg} border flex items-center justify-center shrink-0 ${iconColor} group-hover:scale-105 transition-transform`}>
+                  {React.isValidElement(IconComponent) ? (
+                    IconComponent
+                  ) : typeof IconComponent === 'function' ? (
+                    <IconComponent className="w-4 h-4" />
+                  ) : (
+                    IconComponent
+                  )}
                 </div>
               )}
               <div className="min-w-0">
-                <div className="text-xs sm:text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                <div className="text-xs sm:text-sm font-bold text-white tracking-wide">
                   {label}
-                  {badge && (
-                    <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40">
-                      {badge}
-                    </span>
-                  )}
                 </div>
                 {sublabel && (
                   <div className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
@@ -9316,35 +11549,32 @@ import './index.css';
                 )}
               </div>
             </div>
-            <div className="w-7 h-7 rounded-lg bg-[#040e24] border border-cyan-400/30 flex items-center justify-center text-cyan-400 text-sm font-black group-hover:translate-x-0.5 group-hover:text-cyan-200 transition-all">
-              ›
+            <div className="w-7 h-7 rounded-xl bg-white/[0.08] border border-white/20 flex items-center justify-center text-cyan-300 group-hover:translate-x-0.5 transition-all">
+              <ChevronRight className="w-4 h-4 text-cyan-300" />
             </div>
           </button>
         );
 
         return (
           <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
-            {/* Mathematical Coordinate Blueprint Overlay */}
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlay */}
             <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 right-0 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
 
-            {/* Sticky Modern Sci-Fi Header */}
-            <header className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 px-4 py-3 shrink-0 backdrop-blur-md">
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <button 
                   onClick={() => { sound.click(); navigateTo('profile'); }} 
                   aria-label="Back to profile" 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-xl font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
-                  ‹
+                  <ChevronLeft className="w-5 h-5 text-cyan-200" />
                 </button>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">⚙️</span>
-                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-300 via-sky-100 to-white bg-clip-text text-transparent uppercase">
-                    System Settings
-                  </h1>
-                </div>
+                <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase">
+                  Settings
+                </h1>
                 <div className="w-10 h-10" />
               </div>
             </header>
@@ -9352,44 +11582,16 @@ import './index.css';
             {/* Scrollable Settings Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-4 relative z-10">
 
-              {/* 1. Treasury & Store Quick Jump Banner */}
-              <div className="relative rounded-2xl p-3.5 bg-gradient-to-r from-[#122e6b] via-[#0d2354] to-[#071536] border border-amber-400/40 shadow-[0_8px_24px_rgba(0,0,0,0.5)] overflow-hidden flex items-center justify-between">
-                <div className="absolute right-0 top-0 bottom-0 w-36 bg-gradient-to-l from-amber-500/15 to-transparent pointer-events-none" />
-                <div className="relative z-10 flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400/30 to-amber-600/30 border border-amber-400/60 flex items-center justify-center shadow-[0_0_12px_rgba(251,191,36,0.3)]">
-                    <img src="/assets/icon_gem_3d_clean.png" alt="Treasury" className="w-7 h-7 object-contain" />
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-black font-display text-white tracking-wide flex items-center gap-1.5">
-                      <span>CYBER TREASURY & STORE</span>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 bg-amber-400 text-slate-950 rounded-full">HOT</span>
-                    </div>
-                    <div className="text-[10px] text-amber-200/80 font-medium mt-0.5">
-                      Unlock avatars, power-ups & daily rewards
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => { sound.click(); navigateTo('achievements'); }}
-                  className="relative z-10 shrink-0 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-xs shadow-[0_0_10px_rgba(251,191,36,0.5)] active:scale-95 transition-all cursor-pointer"
-                >
-                  VISIT ›
-                </button>
-              </div>
-
-              {/* 2. Audio & Haptics Group */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg relative overflow-hidden">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-sm text-cyan-300">
-                    🔊
-                  </div>
+              {/* 1. Audio & Sensory (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
                   <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
                     Audio & Sensory Feedback
                   </h3>
                 </div>
 
                 <div className="space-y-2">
-                  <CyberToggle 
+                  <GlassToggle 
                     checked={soundEnabled}
                     onChange={(val) => {
                       setSoundEnabled(val);
@@ -9400,71 +11602,80 @@ import './index.css';
                     }}
                     label="Sound Effects"
                     sublabel="Tactile arcade clicks, fanfare & audio fx"
-                    icon="🎵"
+                    icon={<Volume2 className="w-4 h-4" />}
+                    iconColor="text-cyan-300"
+                    iconBg="bg-cyan-500/20 border-cyan-400/40"
                   />
-                  <CyberToggle 
+                  <GlassToggle 
                     checked={hapticsEnabled}
                     onChange={(val) => setHapticsEnabled(val)}
                     label="Haptic Feedback"
                     sublabel="Vibration pulses on keypad presses and matches"
-                    icon="📳"
+                    icon={<Vibrate className="w-4 h-4" />}
+                    iconColor="text-teal-300"
+                    iconBg="bg-teal-500/20 border-teal-400/40"
                   />
-                  <CyberToggle 
+                  <GlassToggle 
                     checked={timerEnabled}
                     onChange={(val) => setTimerEnabled(val)}
                     label="Game Timer"
                     sublabel="Display countdown clock during puzzle battles"
-                    icon="⏱️"
+                    icon={<Timer className="w-4 h-4" />}
+                    iconColor="text-sky-300"
+                    iconBg="bg-sky-500/20 border-sky-400/40"
                   />
                 </div>
               </div>
 
-              {/* 3. Gameplay Preferences Group */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg relative overflow-hidden">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-sm text-indigo-300">
-                    🎮
-                  </div>
+              {/* 2. Gameplay & Display (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
                   <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
                     Gameplay & Display
                   </h3>
                 </div>
 
                 <div className="space-y-2">
-                  <CyberToggle 
+                  <GlassToggle 
                     checked={explanationEnabled}
                     onChange={(val) => setExplanationEnabled(val)}
                     label="Show Explanation Button"
                     sublabel="Reveal step-by-step mathematical reasoning"
-                    icon="💡"
+                    icon={<Lightbulb className="w-4 h-4" />}
+                    iconColor="text-amber-300"
+                    iconBg="bg-amber-500/20 border-amber-400/40"
                   />
-                  <CyberToggle 
+                  <GlassToggle 
                     checked={autoSubmitEnabled}
                     onChange={(val) => setAutoSubmitEnabled(val)}
                     label="Auto Submit Answer"
-                    sublabel="Automatically verify once the equation is filled"
-                    icon="⚡"
+                    sublabel="Automatically verify once equation is filled"
+                    icon={<Zap className="w-4 h-4" />}
+                    iconColor="text-emerald-300"
+                    iconBg="bg-emerald-500/20 border-emerald-400/40"
                   />
-                  <CyberToggle 
+                  <GlassToggle 
                     checked={largeFontEnabled}
                     onChange={(val) => setLargeFontEnabled(val)}
-                    label="Large Cyber Font"
+                    label="Large Math Font"
                     sublabel="High-legibility enlarged arithmetic tiles"
-                    icon="🔍"
+                    icon={<Type className="w-4 h-4" />}
+                    iconColor="text-indigo-300"
+                    iconBg="bg-indigo-500/20 border-indigo-400/40"
                   />
 
                   {/* Division Symbol Notation Selector */}
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-[#071536]/80 border border-cyan-400/20">
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-sm text-indigo-300">
-                        ➗
+                      <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300 shrink-0">
+                        <Divide className="w-4 h-4" />
                       </div>
                       <div>
                         <div className="text-xs sm:text-sm font-bold text-white tracking-wide">Division Notation</div>
                         <div className="text-[10px] text-slate-400 font-medium">Choose arithmetic operator symbol</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-[#030919] p-1 rounded-xl border border-cyan-500/30 shadow-inner">
+                    <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/15 shadow-inner">
                       {['÷', '/'].map(sym => (
                         <button
                           key={sym}
@@ -9486,72 +11697,145 @@ import './index.css';
                 </div>
               </div>
 
-              {/* 4. Support & Community Group */}
-              <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#0e245a]/90 to-[#071536]/95 border border-cyan-400/30 shadow-lg relative overflow-hidden">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-sm text-emerald-300">
-                    🌐
-                  </div>
+              {/* 3. Information & Help (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
                   <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
-                    Community & Assistance
+                    Rules & Help
                   </h3>
                 </div>
 
                 <div className="space-y-2">
-                  <CyberNavRow 
+                  <GlassNavRow 
                     label="How to Play" 
                     sublabel="Master rules, tips & tactical formulas"
-                    icon="📖"
+                    icon={<BookOpen className="w-4 h-4" />}
+                    iconColor="text-emerald-300"
+                    iconBg="bg-emerald-500/20 border-emerald-400/40"
                     onClick={() => navigateTo('help')}
-                  />
-                  <CyberNavRow 
-                    label="Send Feedback" 
-                    sublabel="Report bugs or suggest new game features"
-                    icon="💬"
-                    onClick={() => navigateTo('help')}
-                  />
-                  <CyberNavRow 
-                    label="Become a Volunteer Translator" 
-                    sublabel="Help localize NewroMath for global players"
-                    icon="🌍"
-                    onClick={() => navigateTo('help')}
-                  />
-                  <CyberNavRow 
-                    label="Redeem Promo Code" 
-                    sublabel="Enter secret voucher for bonus coins & gems"
-                    icon="🎁"
-                    badge="VOUCHER"
-                    onClick={() => {
-                      const code = prompt('Enter your Cyber Promo Code:');
-                      if (code && code.trim()) {
-                        sound.fanfare();
-                        alert(`Promo code "${code.trim().toUpperCase()}" submitted! Rewards will synchronize shortly.`);
-                      }
-                    }}
                   />
                 </div>
               </div>
 
-              {/* 5. System & Legal Footer */}
+              {/* 4. Google Play Membership & Billing (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-amber-200">
+                    Membership & Billing
+                  </h3>
+                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                    purchaseState.isProUser 
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40' 
+                      : 'bg-white/10 text-slate-300 border-white/20'
+                  }`}>
+                    {purchaseState.isProUser ? 'PRO VIP MEMBER' : 'FREE PLAYER'}
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {!purchaseState.isProUser ? (
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        navigateTo('rewards');
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-600/20 border border-amber-400/40 hover:border-amber-300 transition-all cursor-pointer text-left active:scale-[0.99] backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
+                          <Crown className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs sm:text-sm font-bold text-amber-200">Upgrade to PRO VIP Pass</div>
+                          <div className="text-[10px] text-amber-300/70 font-medium">Remove ads & get bonus coins + gems</div>
+                        </div>
+                      </div>
+                      <span className="text-xs font-black text-amber-300 px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-400/40">
+                        {purchaseService.getPrice('newromath_pro_noads')}
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0">
+                        <Crown className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-xs sm:text-sm font-bold text-emerald-200">PRO VIP Lifetime Active</div>
+                        <div className="text-[10px] text-emerald-300/70 font-medium">Enjoy unlimited ad-free math puzzles</div>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={async () => {
+                      sound.click();
+                      setRewardToast("🔄 Contacting Google Play to restore purchases...");
+                      const res = await purchaseService.restorePurchases();
+                      if (res.success) {
+                        sound.correct();
+                        setRewardToast(res.message);
+                      } else {
+                        sound.wrong();
+                        setRewardToast(res.message);
+                      }
+                    }}
+                    className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 hover:bg-white/[0.1] hover:border-white/30 transition-all cursor-pointer text-left active:scale-[0.99] backdrop-blur-md"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center shrink-0 text-cyan-300">
+                        <RotateCcw className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-xs sm:text-sm font-bold text-white">Restore Google Play Purchases</div>
+                        <div className="text-[10px] text-slate-400 font-medium">Recover previous purchases on this account</div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-cyan-300" />
+                  </button>
+                </div>
+              </div>
+
+              {/* 5. Campaign Progress Reset (Start Newly) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.10] via-[#1a1236]/60 to-[#100c24]/75 border border-rose-500/30 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.15)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-rose-300">
+                    Campaign Management
+                  </h3>
+                </div>
+
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => {
+                      sound.click();
+                      if (window.confirm("Start fresh from Level 1? Your campaign level and unlocked stages will be reset to Level 1.")) {
+                        resetAllProgress();
+                      }
+                    }}
+                    className="w-full flex items-center justify-between p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all cursor-pointer text-rose-300 font-bold text-xs sm:text-sm active:scale-[0.99] backdrop-blur-md shadow-inner"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shrink-0">
+                        <Trash2 className="w-4 h-4" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-xs sm:text-sm font-bold text-rose-200">Start Fresh from Level 1</div>
+                        <div className="text-[10px] text-rose-300/70 font-medium">Reset campaign progress to beginning</div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-black text-rose-300 px-2.5 py-1 rounded-lg bg-rose-950/70 border border-rose-500/40 shrink-0">
+                      Level 1
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Footer */}
               <div className="pt-2 pb-8 text-center space-y-2">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#050f26]/90 border border-cyan-500/30 text-[10.5px] text-cyan-300 font-mono shadow-inner">
-                  <span className="text-cyan-400">⚡</span> NEWROMATH CYBER ENGINE v1.0.0
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/15 text-[10.5px] text-cyan-300 font-mono shadow-inner backdrop-blur-md">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-300" /> NewroMath v1.0.0
                 </div>
-                <div className="flex items-center justify-center gap-3 text-xs font-semibold text-sky-400/80 pt-1">
-                  <button onClick={() => navigateTo('help')} className="hover:text-cyan-300 transition-colors cursor-pointer">
-                    Privacy Policy
-                  </button>
-                  <span className="text-slate-600">•</span>
-                  <button onClick={() => navigateTo('help')} className="hover:text-cyan-300 transition-colors cursor-pointer">
-                    Terms of Service
-                  </button>
-                  <span className="text-slate-600">•</span>
-                  <button onClick={() => navigateTo('help')} className="hover:text-cyan-300 transition-colors cursor-pointer">
-                    Support
-                  </button>
-                </div>
-                <div className="text-[10px] text-slate-500 font-mono">
-                  © 2026 NewroMath Systems. All rights reserved.
+                <div className="text-[10px] text-slate-400 font-mono">
+                  Think • Solve • Grow
                 </div>
               </div>
 
@@ -9561,46 +11845,550 @@ import './index.css';
       };
 
       // ========================================================
-      // 17. HELP & SUPPORT (Pixel Perfect to Screen 17)
+      // 17. HELP & SUPPORT (Glassmorphic Arcade Style)
       // ==========================================
       const renderHelpScreen = () => {
-        const supportItems = [
-          { label: 'FAQs', desc: 'Find answers to common questions', icon: '❓' },
-          { label: 'Contact Us', desc: 'Get in touch with our team', icon: '✉️' },
-          { label: 'Report a Problem', desc: 'Help us improve the app', icon: '⚠️' },
-          { label: 'Feedback', desc: 'Share your thoughts', icon: '💬' },
+        const faqItems = [
+          {
+            q: "How do I earn 3 Stars on each level?",
+            a: "To achieve a 3-Star mastery rating: (1) Complete the puzzle without making incorrect equation submissions, (2) Finish before the bonus time milestone, and (3) Use at most 1 hint. Flawless solves award bonus Coins and XP!",
+            icon: "⭐"
+          },
+          {
+            q: "How do intersecting equations work?",
+            a: "In Cross-Math, whenever a horizontal row and a vertical column cross, they share the exact same number tile. That tile must simultaneously balance both the row equation and the column equation.",
+            icon: "📐"
+          },
+          {
+            q: "What order of operations is used?",
+            a: "Equations evaluate in straightforward sequential order from left-to-right and top-to-bottom as written on the grid, matching classic arcade crossword math rules.",
+            icon: "🔢"
+          },
+          {
+            q: "What happens if I miss a Daily Challenge?",
+            a: "You can protect your streak using a Streak Saver shield or unlock missed calendar dates from the calendar view using your earned Coins to keep your Monthly Trophy progress on track.",
+            icon: "📅"
+          },
+          {
+            q: "Can I play NewroMath completely offline?",
+            a: "Yes! All campaign levels and offline practice modes are fully playable without an internet connection. Your stars, coins, and records will automatically sync to cloud leaderboards once reconnected.",
+            icon: "📶"
+          },
+          {
+            q: "How does the Weekly League Leaderboard work?",
+            a: "Earn XP across Campaign, Daily Challenges, and Speed Runs to rise through Bronze, Silver, Gold, Diamond, and Master Leagues. The top 10 solvers promote every Sunday midnight with rare reward chests!",
+            icon: "🏆"
+          }
         ];
 
-        return (
-          <div className="flex-1 flex flex-col bg-slate-50 select-none overflow-hidden">
-            <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3">
-              <StatusBar />
+        const tabs = [
+          { id: 'all', label: 'All Topics', icon: '🌐' },
+          { id: 'rules', label: 'How to Play', icon: '📐' },
+          { id: 'tools', label: 'Tools & Boosters', icon: '⚡' },
+          { id: 'faqs', label: 'FAQs', icon: '❓' },
+          { id: 'tips', label: 'Pro Tips', icon: '🧠' },
+          { id: 'contact', label: 'Contact & Feedback', icon: '✉️' },
+        ];
 
-              {/* Header */}
-              <div className="flex items-center gap-3 pt-1 pb-3">
-                <button onClick={() => navigateTo('settings')} className="p-1 text-slate-600 hover:text-slate-900">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
+        const handleSendFeedback = () => {
+          if (!feedbackText.trim()) {
+            sound.wrong();
+            return;
+          }
+          sound.correct();
+          const ticketNumber = `NM-${Math.floor(10000 + Math.random() * 90000)}`;
+          setFeedbackTicketId(ticketNumber);
+          setFeedbackSent(true);
+        };
+
+        const handleCopyEmail = () => {
+          sound.click();
+          if (navigator && navigator.clipboard) {
+            navigator.clipboard.writeText('support@newromath.com');
+          }
+          setCopiedSupportEmail(true);
+          setTimeout(() => setCopiedSupportEmail(false), 2500);
+        };
+
+        return (
+          <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlay */}
+            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 right-0 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => { 
+                    sound.click(); 
+                    if (navigationStackRef.current.length > 1) {
+                      navigateBack();
+                    } else {
+                      navigateTo('settings');
+                    }
+                  }} 
+                  aria-label="Back" 
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center text-xl font-bold shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  ‹
                 </button>
-                <h1 className="text-base font-black font-display text-slate-900">Help & Support</h1>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🛟</span>
+                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase">
+                    Help & Support
+                  </h1>
+                </div>
+                <div className="w-10 h-10" />
               </div>
 
-              {/* Cards List */}
-              <div className="space-y-2.5 my-2 pb-4">
-                {supportItems.map((item, i) => (
-                  <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer hover:border-slate-300 active:scale-[0.99] transition-all">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
-                        {item.icon}
-                      </div>
-                      <div>
-                        <h3 className="text-xs font-bold text-slate-900">{item.label}</h3>
-                        <p className="text-[10px] text-slate-400">{item.desc}</p>
-                      </div>
-                    </div>
-                    <span className="text-slate-400 text-sm">›</span>
-                  </div>
+              {/* Horizontal Category Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-2.5 pb-0.5">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      sound.click();
+                      setHelpTab(tab.id);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
+                      helpTab === tab.id
+                        ? 'bg-gradient-to-r from-cyan-400 to-blue-600 text-white shadow-[0_0_14px_rgba(0,229,255,0.5)] border border-cyan-300'
+                        : 'bg-white/[0.08] text-slate-300 border border-white/10 hover:bg-white/[0.15] hover:text-white'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
                 ))}
               </div>
+            </header>
+
+            {/* Scrollable Help Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-4 relative z-10">
+
+              {/* SECTION 1: HOW TO PLAY CROSS-MATH */}
+              {(helpTab === 'all' || helpTab === 'rules') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-sm text-cyan-300">
+                      📐
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      How to Play Cross-Math
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                    Your goal is to complete the intersecting mathematical crossword by placing numbers from your dock into the blank grid tiles so that every row and column forms a valid equation.
+                  </p>
+
+                  {/* Visual Intersecting Equation Demonstration */}
+                  <div className="p-3.5 rounded-2xl bg-black/40 border border-white/15 shadow-inner mb-3">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-cyan-300 mb-2.5 flex items-center justify-between">
+                      <span>Interactive Grid Preview</span>
+                      <span className="text-emerald-400">Balanced ✓</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {/* Horizontal Equation */}
+                      <div className="flex items-center gap-1.5 text-xs font-mono">
+                        <span className="text-slate-400 text-[10px] w-10 shrink-0">ROW:</span>
+                        <div className="w-7 h-7 rounded-lg bg-white/[0.12] border border-white/20 flex items-center justify-center font-bold text-white shadow-sm">
+                          7
+                        </div>
+                        <span className="text-cyan-300 font-bold">+</span>
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 border border-cyan-200 flex items-center justify-center font-black text-white shadow-[0_0_8px_rgba(0,229,255,0.6)] animate-pulse">
+                          5
+                        </div>
+                        <span className="text-slate-400 font-bold">=</span>
+                        <div className="w-8 h-7 rounded-lg bg-white/[0.18] border border-white/25 flex items-center justify-center font-bold text-emerald-300">
+                          12
+                        </div>
+                      </div>
+
+                      {/* Vertical Equation Intersection Indicator */}
+                      <div className="flex items-center gap-1.5 text-xs font-mono">
+                        <span className="text-slate-400 text-[10px] w-10 shrink-0">COL:</span>
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 border border-cyan-200 flex items-center justify-center font-black text-white shadow-[0_0_8px_rgba(0,229,255,0.6)]">
+                          5
+                        </div>
+                        <span className="text-cyan-300 font-bold">×</span>
+                        <div className="w-7 h-7 rounded-lg bg-white/[0.12] border border-white/20 flex items-center justify-center font-bold text-white shadow-sm">
+                          3
+                        </div>
+                        <span className="text-slate-400 font-bold">=</span>
+                        <div className="w-8 h-7 rounded-lg bg-white/[0.18] border border-white/25 flex items-center justify-center font-bold text-emerald-300">
+                          15
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 text-[10.5px] text-slate-300 bg-white/[0.06] p-2 rounded-xl border border-white/10">
+                      💡 The shared tile <span className="font-bold text-cyan-300">[ 5 ]</span> satisfies both equations simultaneously (<span className="text-white">7 + 5 = 12</span> and <span className="text-white">5 × 3 = 15</span>).
+                    </div>
+                  </div>
+
+                  {/* Core Mechanics Steps */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        1
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">Select & Place</div>
+                        <div className="text-[10px] text-slate-300">Tap a number in your dock, then tap the target blank cell to place it.</div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        2
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">Recall Anytime</div>
+                        <div className="text-[10px] text-slate-300">Tap any placed number to instantly send it back to your dock with zero penalty.</div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        3
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">Color Verification</div>
+                        <div className="text-[10px] text-slate-300">Balanced equations glow emerald green, while mismatched totals highlight red.</div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        4
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">3-Star Mastery</div>
+                        <div className="text-[10px] text-slate-300">Clear all equations within the target time to unlock the full 3-star rating!</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 2: IN-GAME TOOLS & BOOSTERS */}
+              {(helpTab === 'all' || helpTab === 'tools') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-sm text-amber-300">
+                      ⚡
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      In-Game Tools & Boosters
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-lg shrink-0">
+                        💡
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Smart Hint</span>
+                          <span className="text-[9px] font-mono text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/30">50 Coins</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Instantly reveals and secures the correct number in the most bottlenecked blank cell.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-lg shrink-0">
+                        🔄
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Undo / Board Reset</span>
+                          <span className="text-[9px] font-mono text-cyan-300 bg-cyan-400/10 px-2 py-0.5 rounded-md border border-cyan-400/30">Free</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Recalls all placed tiles back into your tray so you can test alternative strategies without penalty.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-purple-400/20 border border-purple-400/40 flex items-center justify-center text-lg shrink-0">
+                        🎲
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Tray Shuffle</span>
+                          <span className="text-[9px] font-mono text-purple-300 bg-purple-400/10 px-2 py-0.5 rounded-md border border-purple-400/30">Free</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Reorders your dock numbers to stimulate pattern recognition and spot complementary factor pairs.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-rose-400/20 border border-rose-400/40 flex items-center justify-center text-lg shrink-0">
+                        🛡️
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Streak Saver</span>
+                          <span className="text-[9px] font-mono text-rose-300 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/30">Protective</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Preserves your daily streak multiplier if you ever miss a calendar puzzle day.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 3: PRO SOLVING STRATEGIES */}
+              {(helpTab === 'all' || helpTab === 'tips') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-sm text-purple-300">
+                      🧠
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      Pro Math Strategies
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10">
+                      <div className="flex items-center gap-2 font-bold text-xs text-cyan-300 mb-1">
+                        <span>🎯</span> 1. Anchor Multiplication & Division First
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Multiplication and division equations have far fewer valid factor pairs than addition or subtraction. For example, in single digits <span className="font-mono text-white">_ × _ = 28</span> can only be 4 and 7. Solving these first anchors key grid intersections!
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10">
+                      <div className="flex items-center gap-2 font-bold text-xs text-cyan-300 mb-1">
+                        <span>🧩</span> 2. Intersection Cross-Checking
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        When two candidate numbers could fit horizontally, inspect the vertical column equation. Only one candidate will satisfy both directions simultaneously.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10">
+                      <div className="flex items-center gap-2 font-bold text-xs text-cyan-300 mb-1">
+                        <span>⚖️</span> 3. Parity Elimination (Even vs. Odd)
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Use parity rules: <span className="font-mono text-white">Even + Odd = Odd</span> and <span className="font-mono text-white">Even + Even = Even</span>. If the target total is even and your known tile is odd, the missing tile MUST be odd. This cuts possibilities in half!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 4: FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION) */}
+              {(helpTab === 'all' || helpTab === 'faqs') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-sm text-blue-300">
+                      ❓
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      Frequently Asked Questions
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2">
+                    {faqItems.map((item, index) => {
+                      const isOpen = openFaqIndex === index;
+                      return (
+                        <div
+                          key={index}
+                          className="rounded-2xl border border-white/15 bg-white/[0.06] overflow-hidden transition-all backdrop-blur-md"
+                        >
+                          <button
+                            onClick={() => {
+                              sound.click();
+                              setOpenFaqIndex(isOpen ? -1 : index);
+                            }}
+                            className="w-full p-3 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.08] transition-all"
+                          >
+                            <div className="flex items-center gap-2.5 pr-2">
+                              <span className="text-sm shrink-0">{item.icon}</span>
+                              <span className="text-xs font-bold text-white tracking-wide">
+                                {item.q}
+                              </span>
+                            </div>
+                            <div className={`w-6 h-6 rounded-lg bg-white/[0.1] border border-white/20 flex items-center justify-center text-xs font-bold text-cyan-300 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                              ▾
+                            </div>
+                          </button>
+                          {isOpen && (
+                            <div className="px-3 pb-3 pt-1 text-[11px] text-slate-300 leading-relaxed border-t border-white/10 bg-black/20">
+                              {item.a}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 5: DIRECT CONTACT & IN-APP FEEDBACK */}
+              {(helpTab === 'all' || helpTab === 'contact') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-sm text-emerald-300">
+                      ✉️
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      Contact & In-App Feedback
+                    </h3>
+                  </div>
+
+                  {/* Direct Email Pill */}
+                  <div className="p-3 rounded-2xl bg-black/40 border border-white/15 flex items-center justify-between mb-3.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-sm text-cyan-300 shrink-0">
+                        📬
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[10px] text-slate-400 font-mono uppercase">Official Developer Support</div>
+                        <div className="text-xs font-mono font-bold text-cyan-200 truncate">support@newromath.com</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleCopyEmail}
+                      className="px-3 py-1.5 rounded-xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/20 text-xs font-bold text-white transition-all active:scale-95 cursor-pointer shrink-0"
+                    >
+                      {copiedSupportEmail ? '✓ Copied' : 'Copy'}
+                    </button>
+                  </div>
+
+                  {feedbackSent ? (
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-400/40 text-center space-y-2">
+                      <div className="w-12 h-12 mx-auto rounded-full bg-emerald-400/20 border border-emerald-400/50 flex items-center justify-center text-2xl">
+                        ✓
+                      </div>
+                      <h4 className="text-sm font-black font-display text-white">Message Received!</h4>
+                      <p className="text-xs text-slate-300">
+                        Thank you for helping us polish NewroMath. We review submissions within 24-48 hours.
+                      </p>
+                      <div className="inline-block px-3 py-1 rounded-full bg-black/40 border border-white/20 text-[10px] font-mono text-cyan-300">
+                        Ticket Ref: {feedbackTicketId}
+                      </div>
+                      <div className="pt-2">
+                        <button
+                          onClick={() => {
+                            sound.click();
+                            setFeedbackSent(false);
+                            setFeedbackText('');
+                          }}
+                          className="px-4 py-2 rounded-xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/20 text-xs font-bold text-white transition-all cursor-pointer"
+                        >
+                          Send Another Message
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Category Selection */}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-300 mb-1.5">Select Category</div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {['Bug Report', 'Feature Idea', 'Math Question', 'Account'].map((cat) => (
+                            <button
+                              key={cat}
+                              onClick={() => {
+                                sound.click();
+                                setFeedbackCategory(cat);
+                              }}
+                              className={`py-1.5 px-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer border ${
+                                feedbackCategory === cat
+                                  ? 'bg-gradient-to-r from-cyan-400 to-blue-600 text-white border-cyan-300 shadow-[0_0_10px_rgba(0,229,255,0.4)]'
+                                  : 'bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/[0.1]'
+                              }`}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Optional Email */}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-300 mb-1">Your Email (Optional for reply)</div>
+                        <input
+                          type="email"
+                          value={feedbackEmail}
+                          onChange={(e) => setFeedbackEmail(e.target.value)}
+                          placeholder="e.g. player@example.com"
+                          className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+                        />
+                      </div>
+
+                      {/* Message Textarea */}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-300 mb-1">Description</div>
+                        <textarea
+                          rows={3}
+                          value={feedbackText}
+                          onChange={(e) => setFeedbackText(e.target.value)}
+                          placeholder="Please provide details about your issue or idea..."
+                          className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 resize-none"
+                        />
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        onClick={handleSendFeedback}
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-blue-600 text-white font-bold text-xs tracking-wider uppercase shadow-[0_0_16px_rgba(0,229,255,0.5)] border border-cyan-300 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <span>🚀</span>
+                        <span>Submit Feedback</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SECTION 6: SYSTEM SPECIFICATIONS & LEGAL */}
+              <div className="pt-2 pb-8 text-center space-y-2">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/15 text-[10.5px] text-cyan-300 font-mono shadow-inner backdrop-blur-md">
+                  <span>⚡</span> NewroMath v1.0.0 • Engine Build 2026
+                </div>
+                <div className="flex items-center justify-center gap-4 text-[10.5px] text-slate-400 font-medium">
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      alert("Privacy Policy:\nNewroMath does not collect, sell, or transmit any personal identification data. All gameplay records, coins, and campaign achievements are stored safely on your device and private profile.");
+                    }}
+                    className="hover:text-cyan-300 transition-colors cursor-pointer"
+                  >
+                    Privacy Policy
+                  </button>
+                  <span>•</span>
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      alert("Terms of Service:\nNewroMath is provided free for cognitive mathematics practice, education, and entertainment. Play fair and enjoy sharpening your math mind!");
+                    }}
+                    className="hover:text-cyan-300 transition-colors cursor-pointer"
+                  >
+                    Terms of Service
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
         );
@@ -9663,6 +12451,17 @@ import './index.css';
           setRewardToast("🎁 Claimed Daily Gift: +350 Coins & +5 Gems!");
         };
 
+        const handleClaimDailyGiftWithAd = () => {
+          if (dailyGiftClaimed) return;
+          handleWatchAd('both', 0, 'Daily Double Gift Sponsor', {
+            coinAmount: 700,
+            gemAmount: 15,
+            onComplete: () => {
+              setDailyGiftClaimed(true);
+            }
+          });
+        };
+
         const handleExchangeCoins = (costGems, coinsToGet) => {
           sound.click();
           if (gems >= costGems) {
@@ -9677,16 +12476,67 @@ import './index.css';
           }
         };
 
-        const handleBuyPackage = (type, amount, price) => {
+        const handleBuyPackage = async (sku) => {
           sound.click();
-          sound.correct();
-          confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
-          if (type === 'coins') {
-            setCoins(c => c + amount);
-            setRewardToast(`🎉 Purchase Successful: +${amount.toLocaleString()} Coins!`);
+          const pack = IAP_CATALOG.find(p => p.id === sku);
+          if (!pack) return;
+
+          setRewardToast(`⏳ Connecting to Google Play Store...`);
+          const res = await purchaseService.purchaseProduct(sku);
+          if (res.success) {
+            if (typeof sound.victory === 'function') {
+              sound.victory();
+            } else {
+              sound.correct();
+            }
+            confetti({ particleCount: 110, spread: 80, origin: { y: 0.5 } });
+            if (pack.type === 'coins') {
+              setCoins(c => {
+                const next = c + pack.amount;
+                try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+                return next;
+              });
+              setRewardToast(`🎉 Google Play Purchase: +${pack.amount.toLocaleString()} Coins Added!`);
+            } else if (pack.type === 'gems') {
+              setGems(g => {
+                const next = g + pack.amount;
+                try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+                return next;
+              });
+              setRewardToast(`💎 Google Play Purchase: +${pack.amount.toLocaleString()} Diamonds Added!`);
+            } else if (pack.type === 'pro') {
+              setCoins(c => {
+                const next = c + 2000;
+                try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+                return next;
+              });
+              setGems(g => {
+                const next = g + 50;
+                try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+                return next;
+              });
+              setRewardToast(`👑 PRO VIP Pass Activated! Ads Removed + 2,000 🪙 + 50 💎 Added!`);
+            }
           } else {
-            setGems(g => g + amount);
-            setRewardToast(`💎 Purchase Successful: +${amount.toLocaleString()} Gems!`);
+            sound.wrong();
+            if (res.error && !res.error.toLowerCase().includes('cancel')) {
+              setRewardToast(`❌ ${res.error}`);
+            } else {
+              setRewardToast(`Purchase was cancelled.`);
+            }
+          }
+        };
+
+        const handleRestorePurchases = async () => {
+          sound.click();
+          setRewardToast("🔄 Connecting to Google Play to restore purchases...");
+          const res = await purchaseService.restorePurchases();
+          if (res.success) {
+            sound.correct();
+            setRewardToast(res.message);
+          } else {
+            sound.wrong();
+            setRewardToast(res.message);
           }
         };
 
@@ -9710,7 +12560,7 @@ import './index.css';
                 {/* Coins */}
                 <div className="flex items-center gap-1.5 bg-[#0a1f4d]/70 backdrop-blur-md border border-amber-400/50 rounded-xl px-2.5 py-1 shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]">
                   <img 
-                    src="/assets/icon_gold_coin_3d_clean.png" 
+                    src="/assets/icon_gold_coin_3d_clean.webp" 
                     alt="Coins" 
                     className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_2px_4px_rgba(245,158,11,0.6)]" 
                   />
@@ -9721,7 +12571,7 @@ import './index.css';
                 {/* Gems */}
                 <div className="flex items-center gap-1.5 bg-[#0a1f4d]/70 backdrop-blur-md border border-cyan-400/50 rounded-xl px-2.5 py-1 shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]">
                   <img 
-                    src="/assets/icon_gem_3d_clean.png" 
+                    src="/assets/icon_gem_3d_clean.webp" 
                     alt="Diamonds" 
                     className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_2px_5px_rgba(6,182,212,0.6)]" 
                   />
@@ -9743,44 +12593,124 @@ import './index.css';
               )}
 
               {/* 1. Daily Free Gift Banner - Premium Glassmorphism */}
-              <div className="relative rounded-[26px] bg-gradient-to-br from-white/[0.12] via-[#15347a]/60 to-[#0c1f4d]/80 backdrop-blur-xl border border-white/25 p-3.5 shadow-[0_12px_32px_rgba(3,12,38,0.5),inset_0_1.5px_0_rgba(255,255,255,0.25)] flex items-center justify-between gap-3 overflow-hidden">
+              <div className="relative rounded-[26px] bg-gradient-to-br from-white/[0.12] via-[#15347a]/60 to-[#0c1f4d]/80 backdrop-blur-xl border border-white/25 p-3 sm:p-3.5 shadow-[0_12px_32px_rgba(3,12,38,0.5),inset_0_1.5px_0_rgba(255,255,255,0.25)] flex items-center justify-between gap-2.5 sm:gap-3 overflow-hidden">
                 <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-amber-400/15 rounded-full blur-2xl pointer-events-none"></div>
-                <div className="flex items-center gap-3 relative z-10">
+                <div className="flex items-center gap-2.5 sm:gap-3 relative z-10 min-w-0 flex-1">
                   <img 
-                    src="/assets/reward_gift_dial_full.png" 
+                    src="/assets/reward_gift_dial_full.webp" 
                     alt="Daily Reward" 
-                    className="w-14 h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)] animate-pulse" 
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)] animate-pulse" 
                   />
-                  <div>
-                    <span className="text-[10px] uppercase font-extrabold tracking-wider text-amber-300 block">Daily Free Bonus</span>
-                    <h3 className="text-xs font-black text-white">Daily Mystery Chest</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] font-bold text-amber-300 flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 rounded-full px-2 py-0.5">
-                        <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coin" className="w-3 h-3 object-contain" />
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[9.5px] sm:text-[10px] uppercase font-extrabold tracking-wider text-amber-300 block truncate">Daily Free Bonus</span>
+                    <h3 className="text-xs sm:text-sm font-black text-white truncate">Daily Mystery Chest</h3>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[9.5px] sm:text-[10px] font-bold text-amber-300 flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 rounded-full px-2 py-0.5 shrink-0">
+                        <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain" />
                         +350
                       </span>
-                      <span className="text-[10px] font-bold text-cyan-200 flex items-center gap-1 bg-cyan-500/15 border border-cyan-400/30 rounded-full px-2 py-0.5">
-                        <img src="/assets/icon_gem_3d_clean.png" alt="Gem" className="w-3 h-3 object-contain" />
+                      <span className="text-[9.5px] sm:text-[10px] font-bold text-cyan-200 flex items-center gap-1 bg-cyan-500/15 border border-cyan-400/30 rounded-full px-2 py-0.5 shrink-0">
+                        <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-3 h-3 object-contain" />
                         +5
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <button
-                  disabled={dailyGiftClaimed}
-                  onClick={handleClaimDailyGift}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 shrink-0 relative z-10 ${
-                    dailyGiftClaimed
-                      ? 'bg-slate-700/60 border border-slate-600/50 text-slate-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 border border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] cursor-pointer'
-                  }`}
-                >
-                  {dailyGiftClaimed ? 'Claimed ✓' : 'Claim Free'}
-                </button>
+                <div className="flex flex-col gap-1.5 shrink-0 justify-center w-28 sm:w-32 relative z-10">
+                  <button
+                    disabled={dailyGiftClaimed}
+                    onClick={handleClaimDailyGift}
+                    className={`w-full py-1.5 sm:py-2 px-2 rounded-xl text-[10.5px] sm:text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 text-center flex items-center justify-center whitespace-nowrap ${
+                      dailyGiftClaimed
+                        ? 'bg-slate-700/60 border border-slate-600/50 text-slate-400 cursor-not-allowed py-2'
+                        : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 border border-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.5)] cursor-pointer'
+                    }`}
+                  >
+                    {dailyGiftClaimed ? 'Claimed ✓' : 'Claim Free'}
+                  </button>
+                  {!dailyGiftClaimed && (
+                    <button
+                      onClick={handleClaimDailyGiftWithAd}
+                      className="w-full py-1.5 sm:py-2 px-2 rounded-xl text-[10.5px] sm:text-xs font-black tracking-wide uppercase transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)] active:scale-95 bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 hover:from-emerald-300 hover:to-teal-400 text-emerald-950 border border-emerald-300 cursor-pointer flex items-center justify-center gap-1 whitespace-nowrap"
+                      title="Watch Ad to Double Daily Reward"
+                    >
+                      <span className="text-[9px]">▶</span>
+                      <span>2X with Ad</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {/* 2. Collect via Ads Section */}
+              {/* 2. PRO VIP Pass - Lifetime Ad-Free & Exclusive Member Perks */}
+              <div className="relative rounded-[26px] bg-gradient-to-br from-amber-400/20 via-[#27134d]/80 to-[#100624]/95 backdrop-blur-xl border-2 border-amber-400/60 p-4 shadow-[0_14px_36px_rgba(245,158,11,0.25),inset_0_1.5px_0_rgba(255,255,255,0.35)] overflow-hidden">
+                <div className="absolute -right-8 -top-8 w-36 h-36 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="flex items-start justify-between gap-3 relative z-10 mb-2.5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-500 to-yellow-600 border border-amber-200 flex items-center justify-center text-2xl shadow-[0_0_18px_rgba(251,191,36,0.7)] shrink-0 animate-pulse">
+                      👑
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/40">
+                          {purchaseState.isProUser ? 'VIP UNLOCKED' : 'FEATURED PASS'}
+                        </span>
+                        {purchaseState.isProUser && (
+                          <span className="text-[9px] font-black text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-400/40">
+                            ACTIVE ✓
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-sm sm:text-base font-black text-white font-display mt-0.5">
+                        PRO VIP Lifetime Pass
+                      </h3>
+                      <p className="text-[10px] text-amber-200/90 font-medium">
+                        Permanent Ad-Free & Master Bundle
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Perk Pills */}
+                <div className="grid grid-cols-2 gap-2 my-2.5 relative z-10">
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">🚫</span>
+                    <span className="text-[9.5px] font-bold text-slate-200">Remove Ads Forever</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">🪙</span>
+                    <span className="text-[9.5px] font-bold text-amber-300">+2,000 Bonus Coins</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">💎</span>
+                    <span className="text-[9.5px] font-bold text-cyan-200">+50 Bonus Diamonds</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">👑</span>
+                    <span className="text-[9.5px] font-bold text-amber-300">VIP Crown Status</span>
+                  </div>
+                </div>
+
+                {/* Purchase Action Button */}
+                <div className="mt-2.5 relative z-10">
+                  {purchaseState.isProUser ? (
+                    <div className="w-full py-2.5 rounded-2xl bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                      <span>👑</span>
+                      <span>ACTIVE PRO VIP MEMBER ✓</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleBuyPackage('newromath_pro_noads')}
+                      className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-xs uppercase tracking-wider shadow-[0_4px_0_#b45309,0_8px_20px_rgba(245,158,11,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-amber-200"
+                    >
+                      <span>⚡</span>
+                      <span>Unlock PRO Pass — {purchaseService.getPrice('newromath_pro_noads')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. Collect via Ads Section */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
@@ -9797,8 +12727,19 @@ import './index.css';
                 <div className="grid grid-cols-2 gap-2.5">
                   {/* Ad Option 1: Gold Coins - Glassmorphic Card */}
                   <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/25 to-amber-600/35 border border-amber-400/60 flex items-center justify-center shadow-[0_0_14px_rgba(245,158,11,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] mb-1.5">
-                      <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-7 h-7 object-contain drop-shadow-[0_2px_6px_rgba(245,158,11,0.7)]" />
+                    {/* Skeuomorphic Golden Coin Pedestal Circle */}
+                    <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-amber-200 via-amber-400 to-amber-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-amber-950 via-[#1a0e02] to-amber-900 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img 
+                            src="/assets/icon_gold_coin_3d_clean.webp" 
+                            alt="Coins" 
+                            className="w-8 h-8 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" 
+                          />
+                        </div>
+                      </div>
                     </div>
                     <span className="text-xs font-black text-amber-300 font-display">+250 Coins</span>
                     <span className="text-[9.5px] text-slate-300/80 mb-2.5 font-medium">Instant Reward</span>
@@ -9813,8 +12754,19 @@ import './index.css';
 
                   {/* Ad Option 2: Diamonds - Glassmorphic Card */}
                   <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400/25 to-blue-600/35 border border-cyan-400/60 flex items-center justify-center shadow-[0_0_14px_rgba(6,182,212,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] mb-1.5">
-                      <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-7 h-7 object-contain drop-shadow-[0_2px_6px_rgba(6,182,212,0.7)]" />
+                    {/* Skeuomorphic Diamond Pedestal Circle */}
+                    <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-blue-950 via-[#031533] to-cyan-950 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img 
+                            src="/assets/icon_gem_3d_clean.webp" 
+                            alt="Diamonds" 
+                            className="w-7 h-7 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" 
+                          />
+                        </div>
+                      </div>
                     </div>
                     <span className="text-xs font-black text-cyan-200 font-display">+10 Diamonds</span>
                     <span className="text-[9.5px] text-slate-300/80 mb-2.5 font-medium">Instant Reward</span>
@@ -9838,11 +12790,11 @@ import './index.css';
                       <span className="text-xs font-black text-purple-200 block">Jackpot Ad Chest</span>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[10px] text-amber-300 font-bold flex items-center gap-0.5">
-                          <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coin" className="w-3 h-3 object-contain" />
+                          <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain" />
                           +600
                         </span>
                         <span className="text-[10px] text-cyan-200 font-bold flex items-center gap-0.5">
-                          <img src="/assets/icon_gem_3d_clean.png" alt="Diamond" className="w-3 h-3 object-contain" />
+                          <img src="/assets/icon_gem_3d_clean.webp" alt="Diamond" className="w-3 h-3 object-contain" />
                           +15
                         </span>
                       </div>
@@ -9857,27 +12809,22 @@ import './index.css';
                 </div>
               </div>
 
-              {/* 3. Gold Coin Store */}
+              {/* 4. Gold Coin Store (Google Play In-App Purchases & Gem Exchange) */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
-                    <img src="/assets/icon_gold_coin_3d_clean.png" alt="Coins" className="w-4 h-4 object-contain" />
+                    <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain" />
                     <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-amber-200">
                       Gold Coin Store
                     </h2>
                   </div>
                   <span className="text-[9px] font-bold text-amber-400/80">
-                    Use Gems or Buy
+                    Google Play or Gems
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  {[
-                    { id: 'c1', name: 'Handful of Gold', coins: 1500, gemsCost: 10, price: '$0.99', badge: null, customIcon: '/assets/icon_gold_coin_3d_clean.png', isCustomImg: true },
-                    { id: 'c2', name: 'Pouch of Gold', coins: 5000, gemsCost: 25, price: '$1.99', badge: 'POPULAR', icon: '💰' },
-                    { id: 'c3', name: 'Chest of Gold', coins: 15000, gemsCost: 65, price: '$4.99', badge: 'BEST VALUE', icon: '📦' },
-                    { id: 'c4', name: 'Vault of Gold', coins: 45000, gemsCost: 160, price: '$9.99', badge: 'MEGA PACK', icon: '🏦' },
-                  ].map((pack) => (
+                  {IAP_CATALOG.filter(p => p.type === 'coins').map((pack) => (
                     <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
                       {pack.badge && (
                         <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-amber-200/70 z-10">
@@ -9894,24 +12841,26 @@ import './index.css';
                         </div>
                         <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
                         <span className="text-xs font-black text-amber-300 font-display block mt-0.5">
-                          +{pack.coins.toLocaleString()}
+                          +{pack.amount.toLocaleString()}
                         </span>
                       </div>
 
                       <div className="space-y-1 mt-2.5">
+                        {pack.gemsCost && (
+                          <button
+                            onClick={() => handleExchangeCoins(pack.gemsCost, pack.amount)}
+                            className="w-full py-1.5 rounded-xl bg-gradient-to-r from-[#0c245c] to-[#123075] hover:brightness-110 border border-cyan-400/50 text-[10px] font-bold text-cyan-200 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer shadow-xs"
+                            title="Exchange with Gems"
+                          >
+                            <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-3 h-3 object-contain" />
+                            <span>{pack.gemsCost} Gems</span>
+                          </button>
+                        )}
                         <button
-                          onClick={() => handleExchangeCoins(pack.gemsCost, pack.coins)}
-                          className="w-full py-1.5 rounded-xl bg-gradient-to-r from-[#0c245c] to-[#123075] hover:brightness-110 border border-cyan-400/50 text-[10px] font-bold text-cyan-200 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer shadow-xs"
-                          title="Exchange with Gems"
+                          onClick={() => handleBuyPackage(pack.id)}
+                          className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#b45309] border border-amber-200/80 flex items-center justify-center gap-1"
                         >
-                          <img src="/assets/icon_gem_3d_clean.png" alt="Gem" className="w-3 h-3 object-contain" />
-                          <span>{pack.gemsCost} Gems</span>
-                        </button>
-                        <button
-                          onClick={() => handleBuyPackage('coins', pack.coins, pack.price)}
-                          className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#b45309] border border-amber-200/80"
-                        >
-                          {pack.price}
+                          <span>{purchaseService.getPrice(pack.id)}</span>
                         </button>
                       </div>
                     </div>
@@ -9919,11 +12868,11 @@ import './index.css';
                 </div>
               </div>
 
-              {/* 4. Diamond Store */}
+              {/* 5. Diamond Store (Google Play In-App Purchases) */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
-                    <img src="/assets/icon_gem_3d_clean.png" alt="Diamonds" className="w-4 h-4 object-contain" />
+                    <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain" />
                     <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-cyan-200">
                       Diamond Store
                     </h2>
@@ -9934,12 +12883,7 @@ import './index.css';
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
-                  {[
-                    { id: 'g1', name: 'Pile of Gems', gems: 50, price: '$0.99', badge: null, customIcon: '/assets/icon_gem_3d_clean.png', isCustomImg: true },
-                    { id: 'g2', name: 'Crystal Casket', gems: 200, price: '$2.99', badge: 'HOT', icon: '✨' },
-                    { id: 'g3', name: 'Crown of Gems', gems: 600, price: '$6.99', badge: 'POPULAR', icon: '👑' },
-                    { id: 'g4', name: 'Diamond Mountain', gems: 2000, price: '$19.99', badge: 'BEST DEAL', icon: '🏔️' },
-                  ].map((pack) => (
+                  {IAP_CATALOG.filter(p => p.type === 'gems').map((pack) => (
                     <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
                       {pack.badge && (
                         <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-cyan-200/70 z-10">
@@ -9956,22 +12900,58 @@ import './index.css';
                         </div>
                         <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
                         <span className="text-xs font-black text-cyan-200 font-display block mt-0.5">
-                          +{pack.gems.toLocaleString()}
+                          +{pack.amount.toLocaleString()}
                         </span>
                       </div>
 
                       <button
-                        onClick={() => handleBuyPackage('gems', pack.gems, pack.price)}
-                        className="w-full mt-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 hover:brightness-110 text-white text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#0284c7] border border-cyan-300/40"
+                        onClick={() => handleBuyPackage(pack.id)}
+                        className="w-full mt-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 hover:brightness-110 text-white text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#0284c7] border border-cyan-300/40 flex items-center justify-center gap-1"
                       >
-                        {pack.price}
+                        <span>{purchaseService.getPrice(pack.id)}</span>
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
 
+              {/* 6. Google Play Billing Guarantee & Restore Purchases */}
+              <div className="rounded-2xl p-3 bg-white/[0.05] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left mt-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-sm text-emerald-300 shrink-0">
+                    🔒
+                  </div>
+                  <div className="text-[10px] text-slate-300">
+                    <span className="font-bold text-white block">Google Play In-App Billing</span>
+                    Official, secure encrypted transaction & instant item delivery
+                  </div>
+                </div>
+                <button
+                  onClick={handleRestorePurchases}
+                  className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-[10px] font-bold text-cyan-200 active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-xs"
+                >
+                  🔄 Restore Purchases
+                </button>
+              </div>
+
             </div>
+
+            {/* Google Play Transaction Loading Modal */}
+            {purchaseState.isLoading && (
+              <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+                <div className="rounded-3xl p-5 bg-gradient-to-b from-[#152758] to-[#0a1638] border border-cyan-400/50 shadow-[0_0_30px_rgba(0,229,255,0.4)] flex flex-col items-center text-center max-w-xs w-full animate-in zoom-in-95 duration-200">
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-300 flex items-center justify-center text-2xl mb-3 animate-spin">
+                    ⚙️
+                  </div>
+                  <h4 className="text-sm font-black text-white font-display mb-1">
+                    Google Play In-App Billing
+                  </h4>
+                  <p className="text-xs text-cyan-200 font-medium">
+                    Connecting to Google Play Store... Please complete the transaction in the Google Play dialog.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         );
       };
@@ -10012,33 +12992,41 @@ import './index.css';
             {renderActiveScreen()}
           </PageTransition>
 
+          {/* Google AdMob Demo Banner at Bottom (Reserved 50px height, strictly adheres to AdMob layout & separation policies) */}
+          {adMobState.bannerVisible && currentScreen !== 'splash' && currentScreen !== 'onboarding' && (
+            <AdMobBanner isNative={adMobState.isNative} />
+          )}
+
+          {/* Google AdMob Demo Interstitial Ad Fullscreen Modal */}
+          <AdMobInterstitialModal
+            isOpen={adMobState.interstitialActive}
+            onClose={() => adMobService.dismissWebInterstitial()}
+          />
+
           {isPageLoading && <SlidingTileLoader />}
 
-          {/* 3D Cyber-Arcade Flying Number Tiles Layer */}
-          {flyingTiles.length > 0 && (
-            <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
-              {flyingTiles.map(tile => (
-                <FlyingTileItem
-                  key={tile.id}
-                  tile={tile}
-                  largeFontEnabled={largeFontEnabled}
-                  onFinish={(t) => {
-                    setFlyingTiles(prev => prev.filter(item => item.id !== t.id));
-                    if (t.isReturn) {
-                      finalizeReturn(t.number);
-                    } else {
-                      finalizePlacement(t.number, t.targetSlot);
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          )}
+          {/* 3D Cyber-Arcade Flying Number Tiles Layer (Object Pooled - Zero DOM allocations) */}
+          <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
+            {flyingPool.map(slot => (
+              <PooledFlyingTileItem
+                key={slot.slotId}
+                slot={slot}
+                largeFontEnabled={largeFontEnabled}
+                onComplete={(s) => {
+                  recycleFlyingTile(s.slotId);
+                  if (s.isReturn) {
+                    finalizeReturn(s.number);
+                  } else {
+                    finalizePlacement(s.number, s.targetSlot);
+                  }
+                }}
+              />
+            ))}
+          </div>
           {/* Cyber Notification Toast Banner */}
           {rewardToast && (
             <div className="fixed top-5 inset-x-4 z-50 flex justify-center pointer-events-none animate-in fade-in slide-in-from-top-4 duration-200">
-              <div className="bg-gradient-to-r from-[#0d2254]/95 via-[#153473]/95 to-[#0c1f4a]/95 border-2 border-cyan-400/80 rounded-2xl px-4 py-2.5 shadow-[0_8px_25px_rgba(0,229,255,0.6)] text-white font-black text-xs font-display flex items-center gap-2 backdrop-blur-md">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+              <div className="bg-gradient-to-r from-[#0d2254]/95 via-[#153473]/95 to-[#0c1f4a]/95 border-2 border-cyan-400/80 rounded-2xl px-4 py-2.5 shadow-[0_8px_25px_rgba(0,229,255,0.6)] text-white font-black text-xs font-display flex items-center justify-center text-center backdrop-blur-md">
                 <span>{rewardToast}</span>
               </div>
             </div>
@@ -10048,8 +13036,8 @@ import './index.css';
           {insufficientFundsModal.isOpen && (() => {
             const need = insufficientFundsModal.cost;
             const rows = [
-              { key: 'coins', icon: '/assets/icon_gold_coin_3d_clean.png', have: coins, need: need.coins, tone: 'amber' },
-              { key: 'gems', icon: '/assets/icon_gem_3d_clean.png', have: gems, need: need.gems, tone: 'cyan' }
+              { key: 'coins', icon: '/assets/icon_gold_coin_3d_clean.webp', have: coins, need: need.coins, tone: 'amber' },
+              { key: 'gems', icon: '/assets/icon_gem_3d_clean.webp', have: gems, need: need.gems, tone: 'cyan' }
             ];
             const closeModal = () => {
               sound.click();
@@ -10062,7 +13050,7 @@ import './index.css';
               >
                 {/* Glassmorphic Popup Card */}
                 <div
-                  className="relative w-full max-w-[325px] sm:max-w-[340px] rounded-[38px] p-6 pt-14 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible"
+                  className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Top Close Button (Top-Right) */}
@@ -10070,47 +13058,43 @@ import './index.css';
                     onClick={closeModal}
                     aria-label="Close"
                     title="Close"
-                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                    className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                   </button>
 
                   {/* 3D Floating Hero: Glowing Coin & Diamond Pod + Splash Petals + Arched 3D Banner */}
-                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center pointer-events-none z-20">
+                  <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
                     {/* Cloud base & Splash petals behind hero */}
                     <div className="relative flex items-center justify-center">
-                      <div className="absolute -bottom-2 w-32 h-14 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+                      <div className="absolute -bottom-2 w-28 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
 
                       {/* Left Splashes */}
-                      <svg className="absolute -left-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -left-1 top-1.5 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
-                      <svg className="absolute -left-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -left-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
 
                       {/* Right Splashes */}
-                      <svg className="absolute -right-1 top-2 w-9 h-9 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -right-1 top-1.5 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
-                      <svg className="absolute -right-4 top-8 w-6 h-6 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="absolute -right-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                       </svg>
-
-                      {/* Sparkle Stars */}
-                      <div className="absolute -top-3 -left-3 text-amber-400 font-bold text-lg select-none">✦</div>
-                      <div className="absolute -top-2 -right-3 text-amber-400 font-bold text-lg select-none">✦</div>
 
                       {/* 3D Circular Gloss Pod for Coin & Gem */}
-                      <div className="relative w-20 h-20 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-white/90 shadow-[0_8px_20px_rgba(14,165,233,0.45),inset_0_2px_4px_rgba(255,255,255,0.7)] flex items-center justify-center">
+                      <div className="relative w-16 h-16 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-white/90 shadow-[0_8px_20px_rgba(14,165,233,0.45),inset_0_2px_4px_rgba(255,255,255,0.7)] flex items-center justify-center">
                         <div className="absolute inset-1 rounded-full bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
-                        <img src="/assets/icon_gold_coin_3d_clean.png" alt="" className="w-10 h-10 object-contain -translate-x-1.5 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
-                        <img src="/assets/icon_gem_3d_clean.png" alt="" className="absolute w-8 h-8 object-contain translate-x-4 translate-y-3 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
+                        <img src="/assets/icon_gold_coin_3d_clean.webp" alt="" className="w-8 h-8 object-contain -translate-x-1.5 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
+                        <img src="/assets/icon_gem_3d_clean.webp" alt="" className="absolute w-7 h-7 object-contain translate-x-3.5 translate-y-2.5 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
                         {/* Exclamation badge */}
-                        <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white flex items-center justify-center shadow-md">
-                          <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white flex items-center justify-center shadow-md">
+                          <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
                             <path d="M12 7v6M12 17h.01" />
                           </svg>
                         </span>
@@ -10118,7 +13102,7 @@ import './index.css';
                     </div>
 
                     {/* Arched 3D Banner "Need Funds" */}
-                    <div className="relative -mt-3 w-56 h-12 flex items-center justify-center filter drop-shadow-[0_6px_12px_rgba(29,78,216,0.5)]">
+                    <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(29,78,216,0.45)]">
                       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
                         <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
                         <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
@@ -10133,12 +13117,10 @@ import './index.css';
                           </linearGradient>
                         </defs>
                       </svg>
-                      <div className="relative z-10 flex items-center justify-center gap-1.5 pb-1 select-none">
-                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
-                        <span className="font-black text-xl tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] font-display">
-                          Need <span className="text-[#fde047] drop-shadow-[0_2px_4px_rgba(180,83,9,0.8)]">Funds</span>
+                      <div className="relative z-10 flex items-center justify-center pb-1 select-none">
+                        <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
+                          Need <span className="text-[#fde047] drop-shadow-[0_1.5px_3px_rgba(180,83,9,0.8)]">Funds</span>
                         </span>
-                        <span className="text-amber-300 text-sm filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">⭐</span>
                       </div>
                     </div>
                   </div>
@@ -10228,7 +13210,7 @@ import './index.css';
                           coinAmount: 350,
                           gemAmount: 15,
                           onComplete: () => {
-                            setRewardToast(`⚡ +350 Coins & +15 Diamonds Claimed! Launching Level ${targetLvl}...`);
+                            setRewardToast(`+350 Coins & +15 Diamonds Claimed! Launching Level ${targetLvl}...`);
                             setTimeout(() => {
                               attemptStartLevel(targetLvl);
                             }, 600);
@@ -10243,9 +13225,9 @@ import './index.css';
                       </svg>
                       <span className="flex items-center gap-1 font-mono font-black text-[11px] leading-none drop-shadow-sm">
                         <span>+350</span>
-                        <img src="/assets/icon_gold_coin_3d_clean.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <img src="/assets/icon_gold_coin_3d_clean.webp" alt="" className="w-3.5 h-3.5 object-contain" />
                         <span>+15</span>
-                        <img src="/assets/icon_gem_3d_clean.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <img src="/assets/icon_gem_3d_clean.webp" alt="" className="w-3.5 h-3.5 object-contain" />
                       </span>
                     </button>
 
@@ -10267,84 +13249,21 @@ import './index.css';
                       </svg>
                     </button>
                   </div>
-
-                  {/* Corner Water Droplets Decorations */}
-                  <div className="absolute bottom-3 left-3 pointer-events-none opacity-80">
-                    <svg className="w-6 h-6 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                    </svg>
-                  </div>
-                  <div className="absolute bottom-3 right-3 pointer-events-none opacity-80">
-                    <svg className="w-6 h-6 text-sky-400 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2.69l3.5 3.5a5 5 0 1 1-7 0z" />
-                    </svg>
-                  </div>
                 </div>
               </div>
             );
           })()}
 
-          {/* Interactive Global Simulated Ad Modal */}
-          {adModalOpen && (
-            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-              <div className="bg-gradient-to-b from-[#14285e] to-[#0b1736] border border-cyan-400/60 rounded-3xl p-5 max-w-xs w-full shadow-[0_0_30px_rgba(0,229,255,0.4)] text-center space-y-4">
-                {/* Ad Header with Countdown */}
-                <div className="flex items-center justify-between border-b border-cyan-400/20 pb-2">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wide text-cyan-300">
-                    ⚡ Sponsor Video
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-amber-300 bg-black/40 px-2 py-0.5 rounded-full border border-amber-400/30">
-                    {adCountdown > 0 ? `Reward in ${adCountdown}s` : 'Reward Ready! ✓'}
-                  </span>
-                </div>
-
-                {/* Ad Creative Simulation */}
-                <div className="h-40 rounded-2xl bg-gradient-to-br from-[#1d4ed8] via-[#1e3a8a] to-[#0f172a] border border-cyan-400/30 p-3 flex flex-col items-center justify-center relative overflow-hidden">
-                  <div className="text-4xl mb-2 animate-bounce">
-                    {adReward.type === 'coins' ? '🪙' : adReward.type === 'gems' ? '💎' : adReward.type === 'time' ? '⏱️' : '⚡'}
-                  </div>
-                  <span className="text-xs font-black text-white">{adReward.title}</span>
-                  <span className="text-[10px] text-cyan-200 mt-1">
-                    {adReward.type === 'both'
-                      ? `Get +${adReward.coinAmount || 350} Coins & +${adReward.gemAmount || 15} Gems`
-                      : adReward.type === 'time'
-                      ? `Get +${adReward.amount || 30}s Extra Time`
-                      : `Get +${adReward.amount || 250} ${adReward.type === 'coins' ? 'Coins' : 'Diamonds'}`}
-                  </span>
-                  <div className="mt-3 flex items-center gap-1.5 text-[9px] text-slate-300 bg-black/30 px-2 py-1 rounded-full">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>Verified Sponsor Partner</span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="space-y-2">
-                  <button
-                    disabled={adCountdown > 0}
-                    onClick={handleClaimAdReward}
-                    className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-md ${
-                      adCountdown > 0
-                        ? 'bg-slate-700/60 text-slate-400 border border-slate-600 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-emerald-950 border border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)] active:scale-95 cursor-pointer'
-                    }`}
-                  >
-                    {adCountdown > 0 ? `Please Wait (${adCountdown}s)...` : `Collect Reward!`}
-                  </button>
-
-                  <button
-                    onClick={() => setAdModalOpen(false)}
-                    className="text-[10px] text-slate-400 hover:text-white font-bold cursor-pointer"
-                  >
-                    Close Ad
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Google AdMob Demo Rewarded Video Ad Modal */}
+          <AdMobRewardedModal
+            isOpen={adModalOpen}
+            onClose={() => setAdModalOpen(false)}
+            onReward={handleClaimAdReward}
+            rewardInfo={adReward}
+          />
         </div>
       );
     }
 
     const root = createRoot(document.getElementById('root'));
     root.render(<App />);
-  

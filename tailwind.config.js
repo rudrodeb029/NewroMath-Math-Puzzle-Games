@@ -34,9 +34,25 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['"Cormorant Garamond"', '"EB Garamond"', 'Garamond', '"Times New Roman"', 'Georgia', 'serif'],
+        display: ['"Cormorant Garamond"', '"EB Garamond"', 'Garamond', '"Times New Roman"', 'Georgia', 'serif'],
+        serif: ['"Cormorant Garamond"', '"EB Garamond"', 'Garamond', '"Times New Roman"', 'Georgia', 'serif'],
+        mono: ['"Cormorant Garamond"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      spacing: {
+        '4.5': '1.125rem',
+        '5.5': '1.375rem',
+        '6.5': '1.625rem',
+        '7.5': '1.875rem',
+        '8.5': '2.125rem',
+        '9.5': '2.375rem',
+        '11.5': '2.875rem',
+        '13': '3.25rem',
+        '15': '3.75rem',
+        '17': '4.25rem',
+        '18': '4.5rem',
+        '19': '4.75rem',
+        '26': '6.5rem',
       }
     },
   },
