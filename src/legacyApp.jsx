@@ -11650,21 +11650,11 @@ import {
               <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
                 <div className="absolute inset-0 math-blueprint-grid opacity-10 pointer-events-none" />
 
-                {/* Header: Title + Progress counter */}
-                <div className="relative z-10 flex items-center justify-between mb-2 px-1">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
-                        3D Level Awards & Avatars
-                      </h3>
-                      <span className="text-[9px] bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-0.5 rounded-full font-black">
-                        {completedLevelsCount}/25 UNLOCKED
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-slate-300 mt-0.5">
-                      Solved levels unlock modern 3D avatars. Tap any unlocked avatar to equip.
-                    </p>
-                  </div>
+                {/* Header: Title */}
+                <div className="relative z-10 mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                    Your Level Awards
+                  </h3>
                 </div>
 
                 {/* Filter Tabs: All, Unlocked, Locked */}
