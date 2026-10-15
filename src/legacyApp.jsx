@@ -6300,17 +6300,24 @@ import {
                     rank: "Rank #1",
                     rankCol: "from-amber-300 via-amber-400 to-amber-500",
                     rankText: "text-amber-950",
+                    levelsCompleted: 25,
+                    levelDisplay: "25/25",
                     icon: "/assets/awards/award_lvl_25.webp",
                     cardBg: "from-[#13377a] via-[#1d4f9e] to-[#102e66]",
-                    borderCol: "border-amber-400/90 shadow-[0_4px_16px_rgba(245,158,11,0.3)]",
+                    outerRimFrom: "#fef08a",
+                    outerRimVia: "#fbbf24",
+                    outerRimTo: "#b45309",
+                    facetFrom: "#2c1c04",
+                    facetTo: "#150d02",
+                    innerRimFrom: "#fef08a",
+                    innerRimVia: "#f59e0b",
+                    innerRimTo: "#92400e",
+                    glowColor: "rgba(245, 158, 11, 0.45)",
                     domeBg: "bg-[radial-gradient(circle_at_50%_25%,#2558b8_0%,#163b82_55%,#0d2354_100%)]",
                     countryBg: "bg-[#133270]/90 border border-amber-400/40",
                     countryText: "text-amber-200",
                     rewardsBg: "bg-[#0e285a]/95 border border-amber-400/60",
                     cornerColor: "text-amber-300/50",
-                    blueprintTag: "ARCH: Φ-1.618",
-                    mathFormula: "e^(iπ)+1=0",
-                    mathSymbol: "∑",
                     coins: "50,000",
                     gems: "250",
                   },
@@ -6322,17 +6329,24 @@ import {
                     rank: "Rank #2",
                     rankCol: "from-slate-100 via-slate-200 to-slate-300",
                     rankText: "text-slate-900",
+                    levelsCompleted: 23,
+                    levelDisplay: "23/25",
                     icon: "/assets/awards/award_lvl_23.webp",
                     cardBg: "from-[#3a1b73] via-[#51239e] to-[#2e155c]",
-                    borderCol: "border-purple-400/90 shadow-[0_4px_16px_rgba(168,85,247,0.3)]",
+                    outerRimFrom: "#f3e8ff",
+                    outerRimVia: "#c084fc",
+                    outerRimTo: "#7e22ce",
+                    facetFrom: "#240e40",
+                    facetTo: "#130624",
+                    innerRimFrom: "#f3e8ff",
+                    innerRimVia: "#a855f7",
+                    innerRimTo: "#6b21a8",
+                    glowColor: "rgba(168, 85, 247, 0.45)",
                     domeBg: "bg-[radial-gradient(circle_at_50%_25%,#682bc9_0%,#451a87_55%,#260d4d_100%)]",
                     countryBg: "bg-[#371970]/90 border border-purple-400/40",
                     countryText: "text-purple-200",
                     rewardsBg: "bg-[#291354]/95 border border-purple-400/60",
                     cornerColor: "text-purple-300/50",
-                    blueprintTag: "CALC: ∫f(x)dx",
-                    mathFormula: "lim 1/x=0",
-                    mathSymbol: "∫",
                     coins: "35,000",
                     gems: "180",
                   },
@@ -6344,17 +6358,24 @@ import {
                     rank: "Rank #3",
                     rankCol: "from-amber-600 via-amber-500 to-yellow-600",
                     rankText: "text-amber-950",
-                    icon: "/assets/awards/award_lvl_24.webp",
+                    levelsCompleted: 21,
+                    levelDisplay: "21/25",
+                    icon: "/assets/awards/award_lvl_21.webp",
                     cardBg: "from-[#094d3c] via-[#0e6952] to-[#073d30]",
-                    borderCol: "border-emerald-400/90 shadow-[0_4px_16px_rgba(16,185,129,0.3)]",
+                    outerRimFrom: "#d1fae5",
+                    outerRimVia: "#34d399",
+                    outerRimTo: "#047857",
+                    facetFrom: "#062b20",
+                    facetTo: "#031711",
+                    innerRimFrom: "#d1fae5",
+                    innerRimVia: "#10b981",
+                    innerRimTo: "#065f46",
+                    glowColor: "rgba(16, 185, 129, 0.45)",
                     domeBg: "bg-[radial-gradient(circle_at_50%_25%,#158066_0%,#0c5745_55%,#06362b_100%)]",
                     countryBg: "bg-[#0b4739]/90 border border-emerald-400/40",
                     countryText: "text-emerald-200",
                     rewardsBg: "bg-[#07382d]/95 border border-emerald-400/60",
                     cornerColor: "text-emerald-300/50",
-                    blueprintTag: "GEO: a²+b²=c²",
-                    mathFormula: "sin²θ+cos²θ=1",
-                    mathSymbol: "Δ",
                     coins: "25,000",
                     gems: "120",
                   },
@@ -6366,17 +6387,24 @@ import {
                     rank: "Rank #4",
                     rankCol: "from-cyan-300 via-cyan-400 to-cyan-500",
                     rankText: "text-cyan-950",
-                    icon: "/assets/awards/award_lvl_22.webp",
+                    levelsCompleted: 19,
+                    levelDisplay: "19/25",
+                    icon: "/assets/awards/award_lvl_19.webp",
                     cardBg: "from-[#692d0e] via-[#8c3d14] to-[#54240a]",
-                    borderCol: "border-orange-400/90 shadow-[0_4px_16px_rgba(249,115,22,0.3)]",
+                    outerRimFrom: "#ffedd5",
+                    outerRimVia: "#fb923c",
+                    outerRimTo: "#c2410c",
+                    facetFrom: "#331204",
+                    facetTo: "#1c0902",
+                    innerRimFrom: "#ffedd5",
+                    innerRimVia: "#f97316",
+                    innerRimTo: "#9a3412",
+                    glowColor: "rgba(249, 115, 22, 0.45)",
                     domeBg: "bg-[radial-gradient(circle_at_50%_25%,#ad4b1b_0%,#783210_55%,#471d08_100%)]",
                     countryBg: "bg-[#5f280e]/90 border border-orange-400/40",
                     countryText: "text-orange-200",
                     rewardsBg: "bg-[#4a1f0a]/95 border border-orange-400/60",
                     cornerColor: "text-orange-300/50",
-                    blueprintTag: "MATRIX: [3×3]",
-                    mathFormula: "det(A-λI)=0",
-                    mathSymbol: "λ",
                     coins: "18,000",
                     gems: "90",
                   },
@@ -6388,17 +6416,24 @@ import {
                     rank: "Rank #5",
                     rankCol: "from-fuchsia-300 via-fuchsia-400 to-pink-500",
                     rankText: "text-fuchsia-950",
+                    levelsCompleted: 15,
+                    levelDisplay: "15/25",
                     icon: "/assets/awards/award_lvl_15.webp",
                     cardBg: "from-[#0b426e] via-[#105a96] to-[#083559]",
-                    borderCol: "border-cyan-400/90 shadow-[0_4px_16px_rgba(6,182,212,0.3)]",
+                    outerRimFrom: "#cffafe",
+                    outerRimVia: "#22d3ee",
+                    outerRimTo: "#0891b2",
+                    facetFrom: "#08283a",
+                    facetTo: "#04151e",
+                    innerRimFrom: "#cffafe",
+                    innerRimVia: "#06b6d4",
+                    innerRimTo: "#0e7490",
+                    glowColor: "rgba(6, 182, 212, 0.45)",
                     domeBg: "bg-[radial-gradient(circle_at_50%_25%,#1972b5_0%,#0f4c7d_55%,#092f4f_100%)]",
                     countryBg: "bg-[#0d3f66]/90 border border-cyan-400/40",
                     countryText: "text-cyan-200",
                     rewardsBg: "bg-[#093252]/95 border border-cyan-400/60",
                     cornerColor: "text-cyan-300/50",
-                    blueprintTag: "TRIG: π≈3.14",
-                    mathFormula: "f'(x)=2x+7",
-                    mathSymbol: "π",
                     coins: "12,000",
                     gems: "60",
                   },
@@ -6410,91 +6445,113 @@ import {
                       confetti({ particleCount: 30, spread: 50 });
                       navigateTo('leaderboard');
                     }}
-                    className={`math-arch-card shrink-0 cursor-pointer select-none rounded-2xl overflow-hidden transition-transform hover:scale-[1.03] active:scale-[0.97] border-[1.5px] ${champ.borderCol} bg-gradient-to-b ${champ.cardBg} shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_8px_20px_rgba(0,0,0,0.5)]`}
-                    style={{ scrollSnapAlign: 'start' }}
-                    title={`${champ.name} - ${champ.rank}`}
+                    className="shrink-0 cursor-pointer select-none transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
+                    style={{
+                      scrollSnapAlign: 'start',
+                      filter: `drop-shadow(0 4px 12px ${champ.glowColor}) drop-shadow(0 2px 4px rgba(0,0,0,0.6))`
+                    }}
+                    title={`${champ.name} - ${champ.rank} (${champ.levelDisplay} Levels Completed)`}
                   >
-                    <div className="w-[112px] h-[170px] p-2 flex flex-col justify-between relative overflow-hidden pt-2.5">
-                      {/* 1. Mathematical Blueprint Coordinate Grid */}
-                      <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+                    {/* Layer 1: Outer Chamfered Architectural Shell with Outer Glowing Rim */}
+                    <div
+                      className="relative p-[1.5px] w-[114px] h-[174px]"
+                      style={{
+                        clipPath: 'polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px)',
+                        background: `linear-gradient(135deg, ${champ.outerRimFrom}, ${champ.outerRimVia}, ${champ.outerRimTo})`,
+                      }}
+                    >
+                      {/* Layer 2: Beveled 3D Architectural Facet / Shelf */}
+                      <div
+                        className="w-full h-full p-[3px]"
+                        style={{
+                          clipPath: 'polygon(10.5px 0%, calc(100% - 10.5px) 0%, 100% 10.5px, 100% calc(100% - 10.5px), calc(100% - 10.5px) 100%, 10.5px 100%, 0% calc(100% - 10.5px), 0% 10.5px)',
+                          background: `linear-gradient(145deg, ${champ.facetFrom}, ${champ.facetTo})`,
+                        }}
+                      >
+                        {/* Layer 3: Inner Chamfered Glowing Border Rail */}
+                        <div
+                          className="w-full h-full p-[1.5px]"
+                          style={{
+                            clipPath: 'polygon(8.5px 0%, calc(100% - 8.5px) 0%, 100% 8.5px, 100% calc(100% - 8.5px), calc(100% - 8.5px) 100%, 8.5px 100%, 0% calc(100% - 8.5px), 0% 8.5px)',
+                            background: `linear-gradient(135deg, ${champ.innerRimFrom}, ${champ.innerRimVia}, ${champ.innerRimTo})`,
+                          }}
+                        >
+                          {/* Layer 4: Recessed Interior Card Plate with Content */}
+                          <div
+                            className={`w-full h-full flex flex-col justify-between relative overflow-hidden p-1.5 pt-2 bg-gradient-to-b ${champ.cardBg}`}
+                            style={{
+                              clipPath: 'polygon(7.5px 0%, calc(100% - 7.5px) 0%, 100% 7.5px, 100% calc(100% - 7.5px), calc(100% - 7.5px) 100%, 7.5px 100%, 0% calc(100% - 7.5px), 0% 7.5px)',
+                              boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.65), inset 0 -2px 6px rgba(0,0,0,0.5)',
+                            }}
+                          >
+                            {/* 1. Mathematical Blueprint Coordinate Grid */}
+                            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
 
-                      {/* 2. Precision Architectural Tech Corner Brackets */}
-                      <div className={`absolute top-1.5 left-1.5 w-2 h-2 border-t-[1.5px] border-l-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
-                      <div className={`absolute top-1.5 right-1.5 w-2 h-2 border-t-[1.5px] border-r-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
-                      <div className={`absolute bottom-1.5 left-1.5 w-2 h-2 border-b-[1.5px] border-l-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
-                      <div className={`absolute bottom-1.5 right-1.5 w-2 h-2 border-b-[1.5px] border-r-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
+                            {/* 2. Top Architectural Drafting Marks (+) in corners */}
+                            <span className={`absolute top-1 left-1.5 text-[6.5px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                            <span className={`absolute top-1 right-1.5 text-[6.5px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                            <span className={`absolute bottom-1 left-1.5 text-[6.5px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                            <span className={`absolute bottom-1 right-1.5 text-[6.5px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
 
-                      {/* Architectural Drafting Corner Marks (+) */}
-                      <span className={`absolute top-2 left-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
-                      <span className={`absolute top-2 right-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
-                      <span className={`absolute bottom-2 left-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
-                      <span className={`absolute bottom-2 right-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                            {/* 3. Glossy Top Glass Sheen */}
+                            <div className="absolute inset-x-0 top-0 h-2/5 bg-gradient-to-b from-white/20 via-white/5 to-transparent pointer-events-none" />
 
-                      {/* Glossy top glass reflection */}
-                      <div className="absolute inset-x-0 top-0 h-2/5 bg-gradient-to-b from-white/25 via-white/5 to-transparent rounded-t-2xl pointer-events-none" />
+                            {/* Top Architectural Blueprint Header: Level Progress Indicator */}
+                            <div className="w-full relative z-10 px-0.5">
+                              <div className="flex items-center justify-between">
+                                <span className={`text-[7px] font-mono font-bold tracking-wider opacity-90 ${champ.countryText} uppercase flex items-center gap-1`}>
+                                  <span>COMPLETED</span>
+                                </span>
+                                <span className={`text-[8px] font-black font-mono leading-none ${champ.countryText} bg-black/40 px-1 py-0.5 rounded border border-white/10 shadow-xs`}>
+                                  {champ.levelDisplay}
+                                </span>
+                              </div>
+                              <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent my-0.5" />
+                            </div>
 
-                      {/* Top Architectural Blueprint Header Tag & Symbol */}
-                      <div className="w-full relative z-10 px-1 pt-0.5">
-                        <div className="flex items-center justify-between">
-                          <span className={`text-[7px] font-mono font-bold tracking-tight opacity-90 ${champ.countryText} truncate max-w-[70px] uppercase`}>
-                            {champ.blueprintTag}
-                          </span>
-                          <span className={`text-[8.5px] font-black font-mono leading-none opacity-90 ${champ.countryText}`}>
-                            {champ.mathSymbol}
-                          </span>
-                        </div>
-                        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent my-0.5" />
-                      </div>
+                            {/* Center: 3D Champion Avatar Pedestal + Username + Country */}
+                            <div className="flex flex-col items-center justify-center relative z-10 my-auto py-0.5">
+                              <div className={`relative w-[38px] h-[38px] rounded-full ${champ.domeBg} shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1.5px_2px_rgba(255,255,255,0.35),inset_0_-2px_3px_rgba(0,0,0,0.45)] flex items-center justify-center p-0.5 overflow-hidden shrink-0`}>
+                                <div className="absolute inset-x-0.5 top-0 h-[45%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                                <div className="absolute bottom-0.5 w-5 h-1 rounded-full bg-black/55 blur-[1px] pointer-events-none" />
+                                <img 
+                                  src={champ.icon} 
+                                  alt={champ.name} 
+                                  className="w-[28px] h-[28px] object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" 
+                                />
+                              </div>
 
-                      {/* Center: 3D Champion Avatar / Icon + Username + Country */}
-                      <div className="flex flex-col items-center justify-center relative z-10 my-auto py-0.5">
-                        <div className={`relative w-[40px] h-[40px] rounded-full ${champ.domeBg} shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1.5px_2px_rgba(255,255,255,0.35),inset_0_-2px_3px_rgba(0,0,0,0.45)] flex items-center justify-center p-0.5 overflow-hidden shrink-0`}>
-                          {/* Skeuomorphic Glass Specular Sheen (Curved highlight) */}
-                          <div className="absolute inset-x-0.5 top-0 h-[45%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                              <span className="text-white font-black text-[10.5px] font-display tracking-tight text-center truncate w-full mt-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
+                                {champ.name}
+                              </span>
 
-                          {/* Skeuomorphic Pedestal Contact Shadow */}
-                          <div className="absolute bottom-0.5 w-5 h-1 rounded-full bg-black/55 blur-[1px] pointer-events-none" />
+                              <div className={`flex items-center justify-center gap-1 ${champ.countryBg} rounded-full px-1.5 py-0.5 mt-0.5 max-w-full shadow-xs`}>
+                                <span className="text-[9.5px] shrink-0 leading-none">{champ.flag}</span>
+                                <span className={`text-[7.5px] ${champ.countryText} font-bold tracking-tight truncate leading-none`}>
+                                  {champ.country}
+                                </span>
+                              </div>
+                            </div>
 
-                          {/* 3D Figurine Icon - properly sized for circle */}
-                          <img 
-                            src={champ.icon} 
-                            alt={champ.name} 
-                            className="w-[30px] h-[30px] object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" 
-                          />
-                        </div>
+                            {/* Bottom: 3D Rank Badge + Rewards Capsule */}
+                            <div className="flex flex-col gap-0.5 relative z-10 w-full pt-0.5">
+                              <div className={`w-full bg-gradient-to-r ${champ.rankCol} ${champ.rankText} text-[8px] font-black uppercase py-0.5 rounded shadow-xs border border-white/50 text-center leading-none tracking-tight`}>
+                                {champ.rank}
+                              </div>
 
-                        {/* Username */}
-                        <span className="text-white font-black text-[11px] font-display tracking-tight text-center truncate w-full mt-1.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
-                          {champ.name}
-                        </span>
-
-                        {/* Country Name + Flag Pill */}
-                        <div className={`flex items-center justify-center gap-1 ${champ.countryBg} rounded-full px-1.5 py-0.5 mt-1 max-w-full shadow-xs`}>
-                          <span className="text-[10px] shrink-0 leading-none">{champ.flag}</span>
-                          <span className={`text-[8px] ${champ.countryText} font-bold tracking-tight truncate leading-none`}>
-                            {champ.country}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Bottom: 3D Rank Badge + Rewards Capsule */}
-                      <div className="flex flex-col gap-1 relative z-10 w-full pt-1">
-                        {/* 3D Rank Badge */}
-                        <div className={`w-full bg-gradient-to-r ${champ.rankCol} ${champ.rankText} text-[8.5px] font-black uppercase py-0.5 rounded-md shadow-xs border border-white/50 text-center leading-none tracking-tight`}>
-                          {champ.rank}
-                        </div>
-
-                        {/* Rewards Capsule (Coins + Gems) */}
-                        <div className={`flex items-center justify-center gap-1 ${champ.rewardsBg} rounded-md py-0.5 px-1 shadow-xs leading-none`}>
-                          <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain shrink-0" />
-                          <span className="text-amber-300 font-black text-[8.5px] font-display">
-                            {champ.coins}
-                          </span>
-                          <span className="text-white/30 text-[7px]">|</span>
-                          <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-2.5 h-2.5 object-contain shrink-0" />
-                          <span className="text-cyan-200 font-black text-[8.5px] font-display">
-                            {champ.gems}
-                          </span>
+                              <div className={`flex items-center justify-center gap-1 ${champ.rewardsBg} rounded py-0.5 px-1 shadow-xs leading-none`}>
+                                <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-2.5 h-2.5 object-contain shrink-0" />
+                                <span className="text-amber-300 font-black text-[8px] font-display">
+                                  {champ.coins}
+                                </span>
+                                <span className="text-white/30 text-[6.5px]">|</span>
+                                <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-2.5 h-2.5 object-contain shrink-0" />
+                                <span className="text-cyan-200 font-black text-[8px] font-display">
+                                  {champ.gems}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
