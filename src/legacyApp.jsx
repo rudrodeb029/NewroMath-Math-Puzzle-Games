@@ -6087,29 +6087,31 @@ import {
                 className="absolute inset-y-0 right-0 left-[41%] flex flex-col justify-between py-2 sm:py-3 pr-2.5 sm:pr-4 pl-1 pointer-events-none"
                 style={{ top: '6%', bottom: '6%' }}
               >
-                {/* Header Row: Title + Dynamic Date Badge */}
-                <div className="flex items-center justify-between gap-1 min-w-0">
-                  <span 
-                    className="text-white font-black tracking-tight leading-tight block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)] truncate"
-                    style={{ fontSize: 'clamp(13px, 3.6vw, 17px)' }}
-                  >
-                    Daily <span className="text-cyan-300">Challenge</span>
-                  </span>
-                  
-                  {/* Dynamic Date Badge */}
-                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#0a1e4a]/90 border border-cyan-400/50 text-[8px] sm:text-[9.5px] font-mono font-bold text-cyan-200 shadow-sm shrink-0">
-                    <Calendar className="w-2.5 h-2.5 text-cyan-300 shrink-0" />
-                    <span>{todayFormattedDate}</span>
+                {/* Grouped Header + Subtitle: reduced gap between title and next line */}
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-center justify-between gap-1 min-w-0">
+                    <span 
+                      className="text-white font-black tracking-tight leading-tight block drop-shadow-[0_2px_4px_rgba(0,10,35,0.95)] truncate"
+                      style={{ fontSize: 'clamp(13px, 3.6vw, 17px)' }}
+                    >
+                      Daily <span className="text-cyan-300">Challenge</span>
+                    </span>
+                    
+                    {/* Dynamic Date Badge */}
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#0a1e4a]/90 border border-cyan-400/50 text-[8px] sm:text-[9.5px] font-mono font-bold text-cyan-200 shadow-sm shrink-0">
+                      <Calendar className="w-2.5 h-2.5 text-cyan-300 shrink-0" />
+                      <span>{todayFormattedDate}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Dynamic Subtitle */}
-                <p 
-                  className="text-[#cce9ff] font-medium tracking-tight drop-shadow-[0_1px_2px_rgba(0,10,35,0.85)] truncate leading-tight my-0.5"
-                  style={{ fontSize: 'clamp(8.5px, 2.1vw, 10.5px)' }}
-                >
-                  Solve today's puzzle and get amazing rewards!
-                </p>
+                  {/* Subtitle directly beneath title with reduced gap */}
+                  <p 
+                    className="text-[#cce9ff] font-medium tracking-tight drop-shadow-[0_1px_2px_rgba(0,10,35,0.85)] truncate leading-tight mt-0.5"
+                    style={{ fontSize: 'clamp(8.5px, 2.1vw, 10.5px)' }}
+                  >
+                    Solve today's puzzle and get amazing rewards!
+                  </p>
+                </div>
 
                 {/* 3D Play Button (Increased width to fit the space) */}
                 <div className="flex items-center justify-end pt-0.5 sm:pt-1 pointer-events-auto pr-0.5 sm:pr-1 w-full">
@@ -6408,22 +6410,41 @@ import {
                       confetti({ particleCount: 30, spread: 50 });
                       navigateTo('leaderboard');
                     }}
-                    className={`math-arch-card shrink-0 cursor-pointer select-none transition-transform hover:scale-[1.03] active:scale-[0.97] border-[1.5px] ${champ.borderCol} bg-gradient-to-b ${champ.cardBg}`}
+                    className={`math-arch-card shrink-0 cursor-pointer select-none rounded-2xl overflow-hidden transition-transform hover:scale-[1.03] active:scale-[0.97] border-[1.5px] ${champ.borderCol} bg-gradient-to-b ${champ.cardBg} shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_8px_20px_rgba(0,0,0,0.5)]`}
                     style={{ scrollSnapAlign: 'start' }}
                     title={`${champ.name} - ${champ.rank}`}
                   >
-                    <div className="w-[112px] h-[170px] p-2 flex flex-col justify-between relative overflow-hidden pt-3">
+                    <div className="w-[112px] h-[170px] p-2 flex flex-col justify-between relative overflow-hidden pt-2.5">
                       {/* 1. Mathematical Blueprint Coordinate Grid */}
                       <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
 
-                      {/* 2. Architectural Drafting Corner Marks (+) */}
-                      <span className={`absolute top-1 left-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
-                      <span className={`absolute top-1 right-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
-                      <span className={`absolute bottom-1 left-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
-                      <span className={`absolute bottom-1 right-1.5 text-[8px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                      {/* 2. Precision Architectural Tech Corner Brackets */}
+                      <div className={`absolute top-1.5 left-1.5 w-2 h-2 border-t-[1.5px] border-l-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
+                      <div className={`absolute top-1.5 right-1.5 w-2 h-2 border-t-[1.5px] border-r-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
+                      <div className={`absolute bottom-1.5 left-1.5 w-2 h-2 border-b-[1.5px] border-l-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
+                      <div className={`absolute bottom-1.5 right-1.5 w-2 h-2 border-b-[1.5px] border-r-[1.5px] ${champ.borderCol.split(' ')[0]} opacity-80 pointer-events-none`} />
+
+                      {/* Architectural Drafting Corner Marks (+) */}
+                      <span className={`absolute top-2 left-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                      <span className={`absolute top-2 right-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                      <span className={`absolute bottom-2 left-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
+                      <span className={`absolute bottom-2 right-2 text-[7px] font-mono ${champ.cornerColor} select-none pointer-events-none leading-none`}>+</span>
 
                       {/* Glossy top glass reflection */}
-                      <div className="absolute inset-x-0 top-0 h-2/5 bg-gradient-to-b from-white/20 via-white/5 to-transparent rounded-t-[16px] pointer-events-none" />
+                      <div className="absolute inset-x-0 top-0 h-2/5 bg-gradient-to-b from-white/25 via-white/5 to-transparent rounded-t-2xl pointer-events-none" />
+
+                      {/* Top Architectural Blueprint Header Tag & Symbol */}
+                      <div className="w-full relative z-10 px-1 pt-0.5">
+                        <div className="flex items-center justify-between">
+                          <span className={`text-[7px] font-mono font-bold tracking-tight opacity-90 ${champ.countryText} truncate max-w-[70px] uppercase`}>
+                            {champ.blueprintTag}
+                          </span>
+                          <span className={`text-[8.5px] font-black font-mono leading-none opacity-90 ${champ.countryText}`}>
+                            {champ.mathSymbol}
+                          </span>
+                        </div>
+                        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent my-0.5" />
+                      </div>
 
                       {/* Center: 3D Champion Avatar / Icon + Username + Country */}
                       <div className="flex flex-col items-center justify-center relative z-10 my-auto py-0.5">
@@ -13071,7 +13092,7 @@ import {
                   <img 
                     src="/assets/reward_gift_dial_full.webp" 
                     alt="Daily Reward" 
-                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)] animate-pulse" 
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)]" 
                   />
                   <div className="min-w-0 flex-1">
                     <h3 className="text-xs sm:text-sm font-black text-white truncate">Daily Mystery Chest</h3>
@@ -13118,8 +13139,17 @@ import {
                 <div className="absolute -right-8 -top-8 w-36 h-36 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="flex items-start justify-between gap-3 relative z-10 mb-2.5">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-500 to-yellow-600 border border-amber-200 flex items-center justify-center text-2xl shadow-[0_0_18px_rgba(251,191,36,0.7)] shrink-0 animate-pulse">
-                      👑
+                    {/* Skeuomorphic VIP Crown Pedestal Circle */}
+                    <div className="relative w-13 h-13 rounded-full p-[2px] bg-gradient-to-b from-amber-200 via-amber-400 to-amber-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_16px_rgba(245,158,11,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)] shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-amber-950 via-[#1a0e02] to-amber-900 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <span className="text-2xl leading-none drop-shadow-[0_3px_6px_rgba(0,0,0,0.8)] relative z-10 transition-transform hover:scale-110 select-none">
+                            👑
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <h3 className="text-sm sm:text-base font-black text-white font-display">
