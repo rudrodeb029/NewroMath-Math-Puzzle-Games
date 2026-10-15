@@ -824,6 +824,14 @@ const PLAYER_COUNTRIES = [
           });
         } catch (e) {}
       }
+
+      // Celebration fanfare
+      celebrate() {
+        if (this.muted) return;
+        try {
+          this.fanfare();
+        } catch (e) {}
+      }
     }
     const sound = new SoundEngine();
     if (typeof window !== 'undefined') window.__sound = sound;
@@ -4856,12 +4864,25 @@ const PLAYER_COUNTRIES = [
       };
 
       const handleSaveProfileModal = (e) => {
-        if (e) e.preventDefault();
-        sound.celebrate();
-        const trimmedName = profileFormName.trim() || 'Guest-JFNZLZ';
+        if (e) {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        }
+
+        try {
+          if (sound && typeof sound.celebrate === 'function') {
+            sound.celebrate();
+          } else if (sound && typeof sound.fanfare === 'function') {
+            sound.fanfare();
+          } else if (sound && typeof sound.success === 'function') {
+            sound.success();
+          }
+        } catch (sErr) {}
+
+        const trimmedName = (profileFormName || '').trim() || 'Guest-JFNZLZ';
         const trimmedCountry = profileFormCountry || 'United States';
-        const trimmedPhone = profileFormPhone.trim();
-        const trimmedEmail = profileFormEmail.trim();
+        const trimmedPhone = (profileFormPhone || '').trim();
+        const trimmedEmail = (profileFormEmail || '').trim();
 
         setPlayerName(trimmedName);
         setPlayerCountry(trimmedCountry);
@@ -4873,9 +4894,20 @@ const PLAYER_COUNTRIES = [
           GameStorage.setItem('newromath_player_country', trimmedCountry);
           GameStorage.setItem('newromath_player_phone', trimmedPhone);
           GameStorage.setItem('newromath_player_email', trimmedEmail);
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('newromath_player_name', trimmedName);
+            localStorage.setItem('newromath_player_country', trimmedCountry);
+            localStorage.setItem('newromath_player_phone', trimmedPhone);
+            localStorage.setItem('newromath_player_email', trimmedEmail);
+          }
         } catch (err) {}
 
-        confetti({ particleCount: 35, spread: 60 });
+        try {
+          if (typeof confetti === 'function') {
+            confetti({ particleCount: 40, spread: 60 });
+          }
+        } catch (cErr) {}
+
         setRewardToast('🎉 Player profile updated successfully!');
         setIsProfileModalOpen(false);
       };
@@ -11709,6 +11741,18 @@ const PLAYER_COUNTRIES = [
                         <span>{PLAYER_COUNTRIES.find(c => c.name === playerCountry)?.flag || '🌍'}</span>
                         <span className="truncate max-w-[100px]">{playerCountry}</span>
                       </span>
+                      {playerPhone ? (
+                        <span className="text-[9.5px] bg-sky-950/50 border border-cyan-400/30 text-cyan-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm shadow-xs">
+                          <Phone className="w-2.5 h-2.5 text-cyan-300 shrink-0" />
+                          <span className="truncate max-w-[105px]">{playerPhone}</span>
+                        </span>
+                      ) : null}
+                      {playerEmail ? (
+                        <span className="text-[9.5px] bg-sky-950/50 border border-cyan-400/30 text-cyan-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm shadow-xs">
+                          <Mail className="w-2.5 h-2.5 text-cyan-300 shrink-0" />
+                          <span className="truncate max-w-[130px]">{playerEmail}</span>
+                        </span>
+                      ) : null}
                       {(() => {
                         const activeAward = LEVEL_AWARDS.find(a => a.icon === equippedAvatar);
                         return activeAward ? (
@@ -12084,7 +12128,7 @@ const PLAYER_COUNTRIES = [
                       </div>
 
                       {/* Form Body */}
-                      <form onSubmit={handleSaveProfileModal} className="relative z-10 space-y-3">
+                      <form onSubmit={handleSaveProfileModal} noValidate className="relative z-10 space-y-3">
                         {/* 1. Name Field */}
                         <div className="space-y-1">
                           <label className="flex items-center justify-between text-[11px] font-bold text-cyan-200 tracking-tight">
@@ -12198,6 +12242,7 @@ const PLAYER_COUNTRIES = [
                           {/* Skeuomorphic 3D Save Button */}
                           <button
                             type="submit"
+                            onClick={handleSaveProfileModal}
                             className="relative w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black flex items-center justify-center gap-2 shadow-[0_4px_0_#92400e,0_8px_18px_rgba(245,158,11,0.45),inset_0_1px_1.5px_rgba(255,255,255,0.85)] active:translate-y-1 active:shadow-[0_1px_0_#92400e] cursor-pointer transition-all border border-amber-200/80 uppercase tracking-wider text-xs sm:text-sm overflow-hidden"
                           >
                             {/* Curved specular highlight */}
