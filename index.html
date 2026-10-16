@@ -741,5 +741,12 @@
   <div id="root" class="w-full max-w-[430px] h-[100dvh] sm:h-[890px] bg-[#183278] sm:rounded-[44px] sm:shadow-[0_25px_60px_-15px_rgba(20,50,130,0.6)] overflow-hidden flex flex-col relative border-0 sm:border-[8px] sm:border-[#224896]"><div class="nm-loader-overlay nm-boot" role="status" aria-label="Loading"><div class="nm-loader-card"><svg class="nm-loader" viewBox="0 0 100 80"><g transform="translate(50 0) scale(0.707 0.707) rotate(45 0 0)"><rect class="rect nm-r1" width="30" height="30" rx="2" ry="2" fill="red"/><rect class="rect nm-r2" width="30" height="30" rx="2" ry="2" fill="green"/><rect class="rect nm-r3" width="30" height="30" rx="2" ry="2" fill="blue"/><rect class="rect nm-r4" width="30" height="30" rx="2" ry="2" fill="black"/><rect class="rect nm-r5" width="30" height="30" rx="2" ry="2" fill="orange"/><rect class="rect nm-r6" width="30" height="30" rx="2" ry="2" fill="teal"/><rect class="rect nm-r7" width="30" height="30" rx="2" ry="2" fill="gold"/></g></svg></div></div></div>
 
   <script type="module" src="/src/legacyApp.jsx"></script>
+  <script>
+    if ('serviceWorker' in navigator && (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform())) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      });
+    }
+  </script>
 </body>
 </html>

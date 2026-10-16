@@ -950,7 +950,7 @@ const PLAYER_COUNTRIES = [
     const GameStorage = new FastGameStorage();
     if (typeof window !== 'undefined') {
       window.GameStorage = GameStorage;
-      setTimeout(() => { void initFirebaseCloudSync(); }, 300);
+      setTimeout(() => { void initFirebaseCloudSync(GameStorage.cache); }, 300);
     }
 
     function PageTransition({ screenKey, direction, children, isWaitingForLoad = false }) {
