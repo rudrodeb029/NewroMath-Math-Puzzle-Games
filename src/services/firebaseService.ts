@@ -1,6 +1,7 @@
 /**
- * Firebase Realtime Database & Cloud Sync Service for NewroMath
+ * Firebase Cloud Firestore & Realtime Database Sync Service for NewroMath
  * Project ID: newromaths
+ * Cloud Firestore: projects/newromaths/databases/(default)
  * Realtime Database URL: https://newromaths-default-rtdb.firebaseio.com
  */
 
@@ -8,6 +9,7 @@ export const FIREBASE_CONFIG = {
   projectId: 'newromaths',
   appId: '1:380321074987:web:5f576dfdde6b963ddaff6e',
   databaseURL: 'https://newromaths-default-rtdb.firebaseio.com',
+  firestoreBaseUrl: 'https://firestore.googleapis.com/v1/projects/newromaths/databases/(default)/documents',
   storageBucket: 'newromaths.firebasestorage.app',
   apiKey: 'AIzaSyAlGxK6C1_MZzIU3u0U6rvceXVmAJWg4Q4',
   authDomain: 'newromaths.firebaseapp.com',
@@ -50,9 +52,109 @@ const COUNTRY_FLAG_MAP: Record<string, string> = {
   Switzerland: '🇨🇭',
 };
 
+/**
+ * Converts a JS value to Cloud Firestore REST API Value format
+ */
+export function toFirestoreValue(val: any): Record<string, any> {
+  if (val === null || val === undefined) {
+    return { nullValue: null };
+  }
+  if (typeof val === 'boolean') {
+    return { booleanValue: val };
+  }
+  if (typeof val === 'number') {
+    if (Number.isInteger(val)) {
+      return { integerValue: String(val) };
+    }
+    return { doubleValue: val };
+  }
+  if (typeof val === 'string') {
+    return { stringValue: val };
+  }
+  if (Array.isArray(val)) {
+    return {
+      arrayValue: {
+        values: val.map((item) => toFirestoreValue(item)),
+      },
+    };
+  }
+  if (typeof val === 'object') {
+    const fields: Record<string, any> = {};
+    for (const [k, v] of Object.entries(val)) {
+      if (v !== undefined) {
+        fields[k] = toFirestoreValue(v);
+      }
+    }
+    return { mapValue: { fields } };
+  }
+  return { stringValue: String(val) };
+}
+
+/**
+ * Converts a plain JS object to a Cloud Firestore Document payload ({ fields: ... })
+ */
+export function toFirestoreDocument(obj: Record<string, any>): { fields: Record<string, any> } {
+  const fields: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) {
+      fields[k] = toFirestoreValue(v);
+    }
+  }
+  return { fields };
+}
+
+/**
+ * Converts a Cloud Firestore REST API Value back to a plain JS value
+ */
+export function fromFirestoreValue(valObj: any): any {
+  if (!valObj || typeof valObj !== 'object') return null;
+  if ('stringValue' in valObj) return valObj.stringValue;
+  if ('booleanValue' in valObj) return Boolean(valObj.booleanValue);
+  if ('integerValue' in valObj) return Number(valObj.integerValue);
+  if ('doubleValue' in valObj) return Number(valObj.doubleValue);
+  if ('nullValue' in valObj) return null;
+  if ('arrayValue' in valObj) {
+    const vals = valObj.arrayValue?.values || [];
+    return vals.map((v: any) => fromFirestoreValue(v));
+  }
+  if ('mapValue' in valObj) {
+    return fromFirestoreDocument(valObj.mapValue);
+  }
+  return null;
+}
+
+/**
+ * Converts a Cloud Firestore Document ({ fields: ... }) back to a plain JS object
+ */
+export function fromFirestoreDocument(doc: any): Record<string, any> | null {
+  if (!doc || !doc.fields) return null;
+  const result: Record<string, any> = {};
+  for (const [k, v] of Object.entries(doc.fields)) {
+    result[k] = fromFirestoreValue(v);
+  }
+  return result;
+}
+
+/**
+ * Upserts a document in Cloud Firestore via REST API
+ */
+export async function upsertFirestoreDoc(collectionPath: string, docId: string, data: Record<string, any>): Promise<boolean> {
+  try {
+    const url = `${FIREBASE_CONFIG.firestoreBaseUrl}/${collectionPath}/${encodeURIComponent(docId)}?key=${FIREBASE_CONFIG.apiKey}`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(toFirestoreDocument(data)),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export function getOrCreatePlayerId(): string {
   try {
-    let existing = localStorage.getItem(PLAYER_ID_KEY);
+    const existing = localStorage.getItem(PLAYER_ID_KEY);
     if (existing && existing.trim().length > 4) {
       return existing.trim();
     }
@@ -115,7 +217,7 @@ export interface PlayerCloudSnapshot {
 }
 
 /**
- * Builds a complete snapshot of all local player data to sync with Firebase
+ * Builds a complete snapshot of all local player data to sync with Firebase Firestore & RTDB
  */
 export function buildLocalPlayerSnapshot(): PlayerCloudSnapshot {
   const playerId = getOrCreatePlayerId();
@@ -199,22 +301,14 @@ export function buildLocalPlayerSnapshot(): PlayerCloudSnapshot {
 let syncTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 /**
- * Immediately pushes the current player snapshot and leaderboard score to Firebase Realtime Database
+ * Immediately pushes the current player snapshot and leaderboard score to both
+ * Cloud Firestore and Firebase Realtime Database
  */
 export async function syncPlayerToFirebaseNow(): Promise<boolean> {
   try {
     const snapshot = buildLocalPlayerSnapshot();
     const { playerId, profile, progress } = snapshot;
 
-    // 1. Sync full user document to /users/{playerId}.json
-    const userUrl = `${FIREBASE_CONFIG.databaseURL}/users/${encodeURIComponent(playerId)}.json`;
-    const userRes = await fetch(userUrl, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(snapshot),
-    });
-
-    // 2. Sync live player entry to /leaderboard/{playerId}.json
     const computedScore = progress.playerXp + progress.unlockedLevelMax * 500 + progress.coins;
     const leaderboardEntry = {
       playerId,
@@ -229,14 +323,28 @@ export async function syncPlayerToFirebaseNow(): Promise<boolean> {
       isProUser: progress.isProUser,
       updatedAt: snapshot.updatedAt,
     };
+
+    // 1. Sync to Cloud Firestore (users/{playerId} & leaderboard/{playerId})
+    const fsUserPromise = upsertFirestoreDoc('users', playerId, snapshot);
+    const fsLbPromise = upsertFirestoreDoc('leaderboard', playerId, leaderboardEntry);
+
+    // 2. Sync to Firebase Realtime Database (/users/{playerId}.json & /leaderboard/{playerId}.json)
+    const userUrl = `${FIREBASE_CONFIG.databaseURL}/users/${encodeURIComponent(playerId)}.json`;
+    const rtdbUserPromise = fetch(userUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(snapshot),
+    }).then((r) => r.ok).catch(() => false);
+
     const lbUrl = `${FIREBASE_CONFIG.databaseURL}/leaderboard/${encodeURIComponent(playerId)}.json`;
-    await fetch(lbUrl, {
+    const rtdbLbPromise = fetch(lbUrl, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(leaderboardEntry),
-    });
+    }).then((r) => r.ok).catch(() => false);
 
-    return userRes.ok;
+    const [fsOk, , rtdbOk] = await Promise.all([fsUserPromise, fsLbPromise, rtdbUserPromise, rtdbLbPromise]);
+    return Boolean(fsOk || rtdbOk);
   } catch (err) {
     console.warn('[NewroMath Firebase] Cloud sync deferred (offline or network unavailable):', err);
     return false;
@@ -258,7 +366,7 @@ export function scheduleFirebaseSync(changedKey?: string): void {
 }
 
 /**
- * Submit a support / feedback ticket directly to Firebase Realtime Database (/feedback_tickets/{ticketId})
+ * Submit a support / feedback ticket directly to Cloud Firestore and Realtime Database
  */
 export async function submitFeedbackTicketToFirebase(payload: {
   category: string;
@@ -281,13 +389,17 @@ export async function submitFeedbackTicketToFirebase(payload: {
       status: 'open',
       createdAt: Date.now(),
     };
-    const url = `${FIREBASE_CONFIG.databaseURL}/feedback_tickets/${encodeURIComponent(ticketId)}.json`;
-    const res = await fetch(url, {
+
+    const fsPromise = upsertFirestoreDoc('feedback_tickets', ticketId, ticketData);
+    const rtdbUrl = `${FIREBASE_CONFIG.databaseURL}/feedback_tickets/${encodeURIComponent(ticketId)}.json`;
+    const rtdbPromise = fetch(rtdbUrl, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(ticketData),
-    });
-    return res.ok;
+    }).then((r) => r.ok).catch(() => false);
+
+    const [fsOk, rtdbOk] = await Promise.all([fsPromise, rtdbPromise]);
+    return Boolean(fsOk || rtdbOk);
   } catch (err) {
     console.warn('[NewroMath Firebase] Failed to submit feedback ticket:', err);
     return false;
@@ -295,7 +407,7 @@ export async function submitFeedbackTicketToFirebase(payload: {
 }
 
 /**
- * Record an IAP store purchase in Firebase Realtime Database (/purchases/{purchaseId})
+ * Record an IAP store purchase in Cloud Firestore and Realtime Database
  */
 export async function recordPurchaseToFirebase(payload: {
   productId: string;
@@ -319,24 +431,39 @@ export async function recordPurchaseToFirebase(payload: {
       grantPro: Boolean(payload.grantPro),
       createdAt: Date.now(),
     };
+
+    const fsPromise = upsertFirestoreDoc('purchases', purchaseId, purchaseRecord);
     const url = `${FIREBASE_CONFIG.databaseURL}/purchases/${encodeURIComponent(purchaseId)}.json`;
-    const res = await fetch(url, {
+    const rtdbPromise = fetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(purchaseRecord),
-    });
+    }).then((r) => r.ok).catch(() => false);
+
     void syncPlayerToFirebaseNow();
-    return res.ok;
+    const [fsOk, rtdbOk] = await Promise.all([fsPromise, rtdbPromise]);
+    return Boolean(fsOk || rtdbOk);
   } catch {
     return false;
   }
 }
 
 /**
- * Fetch live Global Leaderboard entries from Firebase Realtime Database (/leaderboard.json)
+ * Fetch live Global Leaderboard entries from Cloud Firestore (with RTDB fallback)
  */
 export async function fetchLeaderboardFromFirebase(): Promise<any[]> {
   try {
+    const fsUrl = `${FIREBASE_CONFIG.firestoreBaseUrl}/leaderboard?pageSize=50&key=${FIREBASE_CONFIG.apiKey}`;
+    const fsRes = await fetch(fsUrl);
+    if (fsRes.ok) {
+      const fsJson = await fsRes.json();
+      if (Array.isArray(fsJson?.documents) && fsJson.documents.length > 0) {
+        return fsJson.documents
+          .map((doc: any) => fromFirestoreDocument(doc))
+          .filter(Boolean)
+          .sort((a: any, b: any) => (b.score || b.xp || 0) - (a.score || a.xp || 0));
+      }
+    }
     const url = `${FIREBASE_CONFIG.databaseURL}/leaderboard.json`;
     const res = await fetch(url);
     if (!res.ok) return [];
@@ -350,61 +477,79 @@ export async function fetchLeaderboardFromFirebase(): Promise<any[]> {
 
 /**
  * Initializes two-way cloud synchronization on app startup:
- * - Pulls existing cloud profile/progress if present and merges with local storage
- * - Otherwise seeds the current device player into Firebase Realtime Database
+ * - Pulls existing cloud profile/progress from Cloud Firestore (or RTDB fallback) and merges with local storage
+ * - Otherwise seeds the current device player into Cloud Firestore & Realtime Database
  */
 export async function initFirebaseCloudSync(storageCache?: Record<string, string>): Promise<void> {
   try {
     const playerId = getOrCreatePlayerId();
-    const userUrl = `${FIREBASE_CONFIG.databaseURL}/users/${encodeURIComponent(playerId)}.json`;
-    const res = await fetch(userUrl);
-    if (res.ok) {
-      const cloudData = (await res.json()) as Partial<PlayerCloudSnapshot> | null;
-      if (cloudData && cloudData.progress && cloudData.profile) {
-        const localSnap = buildLocalPlayerSnapshot();
-        let didRestoreFromCloud = false;
+    let cloudData: Partial<PlayerCloudSnapshot> | null = null;
 
-        const setKey = (k: string, v: string) => {
-          localStorage.setItem(k, v);
-          if (storageCache) storageCache[k] = v;
-        };
+    // Try Cloud Firestore first
+    try {
+      const fsUrl = `${FIREBASE_CONFIG.firestoreBaseUrl}/users/${encodeURIComponent(playerId)}?key=${FIREBASE_CONFIG.apiKey}`;
+      const fsRes = await fetch(fsUrl);
+      if (fsRes.ok) {
+        const fsDoc = await fsRes.json();
+        cloudData = fromFirestoreDocument(fsDoc) as Partial<PlayerCloudSnapshot> | null;
+      }
+    } catch {
+      // fallback to RTDB
+    }
 
-        // Merge highest progression values
-        if ((cloudData.progress.unlockedLevelMax || 1) > localSnap.progress.unlockedLevelMax) {
-          setKey('newromath_unlocked_level', String(cloudData.progress.unlockedLevelMax));
-          didRestoreFromCloud = true;
-        }
-        if ((cloudData.progress.playerXp || 0) > localSnap.progress.playerXp) {
-          setKey('newromath_player_xp', String(cloudData.progress.playerXp));
-          didRestoreFromCloud = true;
-        }
-        if (cloudData.progress.isProUser && !localSnap.progress.isProUser) {
-          setKey('newromath_is_pro_user', 'true');
-          didRestoreFromCloud = true;
-        }
-
-        // Restore custom profile fields if local is still default Guest
-        if (
-          cloudData.profile.playerName &&
-          !cloudData.profile.playerName.startsWith('Guest-') &&
-          localSnap.profile.playerName.startsWith('Guest-')
-        ) {
-          setKey('newromath_player_name', cloudData.profile.playerName);
-          if (cloudData.profile.playerCountry) setKey('newromath_player_country', cloudData.profile.playerCountry);
-          if (cloudData.profile.playerPhone) setKey('newromath_player_phone', cloudData.profile.playerPhone);
-          if (cloudData.profile.playerEmail) setKey('newromath_player_email', cloudData.profile.playerEmail);
-          didRestoreFromCloud = true;
-        }
-
-        if (didRestoreFromCloud && typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('newromath-cloud-synced', { detail: cloudData }));
-        }
+    // Fallback to Realtime Database if not found in Firestore yet
+    if (!cloudData) {
+      const userUrl = `${FIREBASE_CONFIG.databaseURL}/users/${encodeURIComponent(playerId)}.json`;
+      const res = await fetch(userUrl);
+      if (res.ok) {
+        cloudData = (await res.json()) as Partial<PlayerCloudSnapshot> | null;
       }
     }
-    // Always push latest merged state back to Firebase
+
+    if (cloudData && cloudData.progress && cloudData.profile) {
+      const localSnap = buildLocalPlayerSnapshot();
+      let didRestoreFromCloud = false;
+
+      const setKey = (k: string, v: string) => {
+        localStorage.setItem(k, v);
+        if (storageCache) storageCache[k] = v;
+      };
+
+      // Merge highest progression values
+      if ((cloudData.progress.unlockedLevelMax || 1) > localSnap.progress.unlockedLevelMax) {
+        setKey('newromath_unlocked_level', String(cloudData.progress.unlockedLevelMax));
+        didRestoreFromCloud = true;
+      }
+      if ((cloudData.progress.playerXp || 0) > localSnap.progress.playerXp) {
+        setKey('newromath_player_xp', String(cloudData.progress.playerXp));
+        didRestoreFromCloud = true;
+      }
+      if (cloudData.progress.isProUser && !localSnap.progress.isProUser) {
+        setKey('newromath_is_pro_user', 'true');
+        didRestoreFromCloud = true;
+      }
+
+      // Restore custom profile fields if local is still default Guest
+      if (
+        cloudData.profile.playerName &&
+        !cloudData.profile.playerName.startsWith('Guest-') &&
+        localSnap.profile.playerName.startsWith('Guest-')
+      ) {
+        setKey('newromath_player_name', cloudData.profile.playerName);
+        if (cloudData.profile.playerCountry) setKey('newromath_player_country', cloudData.profile.playerCountry);
+        if (cloudData.profile.playerPhone) setKey('newromath_player_phone', cloudData.profile.playerPhone);
+        if (cloudData.profile.playerEmail) setKey('newromath_player_email', cloudData.profile.playerEmail);
+        didRestoreFromCloud = true;
+      }
+
+      if (didRestoreFromCloud && typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('newromath-cloud-synced', { detail: cloudData }));
+      }
+    }
+
+    // Always push latest merged state back to both Cloud Firestore and Realtime Database
     await syncPlayerToFirebaseNow();
   } catch (err) {
     console.warn('[NewroMath Firebase] Initial cloud sync skipped:', err);
   }
 }
-
