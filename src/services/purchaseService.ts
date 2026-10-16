@@ -3,6 +3,7 @@
 import { Capacitor } from '@capacitor/core';
 import { NativePurchases, PURCHASE_TYPE, Product } from '@capgo/native-purchases';
 import { adMobService } from './adMobService';
+import { recordPurchaseToFirebase } from './firebaseService';
 
 export interface IAPProductConfig {
   id: string; // SKU used in Google Play Console
@@ -319,6 +320,14 @@ class PurchaseService {
         this.isLoading = false;
         this.activePurchaseSku = null;
         this.notify();
+        void recordPurchaseToFirebase({
+          productId: sku,
+          title: product.name,
+          price: this.getPrice(sku),
+          rewardCoins: product.type === 'coins' ? product.amount : sku === 'newromath_pro_noads' ? 2000 : 0,
+          rewardGems: product.type === 'gems' ? product.amount : sku === 'newromath_pro_noads' ? 50 : 0,
+          grantPro: sku === 'newromath_pro_noads',
+        });
 
         return {
           success: true,
@@ -350,6 +359,14 @@ class PurchaseService {
           this.isLoading = false;
           this.activePurchaseSku = null;
           this.notify();
+          void recordPurchaseToFirebase({
+            productId: sku,
+            title: product.name,
+            price: this.getPrice(sku),
+            rewardCoins: product.type === 'coins' ? product.amount : sku === 'newromath_pro_noads' ? 2000 : 0,
+            rewardGems: product.type === 'gems' ? product.amount : sku === 'newromath_pro_noads' ? 50 : 0,
+            grantPro: sku === 'newromath_pro_noads',
+          });
           resolve({
             success: true,
             sku,

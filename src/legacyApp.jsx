@@ -246,6 +246,7 @@ import confetti from 'canvas-confetti';
 import './index.css';
 import { adMobService } from './services/adMobService';
 import { purchaseService, IAP_CATALOG } from './services/purchaseService';
+import { initFirebaseCloudSync, scheduleFirebaseSync, syncPlayerToFirebaseNow, submitFeedbackTicketToFirebase } from './services/firebaseService';
 import { AdMobBanner, AdMobInterstitialModal, AdMobRewardedModal } from './components/AdMobComponents';
 import {
   Volume2,
@@ -932,6 +933,7 @@ const PLAYER_COUNTRIES = [
             }
           });
           this.pendingWrites.clear();
+          scheduleFirebaseSync('newromath_sync');
         } catch (e) {
           console.warn('[FastGameStorage] Flush error:', e);
         }
@@ -948,6 +950,7 @@ const PLAYER_COUNTRIES = [
     const GameStorage = new FastGameStorage();
     if (typeof window !== 'undefined') {
       window.GameStorage = GameStorage;
+      setTimeout(() => { void initFirebaseCloudSync(); }, 300);
     }
 
     function PageTransition({ screenKey, direction, children, isWaitingForLoad = false }) {

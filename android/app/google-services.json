@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "380321074987",
+    "firebase_url": "https://newromaths-default-rtdb.firebaseio.com",
+    "project_id": "newromaths",
+    "storage_bucket": "newromaths.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380321074987:android:48c86bf1b43eab8ddaff6e",
+        "android_client_info": {
+          "package_name": "com.newromath.puzzlegames"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlZQ4alsZSOkwLjfS6wFP0wK-W8hjjgxI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

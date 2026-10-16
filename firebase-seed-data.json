@@ -1,0 +1,226 @@
+{
+  "app_metadata": {
+    "appName": "NewroMath - Math Puzzle Games",
+    "packageName": "com.newromath.puzzlegames",
+    "firebaseProjectId": "newromaths",
+    "databaseInstance": "newromaths-default-rtdb",
+    "schemaVersion": "1.0.0",
+    "deployedAt": "2026-10-16T19:33:00Z",
+    "entities": [
+      "users/{playerId}/profile",
+      "users/{playerId}/progress",
+      "users/{playerId}/settings",
+      "users/{playerId}/dailyChallenges",
+      "users/{playerId}/puzzleRecords",
+      "users/{playerId}/savedPuzzles",
+      "leaderboard/{playerId}",
+      "catalog/levels",
+      "catalog/awards",
+      "catalog/iap_products",
+      "catalog/countries",
+      "catalog/faqs",
+      "feedback_tickets/{ticketId}",
+      "purchases/{purchaseId}"
+    ]
+  },
+  "catalog": {
+    "levels": {
+      "level_1": { "num": 1, "title": "Number Spark", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "1-10", "xp": 50, "coins": 20, "tag": "Warmup", "tier": "Easy", "stageCount": 3, "targetXp": 120, "cost": { "coins": 0, "gems": 0 } },
+      "level_2": { "num": 2, "title": "Quick Sums", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "1-12", "xp": 60, "coins": 25, "tag": "Addition", "tier": "Easy", "stageCount": 3, "targetXp": 140, "cost": { "coins": 100, "gems": 0 } },
+      "level_3": { "num": 3, "title": "Twin Digits", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "2-15", "xp": 70, "coins": 30, "tag": "Pairs", "tier": "Easy", "stageCount": 3, "targetXp": 160, "cost": { "coins": 160, "gems": 0 } },
+      "level_4": { "num": 4, "title": "Minus Maze", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "3-18", "xp": 80, "coins": 35, "tag": "Subtract", "tier": "Easy", "stageCount": 3, "targetXp": 180, "cost": { "coins": 220, "gems": 0 } },
+      "level_5": { "num": 5, "title": "Stepping Stones", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "5-20", "xp": 95, "coins": 40, "tag": "Combo", "tier": "Easy", "stageCount": 3, "targetXp": 200, "cost": { "coins": 280, "gems": 1 } },
+      "level_6": { "num": 6, "title": "Triple Threat", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "5-25", "xp": 110, "coins": 45, "tag": "3-Step", "tier": "Easy", "stageCount": 3, "targetXp": 220, "cost": { "coins": 340, "gems": 1 } },
+      "level_7": { "num": 7, "title": "Speed Bridge", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "8-30", "xp": 125, "coins": 50, "tag": "Sprint", "tier": "Easy", "stageCount": 3, "targetXp": 240, "cost": { "coins": 400, "gems": 1 } },
+      "level_8": { "num": 8, "title": "Easy Boss", "diff": "Easy", "world": 1, "worldTitle": "Beginner Spark", "range": "10-35", "xp": 150, "coins": 65, "tag": "Milestone", "tier": "Easy", "stageCount": 3, "targetXp": 260, "cost": { "coins": 460, "gems": 1 } },
+      "level_9": { "num": 9, "title": "Factor Forge", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "10-40", "xp": 175, "coins": 75, "tag": "Multiply", "tier": "Medium", "stageCount": 3, "targetXp": 280, "cost": { "coins": 600, "gems": 2 } },
+      "level_10": { "num": 10, "title": "Grid Runner", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "12-45", "xp": 195, "coins": 85, "tag": "Cross", "tier": "Medium", "stageCount": 3, "targetXp": 300, "cost": { "coins": 720, "gems": 2 } },
+      "level_11": { "num": 11, "title": "Split Stream", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "15-50", "xp": 215, "coins": 95, "tag": "Division", "tier": "Medium", "stageCount": 3, "targetXp": 320, "cost": { "coins": 840, "gems": 3 } },
+      "level_12": { "num": 12, "title": "Prime Pulse", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "15-60", "xp": 240, "coins": 105, "tag": "Primes", "tier": "Medium", "stageCount": 3, "targetXp": 340, "cost": { "coins": 960, "gems": 3 } },
+      "level_13": { "num": 13, "title": "Chain Reaction", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "20-65", "xp": 265, "coins": 115, "tag": "Chains", "tier": "Medium", "stageCount": 3, "targetXp": 360, "cost": { "coins": 1080, "gems": 3 } },
+      "level_14": { "num": 14, "title": "Balance Beam", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "20-75", "xp": 290, "coins": 125, "tag": "Equality", "tier": "Medium", "stageCount": 3, "targetXp": 380, "cost": { "coins": 1200, "gems": 4 } },
+      "level_15": { "num": 15, "title": "Cipher Lock", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "25-85", "xp": 320, "coins": 140, "tag": "Mystery", "tier": "Medium", "stageCount": 3, "targetXp": 400, "cost": { "coins": 1320, "gems": 4 } },
+      "level_16": { "num": 16, "title": "Vortex Spin", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "30-95", "xp": 350, "coins": 155, "tag": "Mixed", "tier": "Medium", "stageCount": 3, "targetXp": 420, "cost": { "coins": 1440, "gems": 4 } },
+      "level_17": { "num": 17, "title": "Medium Boss", "diff": "Medium", "world": 2, "worldTitle": "Logic Forge", "range": "35-100", "xp": 400, "coins": 180, "tag": "Milestone", "tier": "Medium", "stageCount": 3, "targetXp": 440, "cost": { "coins": 1560, "gems": 5 } },
+      "level_18": { "num": 18, "title": "Quantum Leap", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "40-120", "xp": 450, "coins": 200, "tag": "Expert", "tier": "Hard", "stageCount": 3, "targetXp": 460, "cost": { "coins": 1800, "gems": 5 } },
+      "level_19": { "num": 19, "title": "Neural Storm", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "50-150", "xp": 500, "coins": 225, "tag": "Brain", "tier": "Hard", "stageCount": 3, "targetXp": 480, "cost": { "coins": 2050, "gems": 6 } },
+      "level_20": { "num": 20, "title": "Hyper Matrix", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "60-180", "xp": 560, "coins": 250, "tag": "Matrix", "tier": "Hard", "stageCount": 3, "targetXp": 500, "cost": { "coins": 2300, "gems": 7 } },
+      "level_21": { "num": 21, "title": "Shadow Calc", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "75-220", "xp": 620, "coins": 280, "tag": "Stealth", "tier": "Hard", "stageCount": 3, "targetXp": 520, "cost": { "coins": 2550, "gems": 7 } },
+      "level_22": { "num": 22, "title": "Infinity Loop", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "90-260", "xp": 690, "coins": 310, "tag": "Endurance", "tier": "Hard", "stageCount": 3, "targetXp": 540, "cost": { "coins": 2800, "gems": 8 } },
+      "level_23": { "num": 23, "title": "Titan Crunch", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "100-320", "xp": 770, "coins": 350, "tag": "Heavy", "tier": "Hard", "stageCount": 3, "targetXp": 560, "cost": { "coins": 3050, "gems": 9 } },
+      "level_24": { "num": 24, "title": "Omega Core", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "120-400", "xp": 860, "coins": 400, "tag": "Final", "tier": "Hard", "stageCount": 3, "targetXp": 580, "cost": { "coins": 3300, "gems": 9 } },
+      "level_25": { "num": 25, "title": "Grandmaster", "diff": "Hard", "world": 3, "worldTitle": "Quantum Apex", "range": "150-500", "xp": 1000, "coins": 500, "tag": "Crown", "tier": "Hard", "stageCount": 3, "targetXp": 600, "cost": { "coins": 3550, "gems": 10 } }
+    },
+    "awards": {
+      "award_1": { "level": 1, "title": "Spark Plug", "icon": "/assets/awards/level_1.webp", "desc": "Ignite your first math equation", "color": "#4ade80" },
+      "award_2": { "level": 2, "title": "Sum Seeker", "icon": "/assets/awards/level_2.webp", "desc": "Master rapid single-digit sums", "color": "#34d399" },
+      "award_3": { "level": 3, "title": "Twin Flame", "icon": "/assets/awards/level_3.webp", "desc": "Conquer double-digit pairings", "color": "#2dd4bf" },
+      "award_4": { "level": 4, "title": "Maze Runner", "icon": "/assets/awards/level_4.webp", "desc": "Navigate the subtraction labyrinth", "color": "#22d3ee" },
+      "award_5": { "level": 5, "title": "Stone Skipper", "icon": "/assets/awards/level_5.webp", "desc": "Hop across combo operations", "color": "#38bdf8" },
+      "award_6": { "level": 6, "title": "Tri-Force", "icon": "/assets/awards/level_6.webp", "desc": "Solve 3-step chained formulas", "color": "#60a5fa" },
+      "award_7": { "level": 7, "title": "Sonic Dash", "icon": "/assets/awards/level_7.webp", "desc": "Cross the speed bridge under par", "color": "#818cf8" },
+      "award_8": { "level": 8, "title": "Bronze Crown", "icon": "/assets/awards/level_8.webp", "desc": "Defeat the Easy Tier Boss", "color": "#fbbf24" },
+      "award_9": { "level": 9, "title": "Iron Blacksmith", "icon": "/assets/awards/level_9.webp", "desc": "Forge heavy multiplication factors", "color": "#fb923c" },
+      "award_10": { "level": 10, "title": "Grid Architect", "icon": "/assets/awards/level_10.webp", "desc": "Complete interlocking cross-math grids", "color": "#f87171" },
+      "award_11": { "level": 11, "title": "Wave Splitter", "icon": "/assets/awards/level_11.webp", "desc": "Slice clean division streams", "color": "#f472b6" },
+      "award_12": { "level": 12, "title": "Prime Guardian", "icon": "/assets/awards/level_12.webp", "desc": "Unlock indivisible prime locks", "color": "#e879f9" },
+      "award_13": { "level": 13, "title": "Chain Reactor", "icon": "/assets/awards/level_13.webp", "desc": "Trigger a 5x streak combo", "color": "#c084fc" },
+      "award_14": { "level": 14, "title": "Equilibrium", "icon": "/assets/awards/level_14.webp", "desc": "Balance dual-sided equations", "color": "#a78bfa" },
+      "award_15": { "level": 15, "title": "Code Breaker", "icon": "/assets/awards/level_15.webp", "desc": "Crack the hidden cipher variables", "color": "#38bdf8" },
+      "award_16": { "level": 16, "title": "Vortex Pilot", "icon": "/assets/awards/level_16.webp", "desc": "Survive mixed-operator turbulence", "color": "#2dd4bf" },
+      "award_17": { "level": 17, "title": "Silver Crest", "icon": "/assets/awards/level_17.webp", "desc": "Conquer the Medium Tier Boss", "color": "#e2e8f0" },
+      "award_18": { "level": 18, "title": "Quantum Jumper", "icon": "/assets/awards/level_18.webp", "desc": "Enter the high-number quantum realm", "color": "#facc15" },
+      "award_19": { "level": 19, "title": "Synapse Lord", "icon": "/assets/awards/level_19.webp", "desc": "Weather the neural calculation storm", "color": "#fb923c" },
+      "award_20": { "level": 20, "title": "Matrix Neo", "icon": "/assets/awards/level_20.webp", "desc": "Decode the hyper-dimensional grid", "color": "#4ade80" },
+      "award_21": { "level": 21, "title": "Phantom Solver", "icon": "/assets/awards/level_21.webp", "desc": "Calculate in stealth mode with zero errors", "color": "#94a3b8" },
+      "award_22": { "level": 22, "title": "Time Lord", "icon": "/assets/awards/level_22.webp", "desc": "Outlast the infinite loop endurance test", "color": "#38bdf8" },
+      "award_23": { "level": 23, "title": "Titan Slayer", "icon": "/assets/awards/level_23.webp", "desc": "Crush triple-digit titan equations", "color": "#f43f5e" },
+      "award_24": { "level": 24, "title": "Omega Core", "icon": "/assets/awards/level_24.webp", "desc": "Stabilize the penultimate math core", "color": "#a855f7" },
+      "award_25": { "level": 25, "title": "Grandmaster", "icon": "/assets/awards/level_25.webp", "desc": "Ascend to the supreme NewroMath throne", "color": "#fde047" }
+    },
+    "iap_products": {
+      "newromath_pro_noads": { "id": "newromath_pro_noads", "type": "non_consumable", "title": "NewroMath PRO + No Ads", "price": "$4.99", "grantPro": true, "rewardCoins": 2500, "rewardGems": 50 },
+      "coins_1500": { "id": "coins_1500", "type": "consumable", "title": "Handful of Coins", "price": "$0.99", "rewardCoins": 1500 },
+      "coins_5000": { "id": "coins_5000", "type": "consumable", "title": "Pouch of Coins", "price": "$2.99", "rewardCoins": 5000 },
+      "coins_15000": { "id": "coins_15000", "type": "consumable", "title": "Chest of Coins", "price": "$6.99", "rewardCoins": 15000 },
+      "coins_45000": { "id": "coins_45000", "type": "consumable", "title": "Vault of Coins", "price": "$14.99", "rewardCoins": 45000 },
+      "gems_50": { "id": "gems_50", "type": "consumable", "title": "Gem Spark", "price": "$0.99", "rewardGems": 50 },
+      "gems_200": { "id": "gems_200", "type": "consumable", "title": "Gem Cluster", "price": "$2.99", "rewardGems": 200 },
+      "gems_600": { "id": "gems_600", "type": "consumable", "title": "Gem Hoard", "price": "$6.99", "rewardGems": 600 },
+      "gems_2000": { "id": "gems_2000", "type": "consumable", "title": "Royal Gem Treasury", "price": "$14.99", "rewardGems": 2000 }
+    },
+    "countries": {
+      "US": { "code": "US", "name": "United States", "flag": "🇺🇸" },
+      "GB": { "code": "GB", "name": "United Kingdom", "flag": "🇬🇧" },
+      "CA": { "code": "CA", "name": "Canada", "flag": "🇨🇦" },
+      "AU": { "code": "AU", "name": "Australia", "flag": "🇦🇺" },
+      "BD": { "code": "BD", "name": "Bangladesh", "flag": "🇧🇩" },
+      "IN": { "code": "IN", "name": "India", "flag": "🇮🇳" },
+      "PK": { "code": "PK", "name": "Pakistan", "flag": "🇵🇰" },
+      "DE": { "code": "DE", "name": "Germany", "flag": "🇩🇪" },
+      "FR": { "code": "FR", "name": "France", "flag": "🇫🇷" },
+      "ES": { "code": "ES", "name": "Spain", "flag": "🇪🇸" },
+      "IT": { "code": "IT", "name": "Italy", "flag": "🇮🇹" },
+      "BR": { "code": "BR", "name": "Brazil", "flag": "🇧🇷" },
+      "MX": { "code": "MX", "name": "Mexico", "flag": "🇲🇽" },
+      "JP": { "code": "JP", "name": "Japan", "flag": "🇯🇵" },
+      "KR": { "code": "KR", "name": "South Korea", "flag": "🇰🇷" },
+      "SG": { "code": "SG", "name": "Singapore", "flag": "🇸🇬" },
+      "MY": { "code": "MY", "name": "Malaysia", "flag": "🇲🇾" },
+      "ID": { "code": "ID", "name": "Indonesia", "flag": "🇮🇩" },
+      "PH": { "code": "PH", "name": "Philippines", "flag": "🇵🇭" },
+      "VN": { "code": "VN", "name": "Vietnam", "flag": "🇻🇳" },
+      "AE": { "code": "AE", "name": "UAE", "flag": "🇦🇪" },
+      "SA": { "code": "SA", "name": "Saudi Arabia", "flag": "🇸🇦" },
+      "TR": { "code": "TR", "name": "Turkey", "flag": "🇹🇷" },
+      "EG": { "code": "EG", "name": "Egypt", "flag": "🇪🇬" },
+      "NG": { "code": "NG", "name": "Nigeria", "flag": "🇳🇬" },
+      "ZA": { "code": "ZA", "name": "South Africa", "flag": "🇿🇦" },
+      "NL": { "code": "NL", "name": "Netherlands", "flag": "🇳🇱" },
+      "SE": { "code": "SE", "name": "Sweden", "flag": "🇸🇪" },
+      "NO": { "code": "NO", "name": "Norway", "flag": "🇳🇴" },
+      "CH": { "code": "CH", "name": "Switzerland", "flag": "🇨🇭" }
+    },
+    "faqs": {
+      "faq_1": { "id": "faq_1", "q": "How do I play the math puzzle?", "a": "Select an empty cell on the cross-math board, then tap a number tile from your tray at the bottom to place it. Complete every horizontal and vertical equation accurately to clear the stage!" },
+      "faq_2": { "id": "faq_2", "q": "How are XP and Coins calculated?", "a": "Each stage awards base XP and Coins according to your Campaign Level tier (Easy, Medium, or Hard). Maintaining a high combo streak and finishing quickly multiplies your rewards!" },
+      "faq_3": { "id": "faq_3", "q": "What are Hints and how do I get more?", "a": "Tapping the Hint bulb automatically places the correct number tile into your selected slot. You can unlock extra hints using Coins or Gems from the Store." },
+      "faq_4": { "id": "faq_4", "q": "How does the Daily Challenge work?", "a": "Every calendar day features a special 3-stage challenge. Completing daily challenges builds your monthly streak and unlocks bonus trophy milestones!" },
+      "faq_5": { "id": "faq_5", "q": "Is my progress saved automatically?", "a": "Yes! Your unlocked levels, XP, coins, gems, custom profile, and puzzle history are saved both locally on your device and synced in real time to the NewroMath Firebase Cloud Database." }
+    }
+  },
+  "leaderboard": {
+    "bot_rank_1": { "playerId": "bot_rank_1", "rank": 1, "name": "RW", "country": "United States", "flag": "🇺🇸", "avatar": "/assets/awards/level_25.webp", "level": 25, "xp": 2490680, "score": 2490680, "coins": 48500, "isProUser": true, "updatedAt": 1792130000000 },
+    "bot_rank_2": { "playerId": "bot_rank_2", "rank": 2, "name": "Guest-7MUET", "country": "United Kingdom", "flag": "🇬🇧", "avatar": "/assets/awards/level_24.webp", "level": 24, "xp": 2385400, "score": 2385400, "coins": 42100, "isProUser": true, "updatedAt": 1792130000000 },
+    "bot_rank_3": { "playerId": "bot_rank_3", "rank": 3, "name": "Guest-JFTL4", "country": "Canada", "flag": "🇨🇦", "avatar": "/assets/awards/level_23.webp", "level": 23, "xp": 2290150, "score": 2290150, "coins": 39800, "isProUser": true, "updatedAt": 1792130000000 },
+    "bot_rank_4": { "playerId": "bot_rank_4", "rank": 4, "name": "Top", "country": "Germany", "flag": "🇩🇪", "avatar": "/assets/awards/level_22.webp", "level": 22, "xp": 2250680, "score": 2250680, "coins": 35000, "isProUser": false, "updatedAt": 1792130000000 },
+    "bot_rank_5": { "playerId": "bot_rank_5", "rank": 5, "name": "Guest-Y9PMW", "country": "Japan", "flag": "🇯🇵", "avatar": "/assets/awards/level_21.webp", "level": 21, "xp": 2187730, "score": 2187730, "coins": 31200, "isProUser": false, "updatedAt": 1792130000000 },
+    "bot_rank_6": { "playerId": "bot_rank_6", "rank": 6, "name": "Guest-N45T5", "country": "India", "flag": "🇮🇳", "avatar": "/assets/awards/level_20.webp", "level": 20, "xp": 2128024, "score": 2128024, "coins": 28400, "isProUser": false, "updatedAt": 1792130000000 },
+    "bot_rank_7": { "playerId": "bot_rank_7", "rank": 7, "name": "So So", "country": "Singapore", "flag": "🇸🇬", "avatar": "/assets/awards/level_19.webp", "level": 19, "xp": 2097730, "score": 2097730, "coins": 25900, "isProUser": false, "updatedAt": 1792130000000 },
+    "bot_rank_8": { "playerId": "bot_rank_8", "rank": 8, "name": "Guest-FCNUD", "country": "Australia", "flag": "🇦🇺", "avatar": "/assets/awards/level_18.webp", "level": 18, "xp": 2053538, "score": 2053538, "coins": 23100, "isProUser": false, "updatedAt": 1792130000000 }
+  },
+  "users": {
+    "player_default_01": {
+      "playerId": "player_default_01",
+      "updatedAt": 1792130000000,
+      "profile": {
+        "playerId": "player_default_01",
+        "playerName": "Guest-JFNZLZ",
+        "playerCountry": "United States",
+        "countryFlag": "🇺🇸",
+        "playerPhone": "",
+        "playerEmail": "",
+        "equippedAvatar": "/assets/icon_robot_3d.webp",
+        "updatedAt": 1792130000000
+      },
+      "progress": {
+        "unlockedLevelMax": 1,
+        "playerLevel": 1,
+        "selectedLevelNum": 1,
+        "playerXp": 0,
+        "coins": 2450,
+        "gems": 25,
+        "isProUser": false,
+        "dailyCrateLastClaimed": "",
+        "updatedAt": 1792130000000
+      },
+      "settings": {
+        "isDarkMode": true,
+        "soundEnabled": true,
+        "hapticsEnabled": true,
+        "notificationsEnabled": true,
+        "timerEnabled": true,
+        "explanationEnabled": true,
+        "autoSubmitEnabled": false,
+        "largeFontEnabled": false,
+        "divisionSymbol": "÷"
+      },
+      "dailyChallenges": {
+        "2026_10": [1, 2, 3]
+      },
+      "puzzleRecords": [
+        {
+          "id": "rec_sample_1",
+          "eq": "4 + 5 = 9",
+          "time": "00:14",
+          "level": 1,
+          "stage": 1,
+          "mode": "Campaign",
+          "solved": true,
+          "xp": 50,
+          "date": "2026-10-16"
+        }
+      ],
+      "savedPuzzles": ["rec_sample_1"]
+    }
+  },
+  "feedback_tickets": {
+    "ticket_welcome_01": {
+      "ticketId": "ticket_welcome_01",
+      "playerId": "player_default_01",
+      "playerName": "Guest-JFNZLZ",
+      "playerCountry": "United States",
+      "email": "support@newromath.com",
+      "category": "System Check",
+      "message": "Initial Firebase Realtime Database feedback collection verified.",
+      "playerLevel": 1,
+      "isProUser": false,
+      "status": "resolved",
+      "createdAt": 1792130000000
+    }
+  },
+  "purchases": {
+    "pur_initial_01": {
+      "purchaseId": "pur_initial_01",
+      "playerId": "player_default_01",
+      "productId": "coins_1500",
+      "title": "Handful of Gold",
+      "price": "$0.99",
+      "rewardCoins": 1500,
+      "rewardGems": 0,
+      "grantPro": false,
+      "createdAt": 1792130000000
+    }
+  }
+}
+

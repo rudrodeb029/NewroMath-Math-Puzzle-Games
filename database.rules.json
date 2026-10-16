@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "catalog": {
+      ".read": true,
+      ".write": false
+    },
+    "app_metadata": {
+      ".read": true,
+      ".write": false
+    },
+    "leaderboard": {
+      ".read": true,
+      ".indexOn": ["score", "xp", "level", "updatedAt"],
+      "$playerId": {
+        ".write": true
+      }
+    },
+    "users": {
+      ".indexOn": ["updatedAt"],
+      "$playerId": {
+        ".read": true,
+        ".write": true,
+        "puzzleRecords": {
+          ".indexOn": ["id", "level", "solved"]
+        }
+      }
+    },
+    "feedback_tickets": {
+      ".read": true,
+      ".indexOn": ["createdAt", "playerId", "status"],
+      "$ticketId": {
+        ".write": true
+      }
+    },
+    "purchases": {
+      ".indexOn": ["playerId", "createdAt"],
+      "$purchaseId": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}
+
