@@ -7110,51 +7110,54 @@ const PLAYER_COUNTRIES = [
       const renderGameScreen = () => {
         const trayCount = puzzleNumbers.length;
         const blankCount = puzzleSlots.length;
-        const isCompact = blankCount >= 5 || trayCount >= 8;
-        const isVeryCompact = blankCount >= 6 || trayCount >= 10;
+        const isCompact = blankCount >= 5 || trayCount >= 6;
+        const isVeryCompact = blankCount >= 6 || trayCount >= 9;
 
-        // Dynamic board max-width based on tray count and blank slots to guarantee fit on all mobile screens
+        // Viewport-aware board width so 5x5 grid + 1 or 2 tray rows + HUD + bottom controls fit 100% with zero vertical scroll
         const gridMaxWidthClass = (() => {
-          if (trayCount >= 11 || blankCount >= 7) return 'max-w-[245px] sm:max-w-[270px]';
-          if (trayCount >= 9 || blankCount >= 6) return 'max-w-[265px] sm:max-w-[290px]';
-          if (trayCount >= 7 || blankCount >= 5) return 'max-w-[285px] sm:max-w-[310px]';
-          if (trayCount >= 6 || blankCount >= 4) return 'max-w-[305px] sm:max-w-[325px]';
-          return 'max-w-[325px] sm:max-w-[340px]';
+          if (trayCount >= 11 || blankCount >= 7) return 'max-w-[215px] sm:max-w-[250px]';
+          if (trayCount >= 9 || blankCount >= 6) return 'max-w-[222px] sm:max-w-[255px]';
+          if (trayCount >= 6 || blankCount >= 5) return 'max-w-[228px] sm:max-w-[265px]';
+          return 'max-w-[246px] sm:max-w-[280px]';
         })();
 
-        const gridGapClass = isVeryCompact ? 'gap-0.5 sm:gap-1' : 'gap-1 sm:gap-1.5 md:gap-2';
+        const boardMaxWidthStyle = trayCount > 5
+          ? { maxWidth: 'min(226px, calc((100vh - 245px) * 0.68))' }
+          : { maxWidth: 'min(246px, calc((100vh - 240px) * 0.78))' };
 
-        // Responsive typography helpers that adapt dynamically to digit count and screen viewport
+        const gridGapClass = isVeryCompact ? 'gap-0.5 sm:gap-1' : 'gap-1 sm:gap-1.5';
+
+        // Responsive typography helpers that adapt dynamically to digit count and compact tile size
         const getTileTextClass = (val) => {
           const str = String(val ?? '');
           const len = str.length;
           if (len >= 3) {
             return isVeryCompact
-              ? 'text-[clamp(8px,2vw,10px)] tracking-tighter font-black'
+              ? 'text-[clamp(7.5px,1.9vw,9.5px)] tracking-tighter font-black'
               : isCompact
-              ? 'text-[clamp(8.5px,2.2vw,11px)] tracking-tighter font-black'
-              : (largeFontEnabled ? 'text-[clamp(10px,2.7vw,13px)] tracking-tight font-black' : 'text-[clamp(9.5px,2.4vw,11.5px)] tracking-tight font-black');
+              ? 'text-[clamp(8px,2.1vw,10.5px)] tracking-tighter font-black'
+              : (largeFontEnabled ? 'text-[clamp(9.5px,2.5vw,12px)] tracking-tight font-black' : 'text-[clamp(9px,2.2vw,11px)] tracking-tight font-black');
           }
           if (len === 2) {
             return isVeryCompact
-              ? 'text-[clamp(10px,2.6vw,12px)] tracking-tight font-black'
+              ? 'text-[clamp(9.5px,2.4vw,11.5px)] tracking-tight font-black'
               : isCompact
-              ? 'text-[clamp(11px,2.9vw,13.5px)] tracking-tight font-black'
-              : (largeFontEnabled ? 'text-[clamp(13px,3.6vw,16px)] tracking-tight font-black' : 'text-[clamp(12px,3.2vw,14.5px)] tracking-tight font-black');
+              ? 'text-[clamp(10.5px,2.7vw,12.5px)] tracking-tight font-black'
+              : (largeFontEnabled ? 'text-[clamp(12px,3.3vw,15px)] tracking-tight font-black' : 'text-[clamp(11px,3vw,13.5px)] tracking-tight font-black');
           }
           return isVeryCompact
-            ? 'text-[clamp(11.5px,3.2vw,14.5px)] font-black'
+            ? 'text-[clamp(11px,3vw,13.5px)] font-black'
             : isCompact
-            ? 'text-[clamp(13px,3.8vw,16.5px)] font-black'
-            : (largeFontEnabled ? 'text-[clamp(16px,4.8vw,22px)] font-black' : 'text-[clamp(14px,4.2vw,19px)] font-black');
+            ? 'text-[clamp(12px,3.4vw,15px)] font-black'
+            : (largeFontEnabled ? 'text-[clamp(14.5px,4.2vw,19px)] font-black' : 'text-[clamp(13px,3.8vw,17px)] font-black');
         };
 
         const getOperatorTextClass = () => {
-          if (isVeryCompact) return 'text-[clamp(10px,2.8vw,13px)] font-black';
-          if (isCompact) return 'text-[clamp(11px,3.2vw,15px)] font-black';
+          if (isVeryCompact) return 'text-[clamp(9.5px,2.6vw,12px)] font-black';
+          if (isCompact) return 'text-[clamp(10.5px,3vw,13.5px)] font-black';
           return largeFontEnabled
-            ? 'text-[clamp(14px,4.5vw,20px)] font-black'
-            : 'text-[clamp(12px,3.8vw,17px)] font-black';
+            ? 'text-[clamp(13px,4vw,18px)] font-black'
+            : 'text-[clamp(11.5px,3.5vw,15.5px)] font-black';
         };
 
         const getTrayButtonSizeClass = () => '';
@@ -7162,27 +7165,23 @@ const PLAYER_COUNTRIES = [
         const getTrayTextClass = (val) => getTileTextClass(val);
 
         return (
-          <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
-          <div 
-            className="flex-1 overflow-y-auto no-scrollbar px-3 pt-0 space-y-2.5 max-w-md mx-auto w-full"
-            style={{ paddingBottom: 'max(3.5rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem))' }}
-          >
-            {/* Top Navigation & HUD Header */}
-            <div className="sticky top-0 z-20 -mx-3 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 pt-2 pb-2 shrink-0">
+          <div className="flex-1 flex flex-col h-full scifi-game-bg select-none overflow-hidden relative text-white">
+            {/* Top Navigation & HUD Header (Fixed at Top) */}
+            <div className="z-20 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between gap-1.5 px-3 py-1.5 shrink-0 w-full max-w-md mx-auto">
               {/* Left: Back Button */}
               <div className="flex items-center shrink-0">
                 <button 
                   onClick={() => { sound.click(); navigateTo('levels'); }} 
                   aria-label="Back to levels" 
-                  className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-sm sm:text-base font-bold shadow-[0_0_10px_rgba(0,229,255,0.3)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   ‹
                 </button>
               </div>
 
               {/* Center: Level Mission Pill */}
-              <div className="flex items-center bg-[#0d255a]/75 backdrop-blur-md border border-cyan-400/50 rounded-full px-3 py-1 shadow-inner shrink-0">
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-cyan-200 font-display">
+              <div className="flex items-center bg-[#0d255a]/75 backdrop-blur-md border border-cyan-400/50 rounded-full px-2.5 py-0.5 shadow-inner shrink-0">
+                <span className="text-[9.5px] sm:text-[10.5px] font-black uppercase tracking-wider text-cyan-200 font-display">
                   Mission L{selectedLevelNum}
                 </span>
               </div>
@@ -7197,7 +7196,7 @@ const PLAYER_COUNTRIES = [
                   }} 
                   aria-label="Mission Instructions & How to Play" 
                   title="Mission Instructions" 
-                  className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border border-yellow-200 text-white flex items-center justify-center text-xs font-black shadow-[0_0_12px_rgba(245,158,11,0.5)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border border-yellow-200 text-white flex items-center justify-center text-[11px] font-black shadow-[0_0_10px_rgba(245,158,11,0.45)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   ⓘ
                 </button>
@@ -7205,7 +7204,7 @@ const PLAYER_COUNTRIES = [
                   onClick={rerollPuzzle} 
                   aria-label="Change all puzzle numbers" 
                   title="Change all puzzle numbers" 
-                  className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-base font-bold shadow-[0_0_12px_rgba(0,229,255,0.35)] hover:scale-105 active:scale-95 transition-all cursor-pointer overflow-hidden"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-b from-[#1b4394] to-[#12306d] border border-cyan-400/70 text-cyan-300 flex items-center justify-center text-sm sm:text-base font-bold shadow-[0_0_10px_rgba(0,229,255,0.3)] hover:scale-105 active:scale-95 transition-all cursor-pointer overflow-hidden"
                 >
                   <span className={`inline-block transition-transform duration-500 ${isSpinningReroll ? 'rotate-180 scale-125 text-white' : ''}`}>
                     ↻
@@ -7214,385 +7213,387 @@ const PLAYER_COUNTRIES = [
               </div>
             </div>
 
-            {/* Appearance Settings Modal */}
-            {showGamePreferences && (
-              <section role="dialog" aria-label="Puzzle appearance settings" className="fixed inset-x-4 top-16 z-30 max-w-sm mx-auto rounded-3xl bg-gradient-to-b from-[#14285e] to-[#0a1533] border border-cyan-400/60 p-5 text-white shadow-[0_0_35px_rgba(0,229,255,0.5)] animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between border-b border-cyan-400/20 pb-2 mb-3">
-                  <h2 className="text-sm font-black uppercase tracking-wider font-display text-cyan-200">Appearance</h2>
-                  <button onClick={() => setShowGamePreferences(false)} className="text-cyan-300 hover:text-white font-bold text-sm">✕</button>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-300 mb-2">Display Theme</h3>
-                    <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
-                      <button onClick={() => setIsDarkMode(false)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!isDarkMode ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
-                        Default Sci-Fi
-                      </button>
-                      <button onClick={() => setIsDarkMode(true)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${isDarkMode ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
-                        Deep Space
-                      </button>
-                    </div>
+            {/* Non-Scrolling Viewport-Locked Main Game Area */}
+            <div className="flex-1 min-h-0 flex flex-col justify-evenly items-center px-2.5 py-1 max-w-md mx-auto w-full overflow-hidden">
+              {/* Appearance Settings Modal */}
+              {showGamePreferences && (
+                <section role="dialog" aria-label="Puzzle appearance settings" className="fixed inset-x-4 top-14 z-30 max-w-sm mx-auto rounded-3xl bg-gradient-to-b from-[#14285e] to-[#0a1533] border border-cyan-400/60 p-5 text-white shadow-[0_0_35px_rgba(0,229,255,0.5)] animate-in fade-in zoom-in-95 duration-150">
+                  <div className="flex items-center justify-between border-b border-cyan-400/20 pb-2 mb-3">
+                    <h2 className="text-sm font-black uppercase tracking-wider font-display text-cyan-200">Appearance</h2>
+                    <button onClick={() => setShowGamePreferences(false)} className="text-cyan-300 hover:text-white font-bold text-sm">✕</button>
                   </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-300 mb-2">Numeral Font Size</h3>
-                    <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
-                      {[true, false].map(isLarge => (
-                        <button key={String(isLarge)} onClick={() => setLargeFontEnabled(isLarge)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${largeFontEnabled === isLarge ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
-                          {isLarge ? 'Large Font' : 'Standard Font'}
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-300 mb-2">Display Theme</h3>
+                      <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
+                        <button onClick={() => setIsDarkMode(false)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!isDarkMode ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
+                          Default Sci-Fi
                         </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-300 mb-2">Division Notation</h3>
-                    <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
-                      {['÷', '/', ':'].map(symbol => (
-                        <button key={symbol} onClick={() => setDivisionSymbol(symbol)} className={`w-10 h-10 rounded-xl text-base font-black transition-all ${divisionSymbol === symbol ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
-                          {symbol}
+                        <button onClick={() => setIsDarkMode(true)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${isDarkMode ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
+                          Deep Space
                         </button>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* Mission Board Terminal */}
-            <section className="flex flex-col rounded-3xl p-2.5 sm:p-4 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl">
-              {/* Blueprint Grid Overlay */}
-              <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
-
-              {/* Drafting Corner Crosses */}
-              <span className="absolute top-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-              <span className="absolute top-1.5 right-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-              <span className="absolute bottom-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-              <span className="absolute bottom-1.5 right-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
-
-              {/* Mission HUD Header: Yellow Background Modern 3D Glassmorphism Section */}
-              <div className="relative z-10 flex items-center justify-between px-2.5 py-2 rounded-2xl bg-gradient-to-b from-yellow-300/25 via-amber-400/20 to-yellow-500/15 border border-yellow-300/50 shadow-[0_4px_20px_rgba(245,158,11,0.25),inset_0_1.5px_1.5px_rgba(255,255,255,0.65),inset_0_-1.5px_3px_rgba(180,83,9,0.3)] backdrop-blur-xl mb-2.5 overflow-hidden">
-                {/* Luminous Inner Glow Shimmer */}
-                <div className="absolute -top-6 left-1/4 w-32 h-12 bg-yellow-300/20 rounded-full blur-md pointer-events-none" />
-
-                {/* Left: 3D Difficulty Badge & Stage Counter */}
-                <div className="relative z-10 flex items-center gap-1.5 min-w-0">
-                  <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] transition-all shrink-0">
-                    {activePuzzle?.stageDifficulty || profileDifficulty}
-                  </span>
-                  <div className="px-2 py-0.5 rounded-lg bg-black/35 border border-yellow-400/30 backdrop-blur-md shadow-inner flex items-center">
-                    <span className="text-[10px] text-yellow-200 font-mono font-black tracking-wider drop-shadow-xs">
-                      GAME {stageNum}/{stageTotal}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Right: 3D Yellow Glass Timer Capsule & 3D Yellow Pause Button */}
-                <div className="relative z-10 flex items-center gap-1.5 shrink-0">
-                  <div 
-                    ref={timerContainerRef} 
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-xl font-mono font-black text-xs transition-all backdrop-blur-md ${
-                      gameTimer <= 15
-                        ? 'animate-timer-warning text-red-100 bg-gradient-to-b from-red-500/80 to-red-800/90 border border-red-300 shadow-[0_0_12px_rgba(239,68,68,0.7),inset_0_1px_1px_rgba(255,255,255,0.5)]'
-                        : 'text-yellow-100 bg-gradient-to-b from-yellow-400/25 via-amber-500/35 to-amber-700/40 border border-yellow-300/60 shadow-[0_2px_8px_rgba(245,158,11,0.3),inset_0_1px_1px_rgba(255,255,255,0.55)]'
-                    }`}
-                  >
-                    <span className="text-xs">⏱️</span>
-                    <span ref={timerDisplayRef} className="drop-shadow-xs">{formatTimer(gameTimer)}</span>
-                  </div>
-
-                  <button 
-                    onClick={() => { sound.click(); setIsGamePaused(v => !v); }} 
-                    aria-label={isGamePaused ? 'Resume puzzle' : 'Pause puzzle'} 
-                    className="w-8 h-8 rounded-xl bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 hover:from-yellow-200 hover:via-amber-300 hover:to-amber-400 border border-yellow-100 text-amber-950 flex items-center justify-center text-xs font-black shadow-[0_3px_0_#b45309,0_4px_10px_rgba(245,158,11,0.45),inset_0_1px_2px_rgba(255,255,255,0.85)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] cursor-pointer transition-all"
-                  >
-                    {isGamePaused ? '▶' : '⏸'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Cross-Math 9x9 Puzzle Grid */}
-              <div className="relative z-10 flex justify-center pb-2.5 pt-2 sm:pb-3 sm:pt-3">
-                <div className={`w-full ${gridMaxWidthClass} p-0.5 sm:p-1.5 transition-all`}>
-                  <div 
-                    className={`grid ${gridGapClass} w-full`} 
-                    style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
-                    role="group" 
-                    aria-label="Cross-math puzzle board"
-                  >
-                    {puzzleRows.flatMap((row, rowIndex) => row.map((cell, columnIndex) => {
-                      if (cell === null) return <div key={`${rowIndex}-${columnIndex}`} className="aspect-square min-w-0" />;
-                      const slot = typeof cell === 'object' ? cell.slot : null;
-                      const isSlot = slot !== null;
-                      const isSelected = isSlot && selectedPuzzleSlot === slot;
-                      const isFilled = isSlot && puzzleAnswers[slot] !== undefined;
-
-                      if (isSlot) {
-                        const isSlotPending = pendingSlots.has(slot);
-                        const hasImpact = impactSlot === slot;
-                        return (
-                          <button
-                            key={`${rowIndex}-${columnIndex}`}
-                            ref={el => { if (el) slotRefs.current[slot] = el; }}
-                            data-puzzle-slot={slot}
-                            onClick={() => {
-                              if (isTimeOver) return;
-                              sound.click();
-                              if (puzzleAnswers[slot] !== undefined) {
-                                const num = puzzleAnswers[slot];
-                                const nextAnswers = { ...puzzleAnswersRef.current };
-                                delete nextAnswers[slot];
-                                puzzleAnswersRef.current = nextAnswers;
-                                setPuzzleAnswers(nextAnswers);
-                                setPuzzleHistory(history => history.filter(item => item !== slot));
-                                setSelectedPuzzleSlot(slot);
-                                returnNumberToTray(num, slot);
-                              } else {
-                                setSelectedPuzzleSlot(slot);
-                              }
-                            }}
-                            aria-label={`Puzzle blank ${slot + 1}${puzzleAnswers[slot] !== undefined ? `, ${puzzleAnswers[slot]}` : ''}`}
-                            aria-pressed={isSelected}
-                            className={`relative flex aspect-square min-w-0 items-center justify-center select-none p-0.5 ${
-                              isFilled
-                                ? `scifi-tile-slot-filled ${hasImpact ? 'animate-tile-pop' : ''} ${getTileTextClass(puzzleAnswers[slot])}`
-                                : isSelected
-                                ? 'scifi-tile-slot-selected'
-                                : isSlotPending
-                                ? 'scifi-tile-slot-target-locked'
-                                : 'scifi-tile-slot-empty'
-                            }`}
-                          >
-                            {isFilled ? (
-                              <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5 drop-shadow-xs">
-                                {puzzleAnswers[slot]}
-                              </span>
-                            ) : isSlotPending ? (
-                              <span className="w-2.5 h-2.5 rounded-full bg-cyan-300 animate-ping opacity-90" />
-                            ) : isSelected ? (
-                              <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping opacity-80" />
-                            ) : (
-                              <span className={`${isVeryCompact ? 'text-[8px]' : isCompact ? 'text-[9px]' : 'text-[10px]'} text-cyan-400/50 font-bold leading-none select-none`}>◇</span>
-                            )}
-                            {hasImpact && <span className="slot-impact-wave" />}
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-300 mb-2">Numeral Font Size</h3>
+                      <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
+                        {[true, false].map(isLarge => (
+                          <button key={String(isLarge)} onClick={() => setLargeFontEnabled(isLarge)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${largeFontEnabled === isLarge ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
+                            {isLarge ? 'Large Font' : 'Standard Font'}
                           </button>
-                        );
-                      }
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-300 mb-2">Division Notation</h3>
+                      <div className="flex justify-around bg-[#0b2050]/70 p-2 rounded-2xl border border-cyan-400/30">
+                        {['÷', '/', ':'].map(symbol => (
+                          <button key={symbol} onClick={() => setDivisionSymbol(symbol)} className={`w-10 h-10 rounded-xl text-base font-black transition-all ${divisionSymbol === symbol ? 'bg-cyan-500 text-blue-950 shadow-md' : 'text-slate-400'}`}>
+                            {symbol}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              )}
 
-                      // Operator or Fixed Number
-                      const isOperator = ['+', '-', '−', '=', '×', '÷', divisionSymbol].includes(cell);
-                      return (
-                        <div 
-                          key={`${rowIndex}-${columnIndex}`} 
-                          className={`flex aspect-square min-w-0 items-center justify-center select-none p-0.5 ${
-                            isOperator
-                              ? `scifi-tile-operator ${getOperatorTextClass()}`
-                              : `scifi-tile-fixed ${getTileTextClass(cell)}`
-                          }`}
-                        >
-                          <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
-                            {cell === '÷' ? divisionSymbol : cell}
-                          </span>
-                        </div>
-                      );
-                    }))}
+              {/* Mission Board Terminal */}
+              <section className="w-full max-w-[306px] sm:max-w-[330px] mx-auto flex flex-col rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_12px_28px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl shrink-0">
+                {/* Blueprint Grid Overlay */}
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+
+                {/* Drafting Corner Crosses */}
+                <span className="absolute top-1 left-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+                <span className="absolute top-1 right-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+                <span className="absolute bottom-1 left-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+                <span className="absolute bottom-1 right-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
+
+                {/* Mission HUD Header: Yellow Background Modern 3D Glassmorphism Section */}
+                <div className="relative z-10 flex items-center justify-between px-2 py-1 rounded-xl bg-gradient-to-b from-yellow-300/25 via-amber-400/20 to-yellow-500/15 border border-yellow-300/50 shadow-[0_3px_14px_rgba(245,158,11,0.25),inset_0_1.5px_1.5px_rgba(255,255,255,0.65),inset_0_-1.5px_3px_rgba(180,83,9,0.3)] backdrop-blur-xl mb-1.5 overflow-hidden">
+                  {/* Luminous Inner Glow Shimmer */}
+                  <div className="absolute -top-6 left-1/4 w-28 h-10 bg-yellow-300/20 rounded-full blur-md pointer-events-none" />
+
+                  {/* Left: 3D Difficulty Badge & Stage Counter */}
+                  <div className="relative z-10 flex items-center gap-1 min-w-0">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] transition-all shrink-0 leading-tight">
+                      {activePuzzle?.stageDifficulty || profileDifficulty}
+                    </span>
+                    <div className="px-1.5 py-0.5 rounded-md bg-black/35 border border-yellow-400/30 backdrop-blur-md shadow-inner flex items-center">
+                      <span className="text-[9px] text-yellow-200 font-mono font-black tracking-wider drop-shadow-xs leading-tight">
+                        GAME {stageNum}/{stageTotal}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Right: 3D Yellow Glass Timer Capsule & 3D Yellow Pause Button */}
+                  <div className="relative z-10 flex items-center gap-1 shrink-0">
+                    <div 
+                      ref={timerContainerRef} 
+                      className={`flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono font-black text-[11px] transition-all backdrop-blur-md ${
+                        gameTimer <= 15
+                          ? 'animate-timer-warning text-red-100 bg-gradient-to-b from-red-500/80 to-red-800/90 border border-red-300 shadow-[0_0_10px_rgba(239,68,68,0.7),inset_0_1px_1px_rgba(255,255,255,0.5)]'
+                          : 'text-yellow-100 bg-gradient-to-b from-yellow-400/25 via-amber-500/35 to-amber-700/40 border border-yellow-300/60 shadow-[0_2px_6px_rgba(245,158,11,0.3),inset_0_1px_1px_rgba(255,255,255,0.55)]'
+                      }`}
+                    >
+                      <span className="text-[10px]">⏱️</span>
+                      <span ref={timerDisplayRef} className="drop-shadow-xs">{formatTimer(gameTimer)}</span>
+                    </div>
+
+                    <button 
+                      onClick={() => { sound.click(); setIsGamePaused(v => !v); }} 
+                      aria-label={isGamePaused ? 'Resume puzzle' : 'Pause puzzle'} 
+                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 hover:from-yellow-200 hover:via-amber-300 hover:to-amber-400 border border-yellow-100 text-amber-950 flex items-center justify-center text-[10px] font-black shadow-[0_2px_0_#b45309,0_3px_8px_rgba(245,158,11,0.45),inset_0_1px_1.5px_rgba(255,255,255,0.85)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] cursor-pointer transition-all"
+                    >
+                      {isGamePaused ? '▶' : '⏸'}
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Number Tray Keyboard (Aligned with Cross-Math Grid and Responsive on All Android Devices) */}
-              <div className="relative z-10 flex flex-col items-center pt-2 sm:pt-2.5 border-t border-cyan-400/20 w-full px-0.5">
-                <div 
-                  className={`w-full ${gridMaxWidthClass} p-0.5 sm:p-1.5 transition-all flex flex-col items-center gap-1.5 sm:gap-2`}
-                  style={{ '--tray-gap': isVeryCompact ? '2px' : '4px' }}
-                >
-                  {puzzleNumbers.length <= 5 ? (
+                {/* Cross-Math 5x5 Puzzle Grid */}
+                <div className="relative z-10 flex justify-center pb-1.5 pt-0.5 sm:pb-2 sm:pt-1">
+                  <div
+                    className={`w-full ${gridMaxWidthClass} p-0.5 transition-all`}
+                    style={boardMaxWidthStyle}
+                  >
                     <div 
                       className={`grid ${gridGapClass} w-full`} 
                       style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
                       role="group" 
-                      aria-label="Available number tiles"
+                      aria-label="Cross-math puzzle board"
                     >
-                      {puzzleNumbers.map(number => {
-                        const isAnswered = Object.values(puzzleAnswers).includes(number);
-                        const isPending = pendingNumbers.has(number);
-                        const used = isAnswered || isPending;
+                      {puzzleRows.flatMap((row, rowIndex) => row.map((cell, columnIndex) => {
+                        if (cell === null) return <div key={`${rowIndex}-${columnIndex}`} className="aspect-square min-w-0" />;
+                        const slot = typeof cell === 'object' ? cell.slot : null;
+                        const isSlot = slot !== null;
+                        const isSelected = isSlot && selectedPuzzleSlot === slot;
+                        const isFilled = isSlot && puzzleAnswers[slot] !== undefined;
+
+                        if (isSlot) {
+                          const isSlotPending = pendingSlots.has(slot);
+                          const hasImpact = impactSlot === slot;
+                          return (
+                            <button
+                              key={`${rowIndex}-${columnIndex}`}
+                              ref={el => { if (el) slotRefs.current[slot] = el; }}
+                              data-puzzle-slot={slot}
+                              onClick={() => {
+                                if (isTimeOver) return;
+                                sound.click();
+                                if (puzzleAnswers[slot] !== undefined) {
+                                  const num = puzzleAnswers[slot];
+                                  const nextAnswers = { ...puzzleAnswersRef.current };
+                                  delete nextAnswers[slot];
+                                  puzzleAnswersRef.current = nextAnswers;
+                                  setPuzzleAnswers(nextAnswers);
+                                  setPuzzleHistory(history => history.filter(item => item !== slot));
+                                  setSelectedPuzzleSlot(slot);
+                                  returnNumberToTray(num, slot);
+                                } else {
+                                  setSelectedPuzzleSlot(slot);
+                                }
+                              }}
+                              aria-label={`Puzzle blank ${slot + 1}${puzzleAnswers[slot] !== undefined ? `, ${puzzleAnswers[slot]}` : ''}`}
+                              aria-pressed={isSelected}
+                              className={`relative flex aspect-square min-w-0 items-center justify-center select-none p-0.5 ${
+                                isFilled
+                                  ? `scifi-tile-slot-filled ${hasImpact ? 'animate-tile-pop' : ''} ${getTileTextClass(puzzleAnswers[slot])}`
+                                  : isSelected
+                                  ? 'scifi-tile-slot-selected'
+                                  : isSlotPending
+                                  ? 'scifi-tile-slot-target-locked'
+                                  : 'scifi-tile-slot-empty'
+                              }`}
+                            >
+                              {isFilled ? (
+                                <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5 drop-shadow-xs">
+                                  {puzzleAnswers[slot]}
+                                </span>
+                              ) : isSlotPending ? (
+                                <span className="w-2 h-2 rounded-full bg-cyan-300 animate-ping opacity-90" />
+                              ) : isSelected ? (
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-ping opacity-80" />
+                              ) : (
+                                <span className={`${isVeryCompact ? 'text-[7.5px]' : isCompact ? 'text-[8.5px]' : 'text-[9px]'} text-cyan-400/50 font-bold leading-none select-none`}>◇</span>
+                              )}
+                              {hasImpact && <span className="slot-impact-wave" />}
+                            </button>
+                          );
+                        }
+
+                        // Operator or Fixed Number
+                        const isOperator = ['+', '-', '−', '=', '×', '÷', divisionSymbol].includes(cell);
                         return (
-                          <button
-                            key={number}
-                            ref={el => { if (el) trayRefs.current[number] = el; }}
-                            data-tray-number={number}
-                            onClick={(e) => {
-                              placePuzzleNumber(number, e.currentTarget);
-                            }}
-                            disabled={used || isGamePaused || isTimeOver}
-                            aria-label={`Place number ${number}`}
-                            className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
-                              used ? 'is-used' : ''
-                            } ${getTileTextClass(number)}`}
+                          <div 
+                            key={`${rowIndex}-${columnIndex}`} 
+                            className={`flex aspect-square min-w-0 items-center justify-center select-none p-0.5 ${
+                              isOperator
+                                ? `scifi-tile-operator ${getOperatorTextClass()}`
+                                : `scifi-tile-fixed ${getTileTextClass(cell)}`
+                            }`}
                           >
                             <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
-                              {number}
+                              {cell === '÷' ? divisionSymbol : cell}
                             </span>
-                          </button>
+                          </div>
                         );
-                      })}
+                      }))}
                     </div>
-                  ) : (
-                    <>
-                      {/* Row 1 */}
-                      {(() => {
-                        const row1Numbers = puzzleNumbers.slice(0, Math.ceil(puzzleNumbers.length / 2));
-                        const k1 = row1Numbers.length;
-                        return (
-                          <div 
-                            className={`grid ${gridGapClass} mx-auto`}
-                            style={{ 
-                              gridTemplateColumns: `repeat(${k1}, minmax(0, 1fr))`,
-                              width: k1 === 5 ? '100%' : k1 < 5 ? `calc(${k1 * 20}% - ${(5 - k1) * 0.2} * var(--tray-gap, 4px))` : '100%'
-                            }}
-                            role="group"
-                            aria-label="Available number tiles row 1"
-                          >
-                            {row1Numbers.map(number => {
-                              const isAnswered = Object.values(puzzleAnswers).includes(number);
-                              const isPending = pendingNumbers.has(number);
-                              const used = isAnswered || isPending;
-                              return (
-                                <button
-                                  key={number}
-                                  ref={el => { if (el) trayRefs.current[number] = el; }}
-                                  data-tray-number={number}
-                                  onClick={(e) => {
-                                    placePuzzleNumber(number, e.currentTarget);
-                                  }}
-                                  disabled={used || isGamePaused || isTimeOver}
-                                  aria-label={`Place number ${number}`}
-                                  className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
-                                    used ? 'is-used' : ''
-                                  } ${getTileTextClass(number)}`}
-                                >
-                                  <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
-                                    {number}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        );
-                      })()}
-
-                      {/* Row 2 */}
-                      {(() => {
-                        const row2Numbers = puzzleNumbers.slice(Math.ceil(puzzleNumbers.length / 2));
-                        const k2 = row2Numbers.length;
-                        return (
-                          <div 
-                            className={`grid ${gridGapClass} mx-auto`}
-                            style={{ 
-                              gridTemplateColumns: `repeat(${k2}, minmax(0, 1fr))`,
-                              width: k2 === 5 ? '100%' : k2 < 5 ? `calc(${k2 * 20}% - ${(5 - k2) * 0.2} * var(--tray-gap, 4px))` : '100%'
-                            }}
-                            role="group"
-                            aria-label="Available number tiles row 2"
-                          >
-                            {row2Numbers.map(number => {
-                              const isAnswered = Object.values(puzzleAnswers).includes(number);
-                              const isPending = pendingNumbers.has(number);
-                              const used = isAnswered || isPending;
-                              return (
-                                <button
-                                  key={number}
-                                  ref={el => { if (el) trayRefs.current[number] = el; }}
-                                  data-tray-number={number}
-                                  onClick={(e) => {
-                                    placePuzzleNumber(number, e.currentTarget);
-                                  }}
-                                  disabled={used || isGamePaused || isTimeOver}
-                                  aria-label={`Place number ${number}`}
-                                  className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
-                                    used ? 'is-used' : ''
-                                  } ${getTileTextClass(number)}`}
-                                >
-                                  <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
-                                    {number}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        );
-                      })()}
-                    </>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </section>
 
-            {/* Bottom Action Controls (Modern 3D Cyber Arcade) */}
-            <div 
-              className="flex items-center justify-around px-4 pt-3 pb-8 sm:pb-6"
-              style={{ paddingBottom: 'max(2.25rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))' }}
-            >
-              {/* 1. History & Mission Records Button */}
-              <button 
-                onClick={() => { sound.click(); navigateTo('history'); }} 
-                aria-label="Puzzle history & records" 
-                className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#173887] border-2 border-cyan-400 text-cyan-100 shadow-[0_4px_0_#0c235c,0_6px_16px_rgba(0,229,255,0.35),inset_0_1px_2px_rgba(255,255,255,0.45)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#0c235c] transition-all cursor-pointer"
-                title="Options / History"
-              >
-                <svg className="w-6 h-6 text-cyan-200 drop-shadow-[0_0_8px_rgba(0,229,255,0.85)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" />
-                  <rect x="13.5" y="3" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" />
-                  <rect x="3" y="13.5" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" />
-                  <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" />
-                </svg>
-              </button>
+                {/* Number Tray Keyboard (Aligned with Cross-Math Grid and Responsive on All Android Devices) */}
+                <div className="relative z-10 flex flex-col items-center pt-1.5 sm:pt-2 border-t border-cyan-400/20 w-full px-0.5">
+                  <div 
+                    className={`w-full ${gridMaxWidthClass} p-0.5 transition-all flex flex-col items-center gap-1 sm:gap-1.5`}
+                    style={{ ...boardMaxWidthStyle, '--tray-gap': isVeryCompact ? '2px' : '4px' }}
+                  >
+                    {puzzleNumbers.length <= 5 ? (
+                      <div 
+                        className={`grid ${gridGapClass} w-full`} 
+                        style={{ gridTemplateColumns: `repeat(${activePuzzle.cols || 5}, minmax(0, 1fr))` }}
+                        role="group" 
+                        aria-label="Available number tiles"
+                      >
+                        {puzzleNumbers.map(number => {
+                          const isAnswered = Object.values(puzzleAnswers).includes(number);
+                          const isPending = pendingNumbers.has(number);
+                          const used = isAnswered || isPending;
+                          return (
+                            <button
+                              key={number}
+                              ref={el => { if (el) trayRefs.current[number] = el; }}
+                              data-tray-number={number}
+                              onClick={(e) => {
+                                placePuzzleNumber(number, e.currentTarget);
+                              }}
+                              disabled={used || isGamePaused || isTimeOver}
+                              aria-label={`Place number ${number}`}
+                              className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
+                                used ? 'is-used' : ''
+                              } ${getTileTextClass(number)}`}
+                            >
+                              <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
+                                {number}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <>
+                        {/* Row 1 */}
+                        {(() => {
+                          const row1Numbers = puzzleNumbers.slice(0, Math.ceil(puzzleNumbers.length / 2));
+                          const k1 = row1Numbers.length;
+                          return (
+                            <div 
+                              className={`grid ${gridGapClass} mx-auto`}
+                              style={{ 
+                                gridTemplateColumns: `repeat(${k1}, minmax(0, 1fr))`,
+                                width: k1 === 5 ? '100%' : k1 < 5 ? `calc(${k1 * 20}% - ${(5 - k1) * 0.2} * var(--tray-gap, 4px))` : '100%'
+                              }}
+                              role="group"
+                              aria-label="Available number tiles row 1"
+                            >
+                              {row1Numbers.map(number => {
+                                const isAnswered = Object.values(puzzleAnswers).includes(number);
+                                const isPending = pendingNumbers.has(number);
+                                const used = isAnswered || isPending;
+                                return (
+                                  <button
+                                    key={number}
+                                    ref={el => { if (el) trayRefs.current[number] = el; }}
+                                    data-tray-number={number}
+                                    onClick={(e) => {
+                                      placePuzzleNumber(number, e.currentTarget);
+                                    }}
+                                    disabled={used || isGamePaused || isTimeOver}
+                                    aria-label={`Place number ${number}`}
+                                    className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
+                                      used ? 'is-used' : ''
+                                    } ${getTileTextClass(number)}`}
+                                  >
+                                    <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
+                                      {number}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
 
-              {/* 2. Undo Move Button */}
-              <button 
-                onClick={undoPuzzleNumber} 
-                aria-label="Undo last number" 
-                disabled={!puzzleHistory.length} 
-                className={`relative grid h-[54px] w-[54px] place-items-center rounded-2xl transition-all ${
-                  puzzleHistory.length > 0
-                    ? 'bg-gradient-to-b from-[#0284c7] via-[#0369a1] to-[#075985] border-2 border-cyan-300 text-white shadow-[0_4px_0_#082f49,0_8px_20px_rgba(14,165,233,0.55),inset_0_1px_2px_rgba(255,255,255,0.6)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#082f49] cursor-pointer'
-                    : 'bg-gradient-to-b from-[#1b3670]/80 via-[#152c5c]/85 to-[#0f2249]/90 border-2 border-cyan-500/30 shadow-[0_4px_0_#0b1a38] text-cyan-200/50 cursor-not-allowed opacity-75'
-                }`}
-                title="Undo Number"
-              >
-                <svg className={`w-6 h-6 ${puzzleHistory.length > 0 ? 'text-white drop-shadow-[0_0_8px_rgba(56,189,248,0.95)]' : 'text-cyan-300/60'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 10h11a5 5 0 0 1 5 5v1a5 5 0 0 1-5 5H9" />
-                  <path d="M7 6L3 10l4 4" />
-                </svg>
-                {puzzleHistory.length > 0 && (
-                  <span className="absolute -top-2 -right-2 min-w-[22px] h-[22px] px-1 rounded-full bg-gradient-to-r from-cyan-400 to-sky-300 border-2 border-white text-slate-950 font-black text-[10px] flex items-center justify-center shadow-[0_0_12px_rgba(0,229,255,0.95)] animate-bounce leading-none">
-                    {puzzleHistory.length}
-                  </span>
-                )}
-              </button>
+                        {/* Row 2 */}
+                        {(() => {
+                          const row2Numbers = puzzleNumbers.slice(Math.ceil(puzzleNumbers.length / 2));
+                          const k2 = row2Numbers.length;
+                          return (
+                            <div 
+                              className={`grid ${gridGapClass} mx-auto`}
+                              style={{ 
+                                gridTemplateColumns: `repeat(${k2}, minmax(0, 1fr))`,
+                                width: k2 === 5 ? '100%' : k2 < 5 ? `calc(${k2 * 20}% - ${(5 - k2) * 0.2} * var(--tray-gap, 4px))` : '100%'
+                              }}
+                              role="group"
+                              aria-label="Available number tiles row 2"
+                            >
+                              {row2Numbers.map(number => {
+                                const isAnswered = Object.values(puzzleAnswers).includes(number);
+                                const isPending = pendingNumbers.has(number);
+                                const used = isAnswered || isPending;
+                                return (
+                                  <button
+                                    key={number}
+                                    ref={el => { if (el) trayRefs.current[number] = el; }}
+                                    data-tray-number={number}
+                                    onClick={(e) => {
+                                      placePuzzleNumber(number, e.currentTarget);
+                                    }}
+                                    disabled={used || isGamePaused || isTimeOver}
+                                    aria-label={`Place number ${number}`}
+                                    className={`scifi-tile-tray-btn aspect-square min-w-0 w-full p-0.5 select-none ${
+                                      used ? 'is-used' : ''
+                                    } ${getTileTextClass(number)}`}
+                                  >
+                                    <span className="leading-none flex items-center justify-center font-black tracking-tight truncate max-w-full px-0.5">
+                                      {number}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </section>
 
-              {/* 3. Quantum Hint / Energy Bulb Button */}
-              <button 
-                onClick={() => { sound.click(); navigateTo('hint'); }} 
-                aria-label="Get a hint" 
-                className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 shadow-[0_4px_0_#075985,0_8px_24px_rgba(14,165,233,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#075985] transition-all cursor-pointer"
-                title="Get Hint"
-              >
-                <div className="relative flex items-center justify-center">
-                  <span className="absolute w-8 h-8 rounded-full bg-cyan-300/40 blur-[3px] animate-pulse pointer-events-none" />
-                  <svg className="w-7 h-7 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.95)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2a6.5 6.5 0 0 0-6.5 6.5c0 2.4 1.3 4.4 3.2 5.5v1.5a1.8 1.8 0 0 0 1.8 1.8h3a1.8 1.8 0 0 0 1.8-1.8V14c1.9-1.1 3.2-3.1 3.2-5.5A6.5 6.5 0 0 0 12 2z" fill="#bae6fd" stroke="#ffffff" strokeWidth="1.8" />
-                    <path d="M9.5 9.5h5" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M10 12.5h4" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M10 19h4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
-                    <path d="M10.5 21.5h3" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+              {/* Bottom Action Controls (Compact 3D Cyber Arcade - Fixed In-Screen) */}
+              <div className="w-full max-w-[306px] sm:max-w-[330px] mx-auto shrink-0 flex items-center justify-around px-2 pt-1 pb-2">
+                {/* 1. History & Mission Records Button */}
+                <button 
+                  onClick={() => { sound.click(); navigateTo('history'); }} 
+                  aria-label="Puzzle history & records" 
+                  className="relative grid h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] place-items-center rounded-xl bg-gradient-to-b from-[#2563eb] via-[#1d4ed8] to-[#173887] border-2 border-cyan-400 text-cyan-100 shadow-[0_3px_0_#0c235c,0_5px_12px_rgba(0,229,255,0.35),inset_0_1px_2px_rgba(255,255,255,0.45)] hover:scale-105 active:translate-y-0.5 active:shadow-[0_1px_0_#0c235c] transition-all cursor-pointer"
+                  title="Options / History"
+                >
+                  <svg className="w-5 h-5 text-cyan-200 drop-shadow-[0_0_6px_rgba(0,229,255,0.85)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" />
+                    <rect x="13.5" y="3" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" />
+                    <rect x="3" y="13.5" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" />
+                    <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2.5" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" />
                   </svg>
-                </div>
-                <span className="absolute -bottom-2 rounded-full bg-gradient-to-r from-cyan-200 via-sky-300 to-cyan-400 border border-cyan-950/40 px-2.5 py-0.5 text-[10px] font-black text-cyan-950 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_10px_rgba(56,189,248,0.95)] tracking-wider leading-none">
-                  HINT
-                </span>
-              </button>
+                </button>
+
+                {/* 2. Undo Move Button */}
+                <button 
+                  onClick={undoPuzzleNumber} 
+                  aria-label="Undo last number" 
+                  disabled={!puzzleHistory.length} 
+                  className={`relative grid h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] place-items-center rounded-xl transition-all ${
+                    puzzleHistory.length > 0
+                      ? 'bg-gradient-to-b from-[#0284c7] via-[#0369a1] to-[#075985] border-2 border-cyan-300 text-white shadow-[0_3px_0_#082f49,0_6px_14px_rgba(14,165,233,0.55),inset_0_1px_2px_rgba(255,255,255,0.6)] hover:scale-105 active:translate-y-0.5 active:shadow-[0_1px_0_#082f49] cursor-pointer'
+                      : 'bg-gradient-to-b from-[#1b3670]/80 via-[#152c5c]/85 to-[#0f2249]/90 border-2 border-cyan-500/30 shadow-[0_3px_0_#0b1a38] text-cyan-200/50 cursor-not-allowed opacity-75'
+                  }`}
+                  title="Undo Number"
+                >
+                  <svg className={`w-5 h-5 ${puzzleHistory.length > 0 ? 'text-white drop-shadow-[0_0_6px_rgba(56,189,248,0.95)]' : 'text-cyan-300/60'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 10h11a5 5 0 0 1 5 5v1a5 5 0 0 1-5 5H9" />
+                    <path d="M7 6L3 10l4 4" />
+                  </svg>
+                  {puzzleHistory.length > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-r from-cyan-400 to-sky-300 border-2 border-white text-slate-950 font-black text-[9px] flex items-center justify-center shadow-[0_0_10px_rgba(0,229,255,0.95)] animate-bounce leading-none">
+                      {puzzleHistory.length}
+                    </span>
+                  )}
+                </button>
+
+                {/* 3. Quantum Hint / Energy Bulb Button */}
+                <button 
+                  onClick={() => { sound.click(); navigateTo('hint'); }} 
+                  aria-label="Get a hint" 
+                  className="relative grid h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] place-items-center rounded-xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 shadow-[0_3px_0_#075985,0_6px_16px_rgba(14,165,233,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-0.5 active:shadow-[0_1px_0_#075985] transition-all cursor-pointer"
+                  title="Get Hint"
+                >
+                  <div className="relative flex items-center justify-center">
+                    <span className="absolute w-6 h-6 rounded-full bg-cyan-300/40 blur-[2px] animate-pulse pointer-events-none" />
+                    <svg className="w-5 h-5 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2a6.5 6.5 0 0 0-6.5 6.5c0 2.4 1.3 4.4 3.2 5.5v1.5a1.8 1.8 0 0 0 1.8 1.8h3a1.8 1.8 0 0 0 1.8-1.8V14c1.9-1.1 3.2-3.1 3.2-5.5A6.5 6.5 0 0 0 12 2z" fill="#bae6fd" stroke="#ffffff" strokeWidth="1.8" />
+                      <path d="M9.5 9.5h5" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M10 12.5h4" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M10 19h4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+                      <path d="M10.5 21.5h3" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <span className="absolute -bottom-1.5 rounded-full bg-gradient-to-r from-cyan-200 via-sky-300 to-cyan-400 border border-cyan-950/40 px-2 py-[1px] text-[8.5px] font-black text-cyan-950 shadow-[0_2px_4px_rgba(0,0,0,0.5),0_0_8px_rgba(56,189,248,0.95)] tracking-wider leading-none">
+                    HINT
+                  </span>
+                </button>
+              </div>
             </div>
-          </div>
 
           {/* 3D Glassmorphic "Protocol Instructions" Banner Modal for Main Game */}
           {showMainInstructionsModal && (
