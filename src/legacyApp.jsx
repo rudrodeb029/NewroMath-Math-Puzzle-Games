@@ -4793,6 +4793,8 @@ const PLAYER_COUNTRIES = [
             return next;
           });
           setRewardToast(`💎 Ad Reward: +${val.toLocaleString()} Gems Collected!`);
+        } else if (reward.type === 'hint') {
+          setRewardToast('💡 Quantum Hint Unlocked!');
         } else if (reward.type === 'time') {
           const extraSec = reward.amount || 30;
           setGameTimer(t => t + extraSec);
@@ -7194,8 +7196,7 @@ const PLAYER_COUNTRIES = [
                 <button 
                   onClick={() => {
                     sound.click();
-                    const proceed = () => setShowMainInstructionsModal(true);
-                    adMobService.showInterstitial({ force: true, onClose: proceed });
+                    setShowMainInstructionsModal(true);
                   }} 
                   aria-label="Mission Instructions & How to Play" 
                   title="Mission Instructions" 
@@ -7576,7 +7577,7 @@ const PLAYER_COUNTRIES = [
 
                 {/* 3. Quantum Hint / Energy Bulb Button */}
                 <button 
-                  onClick={() => { sound.click(); navigateTo('hint'); }} 
+                  onClick={() => { handleWatchAd('hint', 1, 'Quantum Solver Hint Video', { onComplete: () => navigateTo('hint') }); }} 
                   aria-label="Get a hint" 
                   className="relative grid h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] place-items-center rounded-xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 shadow-[0_3px_0_#075985,0_6px_16px_rgba(14,165,233,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-0.5 active:shadow-[0_1px_0_#075985] transition-all cursor-pointer"
                   title="Get Hint"
@@ -7880,7 +7881,7 @@ const PLAYER_COUNTRIES = [
                   {/* Secondary Options: +30s Extra Time (Ad) & Level Select */}
                   <div className="grid grid-cols-2 gap-2 pt-0.5">
                     <button
-                      onClick={() => handleWatchAd('time', 30, 'Chronometer Extender Sponsor')}
+                      onClick={() => { sound.click(); setGameTimer(t => t + 30); setIsTimeOver(false); }}
                       aria-label="Extra Time (+30s)"
                       className="h-10 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-200 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_2.5px_0_#b45309,0_5px_12px_rgba(245,158,11,0.3)] active:translate-y-0.5 active:shadow-[0_1px_0_#b45309] transition-all cursor-pointer"
                     >
@@ -9080,7 +9081,7 @@ const PLAYER_COUNTRIES = [
                       </div>
                     </div>
                     <span className="text-[9.5px] font-black text-amber-300 font-mono bg-amber-400/20 px-2 py-0.5 rounded-md border border-amber-400/40">
-                      50 🪙 or Free Ad
+                      50 🪙
                     </span>
                   </div>
                 )}
@@ -9129,22 +9130,13 @@ const PLAYER_COUNTRIES = [
               {/* 5. Primary Action Launch Button (Glassmorphic Cyber) */}
               <div className="pt-1.5 space-y-2">
                 {isMissedDay ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button
+                  <button
                       onClick={handleStartMissedDayWithCoins}
                       className="w-full py-3.5 rounded-2xl font-black font-display text-xs uppercase tracking-wider bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 border-2 border-amber-200/90 text-amber-950 shadow-[0_4px_0_#b45309,0_8px_20px_rgba(245,158,11,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#b45309] transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-4 h-4 object-contain" />
                       <span>Recover (50 🪙)</span>
                     </button>
-                    <button
-                      onClick={handleStartMissedDayWithAd}
-                      className="w-full py-3.5 rounded-2xl font-black font-display text-xs uppercase tracking-wider bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-600 border-2 border-emerald-200/90 text-white shadow-[0_4px_0_#065f46,0_8px_20px_rgba(16,185,129,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <span>▶</span>
-                      <span>Watch Ad to Play Free</span>
-                    </button>
-                  </div>
                 ) : (
                   <button
                     onClick={() => startDailyChallenge(activeDailyDay)}
@@ -10027,8 +10019,7 @@ const PLAYER_COUNTRIES = [
                 <button 
                   onClick={() => {
                     sound.click();
-                    const proceed = () => setShowDailyInstructionsModal(true);
-                    adMobService.showInterstitial({ force: true, onClose: proceed });
+                    setShowDailyInstructionsModal(true);
                   }} 
                   aria-label="Mission Instructions & How to Play" 
                   className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border-2 border-yellow-200 shadow-[0_4px_0_#92400e,0_8px_24px_rgba(245,158,11,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all cursor-pointer"
@@ -13890,17 +13881,6 @@ const PLAYER_COUNTRIES = [
           <PageTransition screenKey={currentScreen} direction={transitionDirection} isWaitingForLoad={isPageLoading}>
             {renderActiveScreen()}
           </PageTransition>
-
-          {/* Google AdMob Demo Banner at Bottom (Reserved 50px height, strictly adheres to AdMob layout & separation policies) */}
-          {adMobState.bannerVisible && currentScreen !== 'splash' && currentScreen !== 'onboarding' && (
-            <AdMobBanner isNative={adMobState.isNative} />
-          )}
-
-          {/* Google AdMob Demo Interstitial Ad Fullscreen Modal */}
-          <AdMobInterstitialModal
-            isOpen={adMobState.interstitialActive}
-            onClose={() => adMobService.dismissWebInterstitial()}
-          />
 
           {isPageLoading && <SlidingTileLoader />}
 
