@@ -247,7 +247,7 @@ import './index.css';
 import { adMobService } from './services/adMobService';
 import { purchaseService, IAP_CATALOG } from './services/purchaseService';
 import { initFirebaseCloudSync, scheduleFirebaseSync, syncPlayerToFirebaseNow, submitFeedbackTicketToFirebase } from './services/firebaseService';
-import { AdMobRewardedModal } from './components/AdMobComponents';
+import { AdMobBanner, AdMobRewardedModal } from './components/AdMobComponents';
 import { clampEconomyValue, isProtectedEconomyKey, updateEconomySeal } from './services/securityService';
 import {
   Volume2,
@@ -4768,12 +4768,16 @@ const PLAYER_COUNTRIES = [
         setAdReward(payload);
 
         if (adMobState.isNative) {
-          // Native Android: invoke Google AdMob Rewarded Video Ad directly
+          // Native Android: launch preloaded AdMob Rewarded Video immediately, or fall back to zero-flash modal
           adMobService.showRewarded(() => {
             handleClaimAdReward(payload);
+          }).then((shownNatively) => {
+            if (!shownNatively) {
+              setAdModalOpen(true);
+            }
           });
         } else {
-          // Web / Browser Preview: show interactive AdMob Rewarded Video demo modal
+          // Web / Browser Preview: show instant zero-flash AdMob Rewarded Video modal
           setAdModalOpen(true);
         }
       };
@@ -8319,20 +8323,23 @@ const PLAYER_COUNTRIES = [
         const currentStep = hintSteps[hintActiveStep] || hintSteps[0];
 
         const handleWatchAdForSolveHint = () => {
-          sound.correct();
-          const unfilled = puzzleSlots.find(({ slot }) => puzzleAnswers[slot] === undefined || puzzleAnswers[slot] === null);
-          if (unfilled) {
-            const nextAnswers = { ...puzzleAnswers, [unfilled.slot]: unfilled.answer };
-            puzzleAnswersRef.current = nextAnswers;
-            setPuzzleAnswers(nextAnswers);
-            setRewardToast(`💡 Free Slot Revealed: Slot ${unfilled.slot + 1} = ${unfilled.answer}!`);
-            navigateTo('game');
-            setTimeout(() => {
-              submitPuzzle(nextAnswers);
-            }, 400);
-          } else {
-            navigateTo('game');
-          }
+          handleWatchAd('hint', 0, 'Quantum Hint Unlock Sponsor', {
+            onComplete: () => {
+              const unfilled = puzzleSlots.find(({ slot }) => puzzleAnswers[slot] === undefined || puzzleAnswers[slot] === null);
+              if (unfilled) {
+                const nextAnswers = { ...puzzleAnswers, [unfilled.slot]: unfilled.answer };
+                puzzleAnswersRef.current = nextAnswers;
+                setPuzzleAnswers(nextAnswers);
+                setRewardToast(`💡 Ad Reward: Slot ${unfilled.slot + 1} Revealed (${unfilled.answer})!`);
+                navigateTo('game');
+                setTimeout(() => {
+                  submitPuzzle(nextAnswers);
+                }, 400);
+              } else {
+                navigateTo('game');
+              }
+            }
+          });
         };
 
         return (
@@ -8448,7 +8455,7 @@ const PLAYER_COUNTRIES = [
                   className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 text-amber-950 font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-200 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <span>▶</span>
-                  <span>Reveal 1 Number Free</span>
+                  <span>Reveal 1 Number Free (Watch Ad)</span>
                 </button>
                 <button
                   onClick={() => { sound.click(); navigateTo('game'); }}
@@ -9120,19 +9127,37 @@ const PLAYER_COUNTRIES = [
                   >
                     {dailyGiftClaimed ? 'CLAIMED ✓' : 'CLAIM'}
                   </button>
+                  {!dailyGiftClaimed && (
+                    <button
+                      onClick={handleClaimDailyGiftWithAd}
+                      className="px-2.5 py-1.5 rounded-xl font-black text-[11px] bg-gradient-to-r from-emerald-400 to-teal-500 text-emerald-950 border border-emerald-200 shadow-[0_0_10px_rgba(16,185,129,0.5)] active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      <span>▶</span>
+                      <span>2X AD</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* 5. Primary Action Launch Button (Glassmorphic Cyber) */}
               <div className="pt-1.5 space-y-2">
                 {isMissedDay ? (
-                  <button
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
                       onClick={handleStartMissedDayWithCoins}
-                      className="w-full py-3.5 rounded-2xl font-black font-display text-xs uppercase tracking-wider bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 border-2 border-amber-200/90 text-amber-950 shadow-[0_4px_0_#b45309,0_8px_20px_rgba(245,158,11,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#b45309] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-3.5 rounded-2xl font-black font-display text-xs uppercase tracking-wider bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 border-2 border-amber-200/90 text-amber-950 shadow-[0_4px_0_#b45309,0_8px_20px_rgba(245,158,11,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#b45309] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-4 h-4 object-contain" />
                       <span>Recover (50 🪙)</span>
                     </button>
+                    <button
+                      onClick={handleStartMissedDayWithAd}
+                      className="w-full py-3.5 rounded-2xl font-black font-display text-xs uppercase tracking-wider bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-600 border-2 border-emerald-200/90 text-white shadow-[0_4px_0_#065f46,0_8px_20px_rgba(16,185,129,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <span>▶</span>
+                      <span>Watch Ad (Free)</span>
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={() => startDailyChallenge(activeDailyDay)}
@@ -14129,7 +14154,12 @@ const PLAYER_COUNTRIES = [
             );
           })()}
 
-          {/* Google AdMob Demo Rewarded Video Ad Modal */}
+          {/* Fixed-Height Google AdMob Bottom Banner Ad (Zero Layout Shift) */}
+          {adMobState.bannerVisible && currentScreen !== 'splash' && currentScreen !== 'onboarding' && (
+            <AdMobBanner isNative={adMobState.isNative} />
+          )}
+
+          {/* Google AdMob Rewarded Video Ad Modal */}
           <AdMobRewardedModal
             isOpen={adModalOpen}
             onClose={() => setAdModalOpen(false)}

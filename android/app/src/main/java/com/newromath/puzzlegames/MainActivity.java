@@ -2,6 +2,7 @@ package com.newromath.puzzlegames;
 
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
@@ -20,10 +21,10 @@ import java.net.Socket;
 
 /**
  * NewroMath main activity.
- * - Locks WebView text zoom so system font-size settings cannot break the game layout on any device
- * - Disables overscroll bounce for a stable, non-jumping screen
- * - Runs lightweight runtime integrity checks (root, emulator, debugger, hooking frameworks, debuggable build)
- *   and exposes the result to the web layer as window.__NM_INTEGRITY for anti-cheat decisions
+ * - Solid dark window & WebView surface (#0d1a40) so AdMob AdActivity transitions never flash white
+ * - Does NOT force View.LAYER_TYPE_HARDWARE on the WebView (prevents GPU texture recreation bounce when ads open/close)
+ * - Locks WebView text zoom (100%) so system font-size settings cannot break layouts
+ * - Runs lightweight runtime integrity checks off the UI thread
  */
 public class MainActivity extends BridgeActivity {
 
@@ -36,7 +37,6 @@ public class MainActivity extends BridgeActivity {
         applyStableWindow();
         configureWebView();
 
-        // Run integrity checks off the UI thread so app start-up stays smooth
         new Thread(() -> {
             integrityJson = runIntegrityChecks();
             runOnUiThread(this::publishIntegrity);
@@ -46,15 +46,18 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onResume() {
         super.onResume();
+        applyStableWindow();
         publishIntegrity();
     }
 
     private void applyStableWindow() {
         try {
             Window window = getWindow();
-            window.setStatusBarColor(Color.parseColor("#0d1a40"));
-            window.setNavigationBarColor(Color.parseColor("#0d1a40"));
-            window.getDecorView().setBackgroundColor(Color.parseColor("#183278"));
+            int darkBg = Color.parseColor("#0d1a40");
+            window.setBackgroundDrawable(new ColorDrawable(darkBg));
+            window.setStatusBarColor(darkBg);
+            window.setNavigationBarColor(darkBg);
+            window.getDecorView().setBackgroundColor(darkBg);
         } catch (Exception ignored) {
         }
     }
@@ -63,20 +66,20 @@ public class MainActivity extends BridgeActivity {
         try {
             WebView webView = getBridge().getWebView();
             WebSettings settings = webView.getSettings();
-            // Ignore the device's accessibility font scale so layouts are identical on every phone
             settings.setTextZoom(100);
             settings.setSupportZoom(false);
             settings.setBuiltInZoomControls(false);
             settings.setDisplayZoomControls(false);
-            // Security: no file / content access from web content, no mixed content
             settings.setAllowFileAccess(false);
             settings.setAllowContentAccess(false);
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+            settings.setMediaPlaybackRequiresUserGesture(false);
+
             webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
             webView.setVerticalScrollBarEnabled(false);
             webView.setHorizontalScrollBarEnabled(false);
-            webView.setBackgroundColor(Color.parseColor("#183278"));
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            // Solid dark background prevents any white flash before/after native AdActivity
+            webView.setBackgroundColor(Color.parseColor("#0d1a40"));
 
             boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
             WebView.setWebContentsDebuggingEnabled(isDebuggable);
@@ -93,8 +96,6 @@ public class MainActivity extends BridgeActivity {
         } catch (Exception ignored) {
         }
     }
-
-    // ===================== Integrity checks =====================
 
     private String runIntegrityChecks() {
         boolean rooted = isRooted();
@@ -144,13 +145,11 @@ public class MainActivity extends BridgeActivity {
     }
 
     private boolean isHookFrameworkPresent() {
-        // 1. Xposed / LSPosed classes
         try {
             Class.forName("de.robv.android.xposed.XposedBridge");
             return true;
         } catch (Throwable ignored) {
         }
-        // 2. Frida / Xposed libraries mapped into our process
         try (BufferedReader reader = new BufferedReader(new FileReader("/proc/self/maps"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -162,7 +161,6 @@ public class MainActivity extends BridgeActivity {
             }
         } catch (Throwable ignored) {
         }
-        // 3. Default frida-server port
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress("127.0.0.1", 27042), 150);
             return true;
