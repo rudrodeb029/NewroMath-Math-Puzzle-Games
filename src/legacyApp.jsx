@@ -8448,15 +8448,8 @@ const PLAYER_COUNTRIES = [
                 </button>
               </div>
 
-              {/* Action Buttons: Free Slot Reveal via Ad & Resume */}
-              <div className="space-y-2 pt-1">
-                <button
-                  onClick={handleWatchAdForSolveHint}
-                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 text-amber-950 font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-200 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <span>▶</span>
-                  <span>Reveal 1 Number Free (Watch Ad)</span>
-                </button>
+              {/* Action Button: Resume Mission */}
+              <div className="pt-1">
                 <button
                   onClick={() => { sound.click(); navigateTo('game'); }}
                   className="w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 text-white font-black text-xs uppercase tracking-wider shadow-[0_0_16px_rgba(0,229,255,0.4)] hover:brightness-110 active:scale-95 transition-all cursor-pointer"
