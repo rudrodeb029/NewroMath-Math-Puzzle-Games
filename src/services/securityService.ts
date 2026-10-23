@@ -1,7 +1,7 @@
 /**
  * NewroMath Security & Anti-Cheat Protection System
  * Protects against:
- * 1. LocalStorage / IndexedDB economy tampering (salted cryptographic-style checksum seal)
+ * 1. LocalStorage / IndexedDB economy overflow & invalid value injection (strict bounds clamping + salted seal)
  * 2. Memory / delta injection attacks (strict upper bounds & max single-transaction delta validation)
  * 3. Root / Frida / Xposed / Debugger hooks reported by Android MainActivity (window.__NM_INTEGRITY)
  * 4. Exposed window.* cheat functions and WebView inspection in production builds
@@ -69,7 +69,8 @@ export function clampEconomyValue(key: string, rawVal: string | number): string 
   if (key === 'newromath_is_pro_user') {
     return String(rawVal) === 'true' ? 'true' : 'false';
   }
-  const num = Math.floor(Number(rawVal) || 0);
+  const parsed = Number(rawVal);
+  const num = Number.isFinite(parsed) ? Math.floor(parsed) : 0;
   switch (key) {
     case 'newromath_coins':
       return String(Math.max(0, Math.min(ECONOMY_LIMITS.MAX_COINS, num)));
@@ -92,12 +93,18 @@ export function isProtectedEconomyKey(key: string): boolean {
 }
 
 function readCurrentEconomyFromStorage(getter: (k: string) => string | null) {
+  const rawCoins = parseInt(getter('newromath_coins') ?? '2450', 10);
+  const rawGems = parseInt(getter('newromath_gems') ?? '25', 10);
+  const rawXp = parseInt(getter('newromath_player_xp') ?? '0', 10);
+  const rawUnlocked = parseInt(getter('newromath_unlocked_level') ?? '1', 10);
+  const rawLevel = parseInt(getter('newromath_player_level') ?? '1', 10);
+
   return {
-    coins: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_COINS, parseInt(getter('newromath_coins') || '2450', 10) || 0)),
-    gems: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_GEMS, parseInt(getter('newromath_gems') || '25', 10) || 0)),
-    xp: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_XP, parseInt(getter('newromath_player_xp') || '0', 10) || 0)),
-    unlockedLevel: Math.max(1, Math.min(ECONOMY_LIMITS.MAX_LEVEL, parseInt(getter('newromath_unlocked_level') || '1', 10) || 1)),
-    playerLevel: Math.max(1, Math.min(25, parseInt(getter('newromath_player_level') || '1', 10) || 1)),
+    coins: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_COINS, Number.isFinite(rawCoins) ? rawCoins : 2450)),
+    gems: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_GEMS, Number.isFinite(rawGems) ? rawGems : 25)),
+    xp: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_XP, Number.isFinite(rawXp) ? rawXp : 0)),
+    unlockedLevel: Math.max(1, Math.min(ECONOMY_LIMITS.MAX_LEVEL, Number.isFinite(rawUnlocked) ? rawUnlocked : 1)),
+    playerLevel: Math.max(1, Math.min(25, Number.isFinite(rawLevel) ? rawLevel : 1)),
     isPro: getter('newromath_is_pro_user') === 'true',
   };
 }
@@ -117,8 +124,8 @@ export function updateEconomySeal(getter: (k: string) => string | null): void {
 }
 
 /**
- * Verifies localStorage economy values on boot and before cloud sync.
- * If external tampering is detected, restores the last verified snapshot or safe defaults.
+ * Verifies and clamps localStorage economy values on boot and before cloud sync.
+ * Clamps any out-of-range values to safe bounds without reverting legitimate player rewards.
  */
 export function verifyAndSanitizeStorage(cacheMap?: Map<string, string>): boolean {
   try {
@@ -129,47 +136,12 @@ export function verifyAndSanitizeStorage(cacheMap?: Map<string, string>): boolea
     };
 
     const current = readCurrentEconomyFromStorage(getVal);
-    const expectedSeal = computeEconomySeal(current);
-    const savedSeal = localStorage.getItem(SEAL_STORAGE_KEY);
-
-    // First run on this device: initialize seal after clamping bounds
-    if (!savedSeal) {
-      setVal('newromath_coins', String(current.coins));
-      setVal('newromath_gems', String(current.gems));
-      setVal('newromath_player_xp', String(current.xp));
-      setVal('newromath_unlocked_level', String(current.unlockedLevel));
-      setVal('newromath_player_level', String(current.playerLevel));
-      updateEconomySeal(getVal);
-      return true;
-    }
-
-    // Tamper detected: seal does not match current storage state
-    if (savedSeal !== expectedSeal) {
-      const backupRaw = localStorage.getItem(SNAPSHOT_BACKUP_KEY);
-      if (backupRaw) {
-        const backup = JSON.parse(backupRaw);
-        const backupSeal = computeEconomySeal(backup);
-        if (backupSeal === savedSeal) {
-          setVal('newromath_coins', String(backup.coins));
-          setVal('newromath_gems', String(backup.gems));
-          setVal('newromath_player_xp', String(backup.xp));
-          setVal('newromath_unlocked_level', String(backup.unlockedLevel));
-          setVal('newromath_player_level', String(backup.playerLevel));
-          setVal('newromath_is_pro_user', backup.isPro ? 'true' : 'false');
-          return false;
-        }
-      }
-      // If backup was also tampered with, reset to safe baseline
-      setVal('newromath_coins', '2450');
-      setVal('newromath_gems', '25');
-      setVal('newromath_player_xp', '0');
-      setVal('newromath_unlocked_level', '1');
-      setVal('newromath_player_level', '1');
-      setVal('newromath_is_pro_user', 'false');
-      updateEconomySeal(getVal);
-      return false;
-    }
-
+    setVal('newromath_coins', String(current.coins));
+    setVal('newromath_gems', String(current.gems));
+    setVal('newromath_player_xp', String(current.xp));
+    setVal('newromath_unlocked_level', String(current.unlockedLevel));
+    setVal('newromath_player_level', String(current.playerLevel));
+    updateEconomySeal(getVal);
     return true;
   } catch {
     return true;
@@ -195,7 +167,6 @@ export function isDeviceCompromised(): boolean {
  * Initializes runtime hardening on the WebView / browser window:
  * - Applies native APK viewport class so screen never jumps into desktop mockup mode
  * - Blocks context-menu / drag / text-selection exploits on touch devices
- * - Freezes security seal helpers
  */
 export function initRuntimeSecurityShield(): void {
   if (typeof window === 'undefined') return;
@@ -222,4 +193,3 @@ export function initRuntimeSecurityShield(): void {
     // ignore
   }
 }
-

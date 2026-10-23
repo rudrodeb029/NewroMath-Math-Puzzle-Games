@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ADMOB_DEMO_IDS } from '../services/adMobService';
 
 /**
@@ -52,7 +52,7 @@ export const AdMobInterstitialModal = () => null;
 /**
  * Google AdMob Rewarded Video Ad Modal
  * Solid dark (#07112b) surface with zero translucent white flash and zero layout bounce.
- * Supports Coins, Diamonds, Daily 2X Supply ('both'), and Solve Hints ('hint').
+ * Supports Coins, Diamonds, Jackpot ('jackpot'), Supply ('both'), and Hints ('hint').
  */
 const REWARD_AD_DURATION_SEC = 3;
 
@@ -60,9 +60,11 @@ export const AdMobRewardedModal = ({ isOpen, onClose, onReward, rewardInfo }) =>
   const [secondsRemaining, setSecondsRemaining] = useState(REWARD_AD_DURATION_SEC);
   const [rewardGranted, setRewardGranted] = useState(false);
   const [showExitWarning, setShowExitWarning] = useState(false);
+  const claimedRef = useRef(false);
 
   useEffect(() => {
     if (isOpen) {
+      claimedRef.current = false;
       setSecondsRemaining(REWARD_AD_DURATION_SEC);
       setRewardGranted(false);
       setShowExitWarning(false);
@@ -84,10 +86,20 @@ export const AdMobRewardedModal = ({ isOpen, onClose, onReward, rewardInfo }) =>
 
   if (!isOpen) return null;
 
+  const grantAndCloseOnce = () => {
+    if (claimedRef.current) return;
+    claimedRef.current = true;
+    if (onReward) {
+      onReward(rewardInfo);
+    }
+    if (onClose) {
+      onClose();
+    }
+  };
+
   const handleAttemptClose = () => {
     if (rewardGranted) {
-      if (onReward) onReward();
-      onClose();
+      grantAndCloseOnce();
     } else {
       setShowExitWarning(true);
     }
@@ -95,12 +107,12 @@ export const AdMobRewardedModal = ({ isOpen, onClose, onReward, rewardInfo }) =>
 
   const handleConfirmExit = () => {
     setShowExitWarning(false);
-    onClose();
+    if (onClose) onClose();
   };
 
   const handleClaim = () => {
-    if (onReward) onReward();
-    onClose();
+    if (!rewardGranted) return;
+    grantAndCloseOnce();
   };
 
   const progressPercent = Math.min(
@@ -108,19 +120,20 @@ export const AdMobRewardedModal = ({ isOpen, onClose, onReward, rewardInfo }) =>
     Math.round(((REWARD_AD_DURATION_SEC - secondsRemaining) / REWARD_AD_DURATION_SEC) * 100)
   );
 
-  const rewardBadgeText =
-    rewardInfo?.type === 'both'
-      ? `+${rewardInfo.coinAmount || 350} Coins & +${rewardInfo.gemAmount || 15} Gems`
-      : rewardInfo?.type === 'gems'
-      ? `+${rewardInfo.amount || 10} Diamonds`
-      : rewardInfo?.type === 'hint'
-      ? 'Reveal 1 Full Target Solution Free'
-      : `+${rewardInfo?.amount || 250} Gold Coins`;
+  const isDualReward = rewardInfo?.type === 'both' || rewardInfo?.type === 'jackpot';
+
+  const rewardBadgeText = isDualReward
+    ? `+${rewardInfo?.coinAmount || (rewardInfo?.type === 'jackpot' ? 600 : 350)} Coins & +${rewardInfo?.gemAmount || 15} Diamonds`
+    : rewardInfo?.type === 'gems'
+    ? `+${rewardInfo?.gemAmount || rewardInfo?.amount || 10} Diamonds`
+    : rewardInfo?.type === 'hint'
+    ? 'Reveal 1 Full Target Solution Free'
+    : `+${rewardInfo?.coinAmount || rewardInfo?.amount || 250} Gold Coins`;
 
   const rewardIcon =
     rewardInfo?.type === 'gems'
       ? '💎'
-      : rewardInfo?.type === 'both'
+      : isDualReward
       ? '🎁'
       : rewardInfo?.type === 'hint'
       ? '💡'

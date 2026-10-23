@@ -280,7 +280,11 @@ class PurchaseService {
     this.isProUser = isPro;
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('newromath_is_pro_user', isPro ? 'true' : 'false');
+        const val = isPro ? 'true' : 'false';
+        localStorage.setItem('newromath_is_pro_user', val);
+        if ((window as any).GameStorage && typeof (window as any).GameStorage.setItem === 'function') {
+          (window as any).GameStorage.setItem('newromath_is_pro_user', val);
+        }
       } catch (e) {
         console.warn('[IAP] Failed to write Pro status:', e);
       }

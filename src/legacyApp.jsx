@@ -895,6 +895,16 @@ const PLAYER_COUNTRIES = [
         const rawStr = String(value);
         const strVal = isProtectedEconomyKey(key) ? clampEconomyValue(key, rawStr) : rawStr;
         this.cache.set(key, strVal);
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(key, strVal);
+          }
+        } catch (e) {}
+        if (isProtectedEconomyKey(key)) {
+          try {
+            updateEconomySeal((k) => this.getItem(k));
+          } catch (e) {}
+        }
         this.pendingWrites.set(key, strVal);
         this.scheduleFlush();
       }
@@ -4646,11 +4656,16 @@ const PLAYER_COUNTRIES = [
         try { GameStorage.setItem('newromath_player_xp', playerXp.toString()); } catch (e) {}
       }, [playerXp]);
 
+      const coinsRef = useRef(coins);
+      const gemsRef = useRef(gems);
+
       useEffect(() => {
+        coinsRef.current = coins;
         try { GameStorage.setItem('newromath_coins', coins.toString()); } catch (e) {}
       }, [coins]);
 
       useEffect(() => {
+        gemsRef.current = gems;
         try { GameStorage.setItem('newromath_gems', gems.toString()); } catch (e) {}
       }, [gems]);
 
@@ -4755,16 +4770,37 @@ const PLAYER_COUNTRIES = [
       }, [adModalOpen, adCountdown]);
 
       // Global Ad Watch & Reward System (Powered by Google AdMob Rewarded Video)
+      const adRewardRef = useRef(null);
+
       const handleWatchAd = (type, amount, title, extra = {}) => {
         sound.click();
+        const numAmt = Number(amount) || 0;
+        const resolvedCoins =
+          type === 'coins'
+            ? Number(extra.coinAmount ?? (numAmt || 250))
+            : type === 'gems'
+            ? 0
+            : type === 'jackpot'
+            ? Number(extra.coinAmount ?? (numAmt || 600))
+            : Number(extra.coinAmount ?? (numAmt || 350));
+        const resolvedGems =
+          type === 'gems'
+            ? Number(extra.gemAmount ?? (numAmt || 10))
+            : type === 'coins'
+            ? 0
+            : type === 'jackpot'
+            ? Number(extra.gemAmount ?? 15)
+            : Number(extra.gemAmount ?? 15);
+
         const payload = {
           type,
-          amount,
+          amount: numAmt,
           title: title || 'Quantum Sponsor Booster',
-          coinAmount: extra.coinAmount || (type === 'coins' ? amount : 350),
-          gemAmount: extra.gemAmount || (type === 'gems' ? amount : 15),
+          coinAmount: resolvedCoins,
+          gemAmount: resolvedGems,
           onComplete: extra.onComplete || null
         };
+        adRewardRef.current = payload;
         setAdReward(payload);
 
         if (adMobState.isNative) {
@@ -4783,47 +4819,58 @@ const PLAYER_COUNTRIES = [
       };
 
       const handleClaimAdReward = (overrideReward = null) => {
-        const reward = overrideReward || adReward;
+        const isPlainReward =
+          overrideReward &&
+          typeof overrideReward === 'object' &&
+          !('nativeEvent' in overrideReward) &&
+          typeof overrideReward.type === 'string';
+        const reward = isPlainReward ? overrideReward : (adRewardRef.current || adReward);
+        if (!reward) return;
+
         sound.correct();
         confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
         if (reward.type === 'coins') {
-          const val = reward.amount || reward.coinAmount || 250;
+          const val = Number(reward.coinAmount || reward.amount || 250);
           setCoins(c => {
             const next = c + val;
+            coinsRef.current = next;
             try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
             return next;
           });
           setRewardToast(`🎉 Ad Reward: +${val.toLocaleString()} Coins Collected!`);
         } else if (reward.type === 'gems') {
-          const val = reward.amount || reward.gemAmount || 15;
+          const val = Number(reward.gemAmount || reward.amount || 10);
           setGems(g => {
             const next = g + val;
+            gemsRef.current = next;
             try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
             return next;
           });
-          setRewardToast(`💎 Ad Reward: +${val.toLocaleString()} Gems Collected!`);
+          setRewardToast(`💎 Ad Reward: +${val.toLocaleString()} Diamonds Collected!`);
         } else if (reward.type === 'hint') {
           setRewardToast('💡 Quantum Hint Unlocked!');
         } else if (reward.type === 'time') {
-          const extraSec = reward.amount || 30;
+          const extraSec = Number(reward.amount || 30);
           setGameTimer(t => t + extraSec);
           setIsTimeOver(false);
           setRewardToast(`⏱️ Extra Time: +${extraSec}s Added! Mission Resumed!`);
         } else {
           // 'both' / supply drop / jackpot
-          const cAmt = reward.coinAmount || (reward.type === 'jackpot' ? 600 : 350);
-          const gAmt = reward.gemAmount || (reward.type === 'jackpot' ? 20 : 15);
+          const cAmt = Number(reward.coinAmount || (reward.type === 'jackpot' ? 600 : 350));
+          const gAmt = Number(reward.gemAmount || 15);
           setCoins(c => {
             const next = c + cAmt;
+            coinsRef.current = next;
             try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
             return next;
           });
           setGems(g => {
             const next = g + gAmt;
+            gemsRef.current = next;
             try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
             return next;
           });
-          setRewardToast(`🎉 Ad Reward: +${cAmt} 🪙 & +${gAmt} 💎 Added!`);
+          setRewardToast(`🎉 Ad Reward: +${cAmt.toLocaleString()} 🪙 & +${gAmt.toLocaleString()} 💎 Added!`);
         }
         setAdModalOpen(false);
         if (reward.onComplete) {
@@ -5139,20 +5186,25 @@ const PLAYER_COUNTRIES = [
           return;
         }
 
-        if (coins >= cost.coins && gems >= cost.gems) {
+        const liveCoins = coinsRef.current;
+        const liveGems = gemsRef.current;
+
+        if (liveCoins >= cost.coins && liveGems >= cost.gems) {
           // Deduct entry fee
           setCoins(c => {
-            const nextCoins = c - cost.coins;
+            const nextCoins = Math.max(0, c - cost.coins);
+            coinsRef.current = nextCoins;
             try { GameStorage.setItem('newromath_coins', nextCoins.toString()); } catch (e) {}
             return nextCoins;
           });
           setGems(g => {
-            const nextGems = g - cost.gems;
+            const nextGems = Math.max(0, g - cost.gems);
+            gemsRef.current = nextGems;
             try { GameStorage.setItem('newromath_gems', nextGems.toString()); } catch (e) {}
             return nextGems;
           });
           sound.click();
-          setRewardToast(`Mission L${targetLvl} Entry: -${cost.coins} Coins & -${cost.gems} Gems`);
+          setRewardToast(`Mission L${targetLvl} Entry: -${cost.coins} Coins & -${cost.gems} Diamonds`);
           startNewPuzzle(targetLvl);
         } else {
           sound.wrong();
@@ -5160,8 +5212,8 @@ const PLAYER_COUNTRIES = [
             isOpen: true,
             targetLvl,
             cost,
-            missingCoins: Math.max(0, cost.coins - coins),
-            missingGems: Math.max(0, cost.gems - gems)
+            missingCoins: Math.max(0, cost.coins - liveCoins),
+            missingGems: Math.max(0, cost.gems - liveGems)
           });
         }
       };
@@ -5508,8 +5560,8 @@ const PLAYER_COUNTRIES = [
           const isFinalStage = stageNum >= total;
           const targetXp = getLevelTargetXp(selectedLevelNum);
           const earnedXp = isFinalStage ? targetXp : Math.max(1, Math.round(targetXp / total));
-          const earnedCoins = isFinalStage ? Math.round(cost.coins * 1.8) : Math.max(5, Math.round(cost.coins * 0.06));
-          const earnedGems = isFinalStage ? Math.round(cost.gems * 1.3) + 2 : 0;
+          const earnedCoins = isFinalStage ? Math.round(cost.coins * 1.8) : Math.max(15, Math.round(cost.coins * 0.15));
+          const earnedGems = isFinalStage ? Math.round(cost.gems * 1.3) + 2 : Math.max(1, Math.round(cost.gems * 0.15));
 
           if (isFinalStage) {
             setTimeout(() => sound.fanfare(), 320);
@@ -6142,7 +6194,7 @@ const PLAYER_COUNTRIES = [
                     <polygon points="12,6.5 13.6,9.8 17.2,10.3 14.6,12.7 15.2,16.2 12,14.5 8.8,16.2 9.4,12.7 6.8,10.3 10.4,9.8" fill="#fef08a" stroke="#d97706" strokeWidth="0.5" />
                   </svg>
                   <span className="text-amber-300 font-black text-[9.5px] sm:text-[10.5px] font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] tabular-nums">
-                    {Math.max(coins, 10).toLocaleString()}
+                    {coins.toLocaleString()}
                   </span>
                   <span className="w-3 h-3 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 text-amber-950 font-black text-[7.5px] sm:text-[8px] flex items-center justify-center shadow-xs leading-none">
                     +
@@ -8607,17 +8659,20 @@ const PLAYER_COUNTRIES = [
           sound.fanfare();
           confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
           setCoins(c => {
-            const next = c + 250;
+            const next = c + 350;
+            coinsRef.current = next;
             try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
             return next;
           });
           setGems(g => {
-            const next = g + 10;
+            const next = g + 5;
+            gemsRef.current = next;
             try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
             return next;
           });
           try { GameStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
           setDailyGiftClaimed(true);
+          setRewardToast("🎁 Claimed Daily Gift: +350 Coins & +5 Diamonds!");
         };
 
         const handleClaimDailyGiftWithAd = () => {
@@ -11810,7 +11865,7 @@ const PLAYER_COUNTRIES = [
                       className="mb-1"
                     />
                     <span className="text-xs font-black text-cyan-300 font-display leading-none">
-                      {gems}
+                      {gems.toLocaleString()}
                     </span>
                     <span className="text-[8px] text-cyan-200/70 font-semibold uppercase tracking-tight mt-0.5">
                       Diamonds
@@ -13321,10 +13376,21 @@ const PLAYER_COUNTRIES = [
           if (dailyGiftClaimed) return;
           sound.correct();
           confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 } });
+          try { GameStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
           setDailyGiftClaimed(true);
-          setCoins(c => c + 350);
-          setGems(g => g + 5);
-          setRewardToast("🎁 Claimed Daily Gift: +350 Coins & +5 Gems!");
+          setCoins(c => {
+            const next = c + 350;
+            coinsRef.current = next;
+            try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+            return next;
+          });
+          setGems(g => {
+            const next = g + 5;
+            gemsRef.current = next;
+            try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+            return next;
+          });
+          setRewardToast("🎁 Claimed Daily Gift: +350 Coins & +5 Diamonds!");
         };
 
         const handleClaimDailyGiftWithAd = () => {
@@ -13333,6 +13399,7 @@ const PLAYER_COUNTRIES = [
             coinAmount: 700,
             gemAmount: 15,
             onComplete: () => {
+              try { GameStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
               setDailyGiftClaimed(true);
             }
           });
@@ -13340,15 +13407,27 @@ const PLAYER_COUNTRIES = [
 
         const handleExchangeCoins = (costGems, coinsToGet) => {
           sound.click();
-          if (gems >= costGems) {
-            setGems(g => g - costGems);
-            setCoins(c => c + coinsToGet);
+          const numCost = Number(costGems) || 0;
+          const numCoins = Number(coinsToGet) || 0;
+          if (gemsRef.current >= numCost) {
+            setGems(g => {
+              const next = Math.max(0, g - numCost);
+              gemsRef.current = next;
+              try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+              return next;
+            });
+            setCoins(c => {
+              const next = c + numCoins;
+              coinsRef.current = next;
+              try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+              return next;
+            });
             sound.correct();
             confetti({ particleCount: 70, spread: 60, origin: { y: 0.5 } });
-            setRewardToast(`🪙 Exchanged for +${coinsToGet.toLocaleString()} Gold Coins!`);
+            setRewardToast(`🪙 Exchanged ${numCost} 💎 for +${numCoins.toLocaleString()} Gold Coins!`);
           } else {
             sound.wrong();
-            setRewardToast("❌ Need more Gems! Watch an ad to collect free Gems.");
+            setRewardToast("❌ Need more Diamonds! Watch an ad to collect free Diamonds.");
           }
         };
 
