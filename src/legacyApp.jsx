@@ -9127,15 +9127,6 @@ const PLAYER_COUNTRIES = [
                   >
                     {dailyGiftClaimed ? 'CLAIMED ✓' : 'CLAIM'}
                   </button>
-                  {!dailyGiftClaimed && (
-                    <button
-                      onClick={handleClaimDailyGiftWithAd}
-                      className="px-2.5 py-1.5 rounded-xl font-black text-[11px] bg-gradient-to-r from-emerald-400 to-teal-500 text-emerald-950 border border-emerald-200 shadow-[0_0_10px_rgba(16,185,129,0.5)] active:scale-95 transition-all cursor-pointer flex items-center gap-1"
-                    >
-                      <span>▶</span>
-                      <span>2X AD</span>
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -13512,24 +13503,14 @@ const PLAYER_COUNTRIES = [
                   <button
                     disabled={dailyGiftClaimed}
                     onClick={handleClaimDailyGift}
-                    className={`w-full py-1.5 sm:py-2 px-2 rounded-xl text-[10.5px] sm:text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 text-center flex items-center justify-center whitespace-nowrap ${
+                    className={`w-full py-2 sm:py-2.5 px-3 rounded-xl text-[10.5px] sm:text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 text-center flex items-center justify-center whitespace-nowrap ${
                       dailyGiftClaimed
-                        ? 'bg-slate-700/60 border border-slate-600/50 text-slate-400 cursor-not-allowed py-2'
+                        ? 'bg-slate-700/60 border border-slate-600/50 text-slate-400 cursor-not-allowed'
                         : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 border border-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.5)] cursor-pointer'
                     }`}
                   >
                     {dailyGiftClaimed ? 'Claimed ✓' : 'Claim Free'}
                   </button>
-                  {!dailyGiftClaimed && (
-                    <button
-                      onClick={handleClaimDailyGiftWithAd}
-                      className="w-full py-1.5 sm:py-2 px-2 rounded-xl text-[10.5px] sm:text-xs font-black tracking-wide uppercase transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)] active:scale-95 bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 hover:from-emerald-300 hover:to-teal-400 text-emerald-950 border border-emerald-300 cursor-pointer flex items-center justify-center gap-1 whitespace-nowrap"
-                      title="Watch Ad to Double Daily Reward"
-                    >
-                      <span className="text-[9px]">▶</span>
-                      <span>2X with Ad</span>
-                    </button>
-                  )}
                 </div>
               </div>
 
