@@ -12,33 +12,39 @@
       ".read": true,
       ".indexOn": ["score", "xp", "level", "updatedAt"],
       "$playerId": {
-        ".write": true
+        ".write": "newData.exists()",
+        ".validate": "newData.hasChildren(['playerId', 'name', 'level', 'xp', 'score']) && newData.child('playerId').val() === $playerId && newData.child('level').isNumber() && newData.child('level').val() >= 1 && newData.child('level').val() <= 26 && newData.child('xp').isNumber() && newData.child('xp').val() >= 0 && newData.child('xp').val() <= 10000000 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 16000000"
       }
     },
     "users": {
+      ".read": false,
       ".indexOn": ["updatedAt"],
       "$playerId": {
         ".read": true,
-        ".write": true,
+        ".write": "newData.exists()",
+        "progress": {
+          ".validate": "!newData.exists() || (newData.child('coins').isNumber() && newData.child('coins').val() >= 0 && newData.child('coins').val() <= 5000000 && newData.child('gems').isNumber() && newData.child('gems').val() >= 0 && newData.child('gems').val() <= 100000 && newData.child('playerXp').isNumber() && newData.child('playerXp').val() >= 0 && newData.child('playerXp').val() <= 10000000 && newData.child('unlockedLevelMax').isNumber() && newData.child('unlockedLevelMax').val() >= 1 && newData.child('unlockedLevelMax').val() <= 26)"
+        },
         "puzzleRecords": {
           ".indexOn": ["id", "level", "solved"]
         }
       }
     },
     "feedback_tickets": {
-      ".read": true,
+      ".read": false,
       ".indexOn": ["createdAt", "playerId", "status"],
       "$ticketId": {
-        ".write": true
+        ".read": true,
+        ".write": "!data.exists() && newData.exists()"
       }
     },
     "purchases": {
+      ".read": false,
       ".indexOn": ["playerId", "createdAt"],
       "$purchaseId": {
         ".read": true,
-        ".write": true
+        ".write": "!data.exists() && newData.exists()"
       }
     }
   }
 }
-

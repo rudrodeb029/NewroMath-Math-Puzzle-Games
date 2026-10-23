@@ -1,25 +1,47 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# NewroMath R8 / ProGuard rules (release builds are minified + obfuscated)
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep line numbers for crash reports but hide original source file names
+-keepattributes SourceFile,LineNumberTable,*Annotation*,Signature,InnerClasses,EnclosingMethod
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# ---- Capacitor core + plugins (bridge uses reflection on @CapacitorPlugin / @PluginMethod) ----
+-keep class com.getcapacitor.** { *; }
+-keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
+-keepclassmembers class * {
+    @com.getcapacitor.PluginMethod public *;
+    @com.getcapacitor.annotation.PermissionCallback *;
+    @com.getcapacitor.annotation.ActivityCallback *;
+}
+-keep class * extends com.getcapacitor.Plugin { *; }
+-keep class com.capacitorjs.plugins.** { *; }
+-keep class com.getcapacitor.community.admob.** { *; }
 
-# If you keep the line information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# ---- WebView JS interfaces ----
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
 
-# Google Play In-App Billing Client
+# ---- Cordova compatibility layer ----
+-keep class org.apache.cordova.** { *; }
+
+# ---- Google Mobile Ads (AdMob) ----
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.ads.** { *; }
+-dontwarn com.google.android.gms.**
+
+# ---- Google Play In-App Billing ----
 -keep class com.android.billingclient.** { *; }
 -keep class com.capgo.nativepurchases.** { *; }
+-dontwarn com.android.billingclient.**
+
+# ---- AndroidX / Kotlin ----
+-dontwarn kotlin.**
+-dontwarn kotlinx.**
+-dontwarn org.jetbrains.annotations.**
+
+# ---- Strip verbose/debug logging from release ----
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}

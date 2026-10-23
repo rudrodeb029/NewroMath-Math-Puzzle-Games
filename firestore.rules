@@ -3,25 +3,52 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /app_metadata/{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false;
     }
     match /catalog/{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false;
     }
     match /leaderboard/{playerId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create, update: if request.resource.data.playerId == playerId
+        && request.resource.data.level is int
+        && request.resource.data.level >= 1
+        && request.resource.data.level <= 26
+        && request.resource.data.xp is int
+        && request.resource.data.xp >= 0
+        && request.resource.data.xp <= 10000000
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 16000000;
+      allow delete: if false;
     }
     match /users/{playerId} {
-      allow read, write: if true;
-    }
-    match /users/{playerId}/{document=**} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if request.resource.data.playerId == playerId
+        && request.resource.data.progress.coins >= 0
+        && request.resource.data.progress.coins <= 5000000
+        && request.resource.data.progress.gems >= 0
+        && request.resource.data.progress.gems <= 100000
+        && request.resource.data.progress.playerXp >= 0
+        && request.resource.data.progress.playerXp <= 10000000
+        && request.resource.data.progress.unlockedLevelMax >= 1
+        && request.resource.data.progress.unlockedLevelMax <= 26;
+      allow delete: if false;
     }
     match /feedback_tickets/{ticketId} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data.ticketId == ticketId;
+      allow update, delete: if false;
     }
     match /purchases/{purchaseId} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data.purchaseId == purchaseId;
+      allow update, delete: if false;
     }
   }
 }

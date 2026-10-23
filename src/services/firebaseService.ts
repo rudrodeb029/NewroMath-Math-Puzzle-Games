@@ -18,6 +18,13 @@ import {
   setPersistentCacheKey,
   setSWRCache,
 } from './cacheService';
+import {
+  ECONOMY_LIMITS,
+  initRuntimeSecurityShield,
+  isDeviceCompromised,
+  updateEconomySeal,
+  verifyAndSanitizeStorage,
+} from './securityService';
 
 export const FIREBASE_CONFIG = {
   projectId: 'newromaths',
@@ -369,8 +376,21 @@ let syncTimeoutId: ReturnType<typeof setTimeout> | null = null;
  */
 export async function syncPlayerToFirebaseNow(forceFirestore = false): Promise<boolean> {
   try {
+    // Security: Block cloud leaderboard & economy uploads if device has active Frida/Xposed/Root hooks
+    if (isDeviceCompromised()) {
+      return false;
+    }
+    verifyAndSanitizeStorage();
+
     const snapshot = buildLocalPlayerSnapshot();
     const { playerId, profile, progress } = snapshot;
+
+    // Enforce strict server-matching sanity bounds
+    progress.coins = Math.max(0, Math.min(ECONOMY_LIMITS.MAX_COINS, progress.coins));
+    progress.gems = Math.max(0, Math.min(ECONOMY_LIMITS.MAX_GEMS, progress.gems));
+    progress.playerXp = Math.max(0, Math.min(ECONOMY_LIMITS.MAX_XP, progress.playerXp));
+    progress.unlockedLevelMax = Math.max(1, Math.min(ECONOMY_LIMITS.MAX_LEVEL, progress.unlockedLevelMax));
+    progress.playerLevel = Math.max(1, Math.min(25, progress.playerLevel));
 
     // Cache snapshot locally in L2 SWR Cache (30-min TTL)
     await setSWRCache(`user_${playerId}`, snapshot, LEADERBOARD_SWR_TTL_MS);
@@ -655,8 +675,11 @@ async function refreshLeaderboardCacheInBackground(): Promise<any[]> {
  */
 export async function initFirebaseCloudSync(l1Cache?: Map<string, string>): Promise<void> {
   try {
+    initRuntimeSecurityShield();
     void requestPersistentStorage();
+    verifyAndSanitizeStorage(l1Cache);
     await hydrateFromPersistentCache(l1Cache);
+    updateEconomySeal((k) => (l1Cache && l1Cache.has(k) ? l1Cache.get(k)! : localStorage.getItem(k)));
     initIdleAssetPreloader();
 
     if (typeof window !== 'undefined') {

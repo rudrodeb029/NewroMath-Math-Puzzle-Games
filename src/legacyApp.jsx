@@ -247,7 +247,8 @@ import './index.css';
 import { adMobService } from './services/adMobService';
 import { purchaseService, IAP_CATALOG } from './services/purchaseService';
 import { initFirebaseCloudSync, scheduleFirebaseSync, syncPlayerToFirebaseNow, submitFeedbackTicketToFirebase } from './services/firebaseService';
-import { AdMobBanner, AdMobInterstitialModal, AdMobRewardedModal } from './components/AdMobComponents';
+import { AdMobRewardedModal } from './components/AdMobComponents';
+import { clampEconomyValue, isProtectedEconomyKey, updateEconomySeal } from './services/securityService';
 import {
   Volume2,
   Vibrate,
@@ -891,7 +892,8 @@ const PLAYER_COUNTRIES = [
 
       setItem(key, value) {
         if (!this.initialized) this.init();
-        const strVal = String(value);
+        const rawStr = String(value);
+        const strVal = isProtectedEconomyKey(key) ? clampEconomyValue(key, rawStr) : rawStr;
         this.cache.set(key, strVal);
         this.pendingWrites.set(key, strVal);
         this.scheduleFlush();
@@ -933,6 +935,7 @@ const PLAYER_COUNTRIES = [
             }
           });
           this.pendingWrites.clear();
+          updateEconomySeal((k) => this.getItem(k));
           scheduleFirebaseSync('newromath_sync');
         } catch (e) {
           console.warn('[FastGameStorage] Flush error:', e);
@@ -1044,18 +1047,20 @@ const PLAYER_COUNTRIES = [
     // ==========================================
     // SLIDING-TILE LOADER (7 tiles / 8 slots, styles in index.html)
     // ==========================================
-    const LOADER_TILE_COLORS = ['red', 'green', 'blue', 'black', 'orange', 'teal', 'gold'];
     function SlidingTileLoader() {
       return (
-        <div className="nm-loader-overlay bg-[#183278]" role="status" aria-label="Loading">
-          <div className="nm-loader-card bg-transparent shadow-none border-none">
-            <svg className="nm-loader" viewBox="0 0 100 80">
-              <g transform="translate(50 0) scale(0.707 0.707) rotate(45 0 0)">
-                {LOADER_TILE_COLORS.map((fill, i) => (
-                  <rect key={fill} className={`rect nm-r${i + 1}`} width="30" height="30" rx="2" ry="2" fill={fill} />
-                ))}
-              </g>
-            </svg>
+        <div className="nm-loader-overlay" role="status" aria-label="Loading">
+          <div className="nm-cyber-loader">
+            <div className="nm-cyber-orbs">
+              <div className="nm-cyber-orb">+</div>
+              <div className="nm-cyber-orb">−</div>
+              <div className="nm-cyber-orb">×</div>
+              <div className="nm-cyber-orb">÷</div>
+            </div>
+            <div className="nm-cyber-bar-track">
+              <div className="nm-cyber-bar-fill" />
+            </div>
+            <div className="nm-cyber-tag">Loading Arena</div>
           </div>
         </div>
       );
@@ -5180,7 +5185,8 @@ const PLAYER_COUNTRIES = [
         navigateTo('game');
       };
 
-      // Expose for testing and inspection
+      // Security: Only expose debug helpers in local development, never in production APK/Web
+      if (import.meta.env.DEV) {
       window.__triggerTimeout = () => {
         setIsTimeOver(true);
         sound.error();
@@ -5234,6 +5240,7 @@ const PLAYER_COUNTRIES = [
         setPlayerXp(val);
         try { GameStorage.setItem('newromath_player_xp', val.toString()); } catch (e) {}
       };
+      }
       const resetAllProgress = () => {
         setUnlockedLevelMax(1);
         setPlayerLevel(1);
@@ -5251,16 +5258,18 @@ const PLAYER_COUNTRIES = [
         resetPuzzle(1, 1);
         triggerRewardToast('🚀 Campaign reset! Starting fresh from Level 1.');
       };
-      window.__resetAllProgress = resetAllProgress;
-      window.__triggerInsufficientFunds = () => {
-        setInsufficientFundsModal({
-          isOpen: true,
-          targetLvl: 5,
-          cost: { coins: 200, gems: 18 },
-          missingCoins: 0,
-          missingGems: 11
-        });
-      };
+      if (import.meta.env.DEV) {
+        window.__resetAllProgress = resetAllProgress;
+        window.__triggerInsufficientFunds = () => {
+          setInsufficientFundsModal({
+            isOpen: true,
+            targetLvl: 5,
+            cost: { coins: 200, gems: 18 },
+            missingCoins: 0,
+            missingGems: 11
+          });
+        };
+      }
       // Auto-slide ticker for 3D Champions Reel cards (sliding smoothly left to right)
       const championsReelRef = useRef(null);
       useEffect(() => {
@@ -7577,7 +7586,7 @@ const PLAYER_COUNTRIES = [
 
                 {/* 3. Quantum Hint / Energy Bulb Button */}
                 <button 
-                  onClick={() => { handleWatchAd('hint', 1, 'Quantum Solver Hint Video', { onComplete: () => navigateTo('hint') }); }} 
+                  onClick={() => { sound.click(); navigateTo('hint'); }} 
                   aria-label="Get a hint" 
                   className="relative grid h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] place-items-center rounded-xl bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-cyan-200 shadow-[0_3px_0_#075985,0_6px_16px_rgba(14,165,233,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-0.5 active:shadow-[0_1px_0_#075985] transition-all cursor-pointer"
                   title="Get Hint"
@@ -8310,23 +8319,20 @@ const PLAYER_COUNTRIES = [
         const currentStep = hintSteps[hintActiveStep] || hintSteps[0];
 
         const handleWatchAdForSolveHint = () => {
-          handleWatchAd('hint', 1, 'Quantum Solver Hint Video', {
-            onComplete: () => {
-              const unfilled = puzzleSlots.find(({ slot }) => puzzleAnswers[slot] === undefined || puzzleAnswers[slot] === null);
-              if (unfilled) {
-                const nextAnswers = { ...puzzleAnswers, [unfilled.slot]: unfilled.answer };
-                puzzleAnswersRef.current = nextAnswers;
-                setPuzzleAnswers(nextAnswers);
-                setRewardToast(`💡 Free Slot Revealed: Slot ${unfilled.slot + 1} = ${unfilled.answer}!`);
-                navigateTo('game');
-                setTimeout(() => {
-                  submitPuzzle(nextAnswers);
-                }, 400);
-              } else {
-                navigateTo('game');
-              }
-            }
-          });
+          sound.correct();
+          const unfilled = puzzleSlots.find(({ slot }) => puzzleAnswers[slot] === undefined || puzzleAnswers[slot] === null);
+          if (unfilled) {
+            const nextAnswers = { ...puzzleAnswers, [unfilled.slot]: unfilled.answer };
+            puzzleAnswersRef.current = nextAnswers;
+            setPuzzleAnswers(nextAnswers);
+            setRewardToast(`💡 Free Slot Revealed: Slot ${unfilled.slot + 1} = ${unfilled.answer}!`);
+            navigateTo('game');
+            setTimeout(() => {
+              submitPuzzle(nextAnswers);
+            }, 400);
+          } else {
+            navigateTo('game');
+          }
         };
 
         return (
@@ -8442,7 +8448,7 @@ const PLAYER_COUNTRIES = [
                   className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 text-amber-950 font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-200 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <span>▶</span>
-                  <span>Reveal 1 Number Free (Watch Ad)</span>
+                  <span>Reveal 1 Number Free</span>
                 </button>
                 <button
                   onClick={() => { sound.click(); navigateTo('game'); }}
@@ -9114,16 +9120,6 @@ const PLAYER_COUNTRIES = [
                   >
                     {dailyGiftClaimed ? 'CLAIMED ✓' : 'CLAIM'}
                   </button>
-                  {!dailyGiftClaimed && (
-                    <button
-                      onClick={handleClaimDailyGiftWithAd}
-                      className="px-2.5 py-1.5 rounded-xl font-black text-[11px] bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 text-emerald-950 shadow-[0_0_12px_rgba(16,185,129,0.5)] active:scale-95 transition-all cursor-pointer border border-emerald-300 flex items-center gap-1"
-                      title="Watch Ad to Double Daily Reward"
-                    >
-                      <span>▶</span>
-                      <span>2X AD</span>
-                    </button>
-                  )}
                 </div>
               </div>
 

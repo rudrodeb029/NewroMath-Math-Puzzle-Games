@@ -5,12 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Math Puzzle - Think • Solve • Grow</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/fonts/cormorant-garamond.css">
-  
+  <script>
+    // Apply native/mobile full-viewport lock before first paint so the screen never jumps on any Android device
+    (function () {
+      var ua = navigator.userAgent || '';
+      var isAndroidOrMobile = /Android|Mobile|wv/i.test(ua) || (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+      if (isAndroidOrMobile) {
+        document.documentElement.classList.add('nm-native-apk');
+      }
+    })();
+  </script>
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      background-color: #0e1d47;
+    }
+    /* Full-bleed lock on all Android / mobile devices (prevents 640px+ tablets/foldables from jumping into desktop phone frame) */
+    html.nm-native-apk body {
+      padding: 0 !important;
+      display: block !important;
+      height: 100dvh !important;
+      width: 100vw !important;
+      overflow: hidden !important;
+    }
+    html.nm-native-apk #root {
+      max-width: 100% !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+    }
     body, html, * {
       font-family: 'Cormorant Garamond', 'EB Garamond', Garamond, 'Times New Roman', Georgia, serif;
     }
@@ -700,45 +736,107 @@
       pointer-events: none;
     }
 
-    /* ===== NewroMath Sliding-Tile Loader =====
-       7 tiles move around 8 slots of a 45° rotated 3x3 grid (one gap = sliding-puzzle motion).
-       Only becomes visible after a short delay, so fast loads never flash a loader. */
-    @keyframes nmTileSlide{0%{transform:translate(0px,70px);animation-timing-function:cubic-bezier(.65,0,.35,1)}1.125%{transform:translate(0px,35px);animation-timing-function:linear}12.5%{transform:translate(0px,35px);animation-timing-function:cubic-bezier(.65,0,.35,1)}13.625%{transform:translate(0px,0px);animation-timing-function:linear}25%{transform:translate(0px,0px);animation-timing-function:cubic-bezier(.65,0,.35,1)}26.125%{transform:translate(35px,0px);animation-timing-function:linear}37.5%{transform:translate(35px,0px);animation-timing-function:cubic-bezier(.65,0,.35,1)}38.625%{transform:translate(70px,0px);animation-timing-function:linear}50%{transform:translate(70px,0px);animation-timing-function:cubic-bezier(.65,0,.35,1)}51.125%{transform:translate(70px,35px);animation-timing-function:linear}62.5%{transform:translate(70px,35px);animation-timing-function:cubic-bezier(.65,0,.35,1)}63.625%{transform:translate(35px,35px);animation-timing-function:linear}75%{transform:translate(35px,35px);animation-timing-function:cubic-bezier(.65,0,.35,1)}76.125%{transform:translate(35px,70px);animation-timing-function:linear}87.5%{transform:translate(35px,70px);animation-timing-function:cubic-bezier(.65,0,.35,1)}88.625%{transform:translate(0px,70px);animation-timing-function:linear}100%{transform:translate(0px,70px)}}
-    .nm-loader .rect{
-      animation:nmTileSlide 11.52s infinite;
-      will-change:transform;
-      stroke:rgba(255,255,255,.22);
-      stroke-width:0.75px;
-      filter:drop-shadow(0 3px 6px rgba(0,0,0,.45));
+    /* ===== NewroMath Lightweight Cyber-Arcade Gaming Loader =====
+       Pure GPU-accelerated CSS (transform + opacity only, 0 SVG filters).
+       Features 4 neon math operator cores (+ − × ÷) and a sleek cyan energy bar. */
+    .nm-loader-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 42%, #1d3c8c 0%, #112459 55%, #091436 100%);
+      animation: nmLoaderFade 0.14s ease-out both;
+      pointer-events: auto;
+      user-select: none;
     }
-    .nm-loader .nm-r1{animation-delay:-10.44s}
-    .nm-loader .nm-r2{animation-delay:-0.54s}
-    .nm-loader .nm-r3{animation-delay:-2.16s}
-    .nm-loader .nm-r4{animation-delay:-3.78s}
-    .nm-loader .nm-r5{animation-delay:-5.40s}
-    .nm-loader .nm-r6{animation-delay:-7.02s}
-    .nm-loader .nm-r7{animation-delay:-8.64s}
-    .nm-loader-overlay{
-      position:absolute; inset:0; z-index:10000;
-      display:flex; align-items:center; justify-content:center;
-      background:#183278;
-      animation:nmLoaderFade .18s ease-out both;
-      pointer-events:auto;
+    .nm-loader-overlay.nm-boot {
+      animation: nmLoaderFade 0.16s ease-out 0.15s both;
     }
-    .nm-loader-overlay.nm-boot{ background:#183278; animation:nmLoaderFade .2s ease-out .35s both; }
-    .nm-loader-card{
-      width:auto; height:auto; border-radius:0;
-      background:transparent !important; display:flex; align-items:center; justify-content:center;
-      box-shadow:none !important; border:none !important;
+    .nm-cyber-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      transform: translateZ(0);
     }
-    .nm-loader-card svg{ width:100px; height:80px; overflow:visible; }
-    @keyframes nmLoaderFade{ from{opacity:0} to{opacity:1} }
-    @media (prefers-reduced-motion: reduce){ .nm-loader .rect{ animation-duration:23s; } }
+    .nm-cyber-orbs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nm-cyber-orb {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      color: #ffffff;
+      border: 1.5px solid rgba(125, 211, 252, 0.65);
+      background: linear-gradient(145deg, rgba(56, 189, 248, 0.32), rgba(29, 78, 216, 0.55));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      will-change: transform, opacity;
+      animation: nmOrbPulse 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .nm-cyber-orb:nth-child(2) {
+      animation-delay: 0.14s;
+      border-color: rgba(167, 243, 208, 0.65);
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.32), rgba(5, 150, 105, 0.55));
+    }
+    .nm-cyber-orb:nth-child(3) {
+      animation-delay: 0.28s;
+      border-color: rgba(253, 230, 138, 0.7);
+      background: linear-gradient(145deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.58));
+    }
+    .nm-cyber-orb:nth-child(4) {
+      animation-delay: 0.42s;
+      border-color: rgba(216, 180, 254, 0.65);
+      background: linear-gradient(145deg, rgba(168, 85, 247, 0.32), rgba(109, 40, 217, 0.55));
+    }
+    .nm-cyber-bar-track {
+      width: 148px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      overflow: hidden;
+      position: relative;
+    }
+    .nm-cyber-bar-fill {
+      width: 48%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8, #fde047, #34d399);
+      will-change: transform;
+      animation: nmBarSweep 0.95s ease-in-out infinite alternate;
+    }
+    .nm-cyber-tag {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #bae6fd;
+      opacity: 0.88;
+    }
+    @keyframes nmOrbPulse {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.72; }
+      50% { transform: translate3d(0, -6px, 0) scale(1.06); opacity: 1; }
+    }
+    @keyframes nmBarSweep {
+      0% { transform: translate3d(-15%, 0, 0); }
+      100% { transform: translate3d(125%, 0, 0); }
+    }
+    @keyframes nmLoaderFade { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-0 sm:p-4 bg-gradient-to-br from-[#0e1d47] via-[#14285e] to-[#0d1a40] text-slate-100">
 
-  <div id="root" class="w-full max-w-[430px] h-[100dvh] sm:h-[890px] bg-[#183278] sm:rounded-[44px] sm:shadow-[0_25px_60px_-15px_rgba(20,50,130,0.6)] overflow-hidden flex flex-col relative border-0 sm:border-[8px] sm:border-[#224896]"><div class="nm-loader-overlay nm-boot" role="status" aria-label="Loading"><div class="nm-loader-card"><svg class="nm-loader" viewBox="0 0 100 80"><g transform="translate(50 0) scale(0.707 0.707) rotate(45 0 0)"><rect class="rect nm-r1" width="30" height="30" rx="2" ry="2" fill="red"/><rect class="rect nm-r2" width="30" height="30" rx="2" ry="2" fill="green"/><rect class="rect nm-r3" width="30" height="30" rx="2" ry="2" fill="blue"/><rect class="rect nm-r4" width="30" height="30" rx="2" ry="2" fill="black"/><rect class="rect nm-r5" width="30" height="30" rx="2" ry="2" fill="orange"/><rect class="rect nm-r6" width="30" height="30" rx="2" ry="2" fill="teal"/><rect class="rect nm-r7" width="30" height="30" rx="2" ry="2" fill="gold"/></g></svg></div></div></div>
+  <div id="root" class="w-full max-w-[430px] h-[100dvh] sm:h-[890px] bg-[#183278] sm:rounded-[44px] sm:shadow-[0_25px_60px_-15px_rgba(20,50,130,0.6)] overflow-hidden flex flex-col relative border-0 sm:border-[8px] sm:border-[#224896]"><div class="nm-loader-overlay nm-boot" role="status" aria-label="Loading"><div class="nm-cyber-loader"><div class="nm-cyber-orbs"><div class="nm-cyber-orb">+</div><div class="nm-cyber-orb">−</div><div class="nm-cyber-orb">×</div><div class="nm-cyber-orb">÷</div></div><div class="nm-cyber-bar-track"><div class="nm-cyber-bar-fill"></div></div><div class="nm-cyber-tag">Loading Arena</div></div></div></div>
 
   <script type="module" src="/src/legacyApp.jsx"></script>
   <script>
