@@ -10,11 +10,6 @@ export const AdMobBanner = ({ isNative }) => {
   return (
     <div
       className="w-full h-[50px] min-h-[50px] max-h-[50px] shrink-0 bg-[#061026] border-t border-cyan-500/30 flex items-center justify-between px-3 select-none z-40 overflow-hidden"
-      style={{
-        contain: 'layout paint size',
-        transform: 'translateZ(0)',
-        backfaceVisibility: 'hidden',
-      }}
     >
       <div className="flex items-center gap-2.5 min-w-0">
         <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-wider shrink-0 shadow-sm">
@@ -142,11 +137,6 @@ export const AdMobRewardedModal = ({ isOpen, onClose, onReward, rewardInfo }) =>
   return (
     <div
       className="fixed inset-0 z-[110] bg-[#07112b] flex flex-col justify-between p-4 sm:p-6 select-none text-white"
-      style={{
-        contain: 'layout paint size',
-        transform: 'translateZ(0)',
-        backfaceVisibility: 'hidden',
-      }}
     >
       <div className="flex items-center justify-between pt-[max(8px,env(safe-area-inset-top))]">
         <div className="flex items-center gap-2">

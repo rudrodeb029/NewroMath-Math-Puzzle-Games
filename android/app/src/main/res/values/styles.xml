@@ -22,11 +22,10 @@
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 
-    <!-- Dark, zero-bounce theme for Google AdMob AdActivity so opening/closing ads never flashes white -->
-    <style name="AppTheme.AdActivity" parent="android:Theme.NoTitleBar.Fullscreen">
-        <item name="android:windowBackground">@color/nmSystemBar</item>
-        <item name="android:colorBackground">@color/nmSystemBar</item>
-        <item name="android:windowIsTranslucent">false</item>
+    <!-- Translucent non-fullscreen theme for Google AdMob AdActivity so MainActivity's WebView surface is never destroyed and status bar never jumps -->
+    <style name="AppTheme.AdActivity" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 

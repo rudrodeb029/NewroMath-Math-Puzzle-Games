@@ -47,7 +47,39 @@ public class MainActivity extends BridgeActivity {
     public void onResume() {
         super.onResume();
         applyStableWindow();
+        recoverWebViewSurface();
         publishIntegrity();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            applyStableWindow();
+            recoverWebViewSurface();
+        }
+    }
+
+    private void recoverWebViewSurface() {
+        try {
+            WebView webView = getBridge() != null ? getBridge().getWebView() : null;
+            if (webView != null) {
+                webView.setBackgroundColor(Color.parseColor("#0d1a40"));
+                webView.invalidate();
+                webView.postInvalidateOnAnimation();
+                webView.postDelayed(() -> {
+                    try {
+                        webView.invalidate();
+                        webView.evaluateJavascript(
+                            "window.dispatchEvent(new CustomEvent('nm-webview-repaint'));",
+                            null
+                        );
+                    } catch (Exception ignored) {
+                    }
+                }, 60);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     private void applyStableWindow() {

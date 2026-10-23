@@ -254,12 +254,22 @@ class AdMobService {
       this.rewardedReady = false;
       const rewardItem = await AdMob.showRewardVideoAd();
       if (rewardItem && onReward) {
+        await new Promise<void>((resolve) => {
+          if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => setTimeout(resolve, 40));
+          } else {
+            setTimeout(resolve, 50);
+          }
+        });
         onReward(rewardItem);
+      }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('nm-webview-repaint'));
       }
       // Warm up next ad in background
       setTimeout(() => {
         this.preloadRewarded().catch(() => {});
-      }, 300);
+      }, 400);
       return true;
     } catch (err) {
       console.warn('[AdMob Native] showRewarded error, falling back to instant modal:', err);

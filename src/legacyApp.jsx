@@ -242,7 +242,17 @@
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
-import confetti from 'canvas-confetti';
+import rawConfetti from 'canvas-confetti';
+const confetti = (opts) => {
+  try {
+    if (typeof document !== 'undefined' && document.documentElement.classList.contains('nm-native-apk')) {
+      return null;
+    }
+    return rawConfetti(opts);
+  } catch (e) {
+    return null;
+  }
+};
 import './index.css';
 import { adMobService } from './services/adMobService';
 import { purchaseService, IAP_CATALOG } from './services/purchaseService';
@@ -966,87 +976,13 @@ const PLAYER_COUNTRIES = [
       setTimeout(() => { void initFirebaseCloudSync(GameStorage.cache); }, 300);
     }
 
-    function PageTransition({ screenKey, direction, children, isWaitingForLoad = false }) {
-      const [displayedKey, setDisplayedKey] = useState(screenKey);
-      const [transition, setTransition] = useState(null);
-      const prevChildrenRef = useRef(children);
-      const timeoutRef = useRef(null);
-
-      const getPageKind = key => key === 'hint'
-        ? 'hint'
-        : key === 'correct' || key === 'wrong'
-          ? 'result'
-          : 'page';
-
-      // Detect screen change during render
-      if (screenKey !== displayedKey) {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        const prevKey = displayedKey;
-        const prevChildren = prevChildrenRef.current;
-        setDisplayedKey(screenKey);
-        setTransition({
-          outgoingKey: prevKey,
-          outgoingChildren: prevChildren,
-          incomingKey: screenKey,
-          outgoingKind: getPageKind(prevKey),
-          incomingKind: getPageKind(screenKey),
-          direction: direction || 'forward',
-        });
-      }
-
-      useEffect(() => {
-        prevChildrenRef.current = children;
-      }, [children]);
-
-      useEffect(() => {
-        if (transition) {
-          timeoutRef.current = setTimeout(() => {
-            timeoutRef.current = null;
-            setTransition(null);
-          }, 290);
-          return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          };
-        }
-      }, [transition]);
-
-      let incomingAnimClass = '';
-      let outgoingAnimClass = '';
-
-      if (transition) {
-        if (transition.incomingKind === 'hint') {
-          incomingAnimClass = 'page-anim-in-hint';
-        } else if (transition.incomingKind === 'result') {
-          incomingAnimClass = 'page-anim-in-result';
-        } else {
-          incomingAnimClass = transition.direction === 'back' ? 'page-anim-in-back' : 'page-anim-in-forward';
-        }
-
-        if (transition.outgoingKind === 'hint') {
-          outgoingAnimClass = 'page-anim-out-hint';
-        } else if (transition.outgoingKind === 'result') {
-          outgoingAnimClass = 'page-anim-out-result';
-        } else {
-          outgoingAnimClass = transition.direction === 'back' ? 'page-anim-out-back' : 'page-anim-out-forward';
-        }
-      }
-
-      const isHintLayer = getPageKind(screenKey) === 'hint';
-
+    function PageTransition({ screenKey, children }) {
+      const isHintLayer = screenKey === 'hint';
       return (
         <div className="page-transition-stage">
-          {transition && (
-            <div
-              key={`outgoing-${transition.outgoingKey}`}
-              aria-hidden="true"
-              className={`page-transition-layer page-transition-outgoing ${outgoingAnimClass}`}
-            >
-              {transition.outgoingChildren}
-            </div>
-          )}
           <div
             key={`current-${screenKey}`}
-            className={`page-transition-layer page-transition-current ${isHintLayer ? 'hint-layer' : ''} ${incomingAnimClass} ${isWaitingForLoad ? 'opacity-0 pointer-events-none' : ''}`}
+            className={`page-transition-layer page-transition-current ${isHintLayer ? 'hint-layer' : ''}`}
           >
             {children}
           </div>
@@ -1091,7 +1027,10 @@ const PLAYER_COUNTRIES = [
 
     // Shows the loader ONLY when the newly opened page is genuinely slow
     // (its visible images still loading). Fast pages open instantly, no loader flash.
-    function useSmartPageLoader(screenKey, minDisplayMs = 280, maxMs = 5000) {
+    function useSmartPageLoader() {
+      return false;
+    }
+    function _unusedSmartPageLoader(screenKey, minDisplayMs = 280, maxMs = 5000) {
       const [visible, setVisible] = useState(false);
       const showStartRef = useRef(0);
 
@@ -1271,9 +1210,11 @@ const PLAYER_COUNTRIES = [
         };
       }, [slot.active, slot.flightSeq]);
 
-      const initialTransform = slot.active && isFinite(slot.fromX) && isFinite(slot.fromY)
+      if (!slot.active) return null;
+
+      const initialTransform = isFinite(slot.fromX) && isFinite(slot.fromY)
         ? `translate3d(${slot.fromX}px, ${slot.fromY}px, 0)`
-        : 'translate3d(-9999px, -9999px, 0)';
+        : 'translate3d(0px, 0px, 0)';
 
       return (
         <div
@@ -5148,7 +5089,7 @@ const PLAYER_COUNTRIES = [
       // Timer effect in gameplay with Modern Cyber Timeout Trigger
       useEffect(() => {
         let interval = null;
-        if (currentScreen === 'game' && !isGamePaused && !isTimeOver) {
+        if (currentScreen === 'game' && !isGamePaused && !isTimeOver && !adModalOpen) {
           interval = setInterval(() => {
             setGameTimer(gameTimerRef.current - 1);
             if (gameTimerRef.current === 0) {
@@ -5158,12 +5099,12 @@ const PLAYER_COUNTRIES = [
           }, 1000);
         }
         return () => clearInterval(interval);
-      }, [currentScreen, isGamePaused, isTimeOver]);
+      }, [currentScreen, isGamePaused, isTimeOver, adModalOpen]);
 
       // Timer effect for Daily Challenge (Quantum Countdown with Timeout Trigger)
       useEffect(() => {
         let interval = null;
-        if (currentScreen === 'daily_game' && !isDailyGamePaused && !showDailyInstructionsModal && dailyGameTimer > 0 && !dailyGameVictoryModal && !dailyGameDefeatModal && !dailyGameTimeOver) {
+        if (currentScreen === 'daily_game' && !isDailyGamePaused && !showDailyInstructionsModal && dailyGameTimer > 0 && !dailyGameVictoryModal && !dailyGameDefeatModal && !dailyGameTimeOver && !adModalOpen) {
           interval = setInterval(() => {
             setDailyGameTimer(prev => {
               if (prev <= 1) {
@@ -5176,7 +5117,7 @@ const PLAYER_COUNTRIES = [
           }, 1000);
         }
         return () => clearInterval(interval);
-      }, [currentScreen, isDailyGamePaused, showDailyInstructionsModal, dailyGameTimer, dailyGameVictoryModal, dailyGameDefeatModal, dailyGameTimeOver]);
+      }, [currentScreen, isDailyGamePaused, showDailyInstructionsModal, dailyGameTimer, dailyGameVictoryModal, dailyGameDefeatModal, dailyGameTimeOver, adModalOpen]);
 
       // Level Entry Fee verification and launch flow
       const attemptStartLevel = (targetLvl = selectedLevelNum, bypassFee = false) => {
@@ -5376,15 +5317,41 @@ const PLAYER_COUNTRIES = [
         }
         if (timerContainerRef.current) {
           const warning = gameTimerRef.current <= 15;
-          timerContainerRef.current.classList.toggle('animate-timer-warning', warning);
-          timerContainerRef.current.classList.toggle('text-red-300', warning);
-          timerContainerRef.current.classList.toggle('bg-red-950/80', warning);
-          timerContainerRef.current.classList.toggle('border-red-500/80', warning);
-          timerContainerRef.current.classList.toggle('text-cyan-200', !warning);
-          timerContainerRef.current.classList.toggle('bg-cyan-950/70', !warning);
-          timerContainerRef.current.classList.toggle('border-cyan-400/40', !warning);
+          const prevWarning = timerContainerRef.current.dataset.warning === '1';
+          if (warning !== prevWarning) {
+            timerContainerRef.current.dataset.warning = warning ? '1' : '0';
+            timerContainerRef.current.classList.toggle('animate-timer-warning', warning);
+            timerContainerRef.current.classList.toggle('text-red-100', warning);
+            timerContainerRef.current.classList.toggle('bg-[#881337]', warning);
+            timerContainerRef.current.classList.toggle('border-red-300', warning);
+            timerContainerRef.current.classList.toggle('text-yellow-100', !warning);
+            timerContainerRef.current.classList.toggle('bg-[#6b440b]', !warning);
+            timerContainerRef.current.classList.toggle('border-yellow-300/70', !warning);
+          }
         }
       }
+
+      // Refresh HUD timer and surface state immediately when returning from a full-screen AdActivity
+      useEffect(() => {
+        const onRepaint = () => {
+          if (timerDisplayRef.current) {
+            timerDisplayRef.current.textContent = formatTimer(gameTimerRef.current);
+          }
+          if (timerContainerRef.current) {
+            timerContainerRef.current.dataset.warning = '';
+            setGameTimer(gameTimerRef.current);
+          }
+        };
+        const onVis = () => {
+          if (document.visibilityState === 'visible') onRepaint();
+        };
+        window.addEventListener('nm-webview-repaint', onRepaint);
+        document.addEventListener('visibilitychange', onVis);
+        return () => {
+          window.removeEventListener('nm-webview-repaint', onRepaint);
+          document.removeEventListener('visibilitychange', onVis);
+        };
+      }, []);
 
       const navigateTo = (screen, replaceCurrent = false) => {
         if (screen === currentScreen) return;
@@ -7328,7 +7295,7 @@ const PLAYER_COUNTRIES = [
               )}
 
               {/* Mission Board Terminal */}
-              <section className="w-full max-w-[306px] sm:max-w-[330px] mx-auto flex flex-col rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_12px_28px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl shrink-0">
+              <section className="w-full max-w-[306px] sm:max-w-[330px] mx-auto flex flex-col rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-gradient-to-b from-[#1a3882] via-[#102761] to-[#0b1c45] border border-cyan-300/30 shadow-[0_12px_28px_rgba(2,10,32,0.6),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden shrink-0">
                 {/* Blueprint Grid Overlay */}
                 <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
 
@@ -7338,31 +7305,29 @@ const PLAYER_COUNTRIES = [
                 <span className="absolute bottom-1 left-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
                 <span className="absolute bottom-1 right-1.5 text-[8px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
 
-                {/* Mission HUD Header: Yellow Background Modern 3D Glassmorphism Section */}
-                <div className="relative z-10 flex items-center justify-between px-2 py-1 rounded-xl bg-gradient-to-b from-yellow-300/25 via-amber-400/20 to-yellow-500/15 border border-yellow-300/50 shadow-[0_3px_14px_rgba(245,158,11,0.25),inset_0_1.5px_1.5px_rgba(255,255,255,0.65),inset_0_-1.5px_3px_rgba(180,83,9,0.3)] backdrop-blur-xl mb-1.5 overflow-hidden">
-                  {/* Luminous Inner Glow Shimmer */}
-                  <div className="absolute -top-6 left-1/4 w-28 h-10 bg-yellow-300/20 rounded-full blur-md pointer-events-none" />
-
+                {/* Mission HUD Header: Solid 3D Gold/Amber Section */}
+                <div className="relative z-10 flex items-center justify-between px-2 py-1 rounded-xl bg-gradient-to-b from-[#5c4518] via-[#463310] to-[#33240a] border border-yellow-300/60 shadow-[0_3px_10px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.35)] mb-1.5 overflow-hidden">
                   {/* Left: 3D Difficulty Badge & Stage Counter */}
                   <div className="relative z-10 flex items-center gap-1 min-w-0">
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] transition-all shrink-0 leading-tight">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] shrink-0 leading-tight">
                       {activePuzzle?.stageDifficulty || profileDifficulty}
                     </span>
-                    <div className="px-1.5 py-0.5 rounded-md bg-black/35 border border-yellow-400/30 backdrop-blur-md shadow-inner flex items-center">
-                      <span className="text-[9px] text-yellow-200 font-mono font-black tracking-wider drop-shadow-xs leading-tight">
+                    <div className="px-1.5 py-0.5 rounded-md bg-[#1e1607] border border-yellow-400/40 shadow-inner flex items-center">
+                      <span className="text-[9px] text-yellow-200 font-mono font-black tracking-wider leading-tight">
                         GAME {stageNum}/{stageTotal}
                       </span>
                     </div>
                   </div>
 
-                  {/* Right: 3D Yellow Glass Timer Capsule & 3D Yellow Pause Button */}
+                  {/* Right: Solid 3D Timer Capsule & 3D Yellow Pause Button */}
                   <div className="relative z-10 flex items-center gap-1 shrink-0">
                     <div 
-                      ref={timerContainerRef} 
-                      className={`flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono font-black text-[11px] transition-all backdrop-blur-md ${
+                      ref={timerContainerRef}
+                      data-warning={gameTimer <= 15 ? '1' : '0'}
+                      className={`flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono font-black text-[11px] border ${
                         gameTimer <= 15
-                          ? 'animate-timer-warning text-red-100 bg-gradient-to-b from-red-500/80 to-red-800/90 border border-red-300 shadow-[0_0_10px_rgba(239,68,68,0.7),inset_0_1px_1px_rgba(255,255,255,0.5)]'
-                          : 'text-yellow-100 bg-gradient-to-b from-yellow-400/25 via-amber-500/35 to-amber-700/40 border border-yellow-300/60 shadow-[0_2px_6px_rgba(245,158,11,0.3),inset_0_1px_1px_rgba(255,255,255,0.55)]'
+                          ? 'animate-timer-warning text-red-100 bg-[#881337] border-red-300'
+                          : 'text-yellow-100 bg-[#6b440b] border-yellow-300/70'
                       }`}
                     >
                       <span className="text-[10px]">⏱️</span>
@@ -7439,9 +7404,9 @@ const PLAYER_COUNTRIES = [
                                   {puzzleAnswers[slot]}
                                 </span>
                               ) : isSlotPending ? (
-                                <span className="w-2 h-2 rounded-full bg-cyan-300 animate-ping opacity-90" />
+                                <span className="w-2 h-2 rounded-full bg-cyan-300 opacity-90" />
                               ) : isSelected ? (
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-ping opacity-80" />
+                                <span className="w-2 h-2 rounded-full bg-amber-300 opacity-95 shadow-[0_0_6px_rgba(252,211,77,0.9)]" />
                               ) : (
                                 <span className={`${isVeryCompact ? 'text-[7.5px]' : isCompact ? 'text-[8.5px]' : 'text-[9px]'} text-cyan-400/50 font-bold leading-none select-none`}>◇</span>
                               )}
@@ -7648,8 +7613,7 @@ const PLAYER_COUNTRIES = [
                   title="Get Hint"
                 >
                   <div className="relative flex items-center justify-center">
-                    <span className="absolute w-6 h-6 rounded-full bg-cyan-300/40 blur-[2px] animate-pulse pointer-events-none" />
-                    <svg className="w-5 h-5 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-5 h-5 text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.85)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 2a6.5 6.5 0 0 0-6.5 6.5c0 2.4 1.3 4.4 3.2 5.5v1.5a1.8 1.8 0 0 0 1.8 1.8h3a1.8 1.8 0 0 0 1.8-1.8V14c1.9-1.1 3.2-3.1 3.2-5.5A6.5 6.5 0 0 0 12 2z" fill="#bae6fd" stroke="#ffffff" strokeWidth="1.8" />
                       <path d="M9.5 9.5h5" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
                       <path d="M10 12.5h4" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
@@ -9834,7 +9798,7 @@ const PLAYER_COUNTRIES = [
               </div>
 
               {/* Mission Board Terminal Card (Housing Daily Challenge Functions in Unified Cyber Card) */}
-              <section className="flex flex-col rounded-3xl p-2.5 sm:p-3.5 bg-gradient-to-b from-white/[0.10] via-[#102761]/80 to-[#0b1c45]/90 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.5),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden backdrop-blur-xl">
+              <section className="flex flex-col rounded-3xl p-2.5 sm:p-3.5 bg-gradient-to-b from-[#1a3882] via-[#102761] to-[#0b1c45] border border-cyan-300/30 shadow-[0_16px_36px_rgba(2,10,32,0.6),inset_0_1.5px_0_rgba(255,255,255,0.22)] relative overflow-hidden">
                 {/* Blueprint Grid Overlay */}
                 <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
 
@@ -9844,29 +9808,26 @@ const PLAYER_COUNTRIES = [
                 <span className="absolute bottom-1.5 left-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
                 <span className="absolute bottom-1.5 right-2 text-[9px] font-mono text-cyan-300/40 select-none pointer-events-none leading-none">+</span>
 
-                {/* Mission HUD Header: Yellow Background Modern 3D Glassmorphism Section */}
-                <div className="relative z-10 flex items-center justify-between px-2.5 py-2 rounded-2xl bg-gradient-to-b from-yellow-300/25 via-amber-400/20 to-yellow-500/15 border border-yellow-300/50 shadow-[0_4px_20px_rgba(245,158,11,0.25),inset_0_1.5px_1.5px_rgba(255,255,255,0.65),inset_0_-1.5px_3px_rgba(180,83,9,0.3)] backdrop-blur-xl mb-2.5 overflow-hidden">
-                  {/* Luminous Inner Glow Shimmer */}
-                  <div className="absolute -top-6 left-1/4 w-32 h-12 bg-yellow-300/20 rounded-full blur-md pointer-events-none" />
-
+                {/* Mission HUD Header: Solid 3D Gold/Amber Section */}
+                <div className="relative z-10 flex items-center justify-between px-2.5 py-2 rounded-2xl bg-gradient-to-b from-[#5c4518] via-[#463310] to-[#33240a] border border-yellow-300/60 shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.35)] mb-2.5 overflow-hidden">
                   {/* Left: 3D Difficulty Badge & Day Counter */}
                   <div className="relative z-10 flex items-center gap-1.5 min-w-0">
-                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] transition-all shrink-0">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-gradient-to-b from-yellow-200 via-amber-300 to-amber-500 text-amber-950 border border-yellow-100 shadow-[0_2px_4px_rgba(180,83,9,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] shrink-0">
                       {difficulty}
                     </span>
-                    <div className="px-2 py-0.5 rounded-lg bg-black/35 border border-yellow-400/30 backdrop-blur-md shadow-inner flex items-center">
-                      <span className="text-[10px] text-yellow-200 font-mono font-black tracking-wider drop-shadow-xs">
+                    <div className="px-2 py-0.5 rounded-lg bg-[#1e1607] border border-yellow-400/40 shadow-inner flex items-center">
+                      <span className="text-[10px] text-yellow-200 font-mono font-black tracking-wider">
                         DAY {dailyGameDay}
                       </span>
                     </div>
                   </div>
 
-                  {/* Right: 3D Yellow Glass Timer Capsule & 3D Yellow Pause Button */}
+                  {/* Right: Solid 3D Timer Capsule & 3D Yellow Pause Button */}
                   <div className="relative z-10 flex items-center gap-1.5 shrink-0">
-                    <div className={`flex items-center gap-1 px-2.5 py-1 rounded-xl font-mono font-black text-xs transition-all backdrop-blur-md ${
+                    <div className={`flex items-center gap-1 px-2.5 py-1 rounded-xl font-mono font-black text-xs border ${
                       dailyGameTimer <= 15
-                        ? 'animate-timer-warning text-red-100 bg-gradient-to-b from-red-500/80 to-red-800/90 border border-red-300 shadow-[0_0_12px_rgba(239,68,68,0.7),inset_0_1px_1px_rgba(255,255,255,0.5)]'
-                        : 'text-yellow-100 bg-gradient-to-b from-yellow-400/25 via-amber-500/35 to-amber-700/40 border border-yellow-300/60 shadow-[0_2px_8px_rgba(245,158,11,0.3),inset_0_1px_1px_rgba(255,255,255,0.55)]'
+                        ? 'animate-timer-warning text-red-100 bg-[#881337] border-red-300'
+                        : 'text-yellow-100 bg-[#6b440b] border-yellow-300/70'
                     }`}>
                       <span className="text-xs">⏱️</span>
                       <span className="drop-shadow-xs">{formatTimer(dailyGameTimer)}</span>
@@ -13951,31 +13912,33 @@ const PLAYER_COUNTRIES = [
       };
 
       return (
-        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans">
+        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans bg-[#173272]">
           <PageTransition screenKey={currentScreen} direction={transitionDirection} isWaitingForLoad={isPageLoading}>
             {renderActiveScreen()}
           </PageTransition>
 
           {isPageLoading && <SlidingTileLoader />}
 
-          {/* 3D Cyber-Arcade Flying Number Tiles Layer (Object Pooled - Zero DOM allocations) */}
-          <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
-            {flyingPool.map(slot => (
-              <PooledFlyingTileItem
-                key={slot.slotId}
-                slot={slot}
-                largeFontEnabled={largeFontEnabled}
-                onComplete={(s) => {
-                  recycleFlyingTile(s.slotId);
-                  if (s.isReturn) {
-                    finalizeReturn(s.number);
-                  } else {
-                    finalizePlacement(s.number, s.targetSlot);
-                  }
-                }}
-              />
-            ))}
-          </div>
+          {/* 3D Cyber-Arcade Flying Number Tiles Layer (Mounted only during active flight) */}
+          {flyingPool.some(slot => slot.active) && (
+            <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
+              {flyingPool.map(slot => (
+                <PooledFlyingTileItem
+                  key={slot.slotId}
+                  slot={slot}
+                  largeFontEnabled={largeFontEnabled}
+                  onComplete={(s) => {
+                    recycleFlyingTile(s.slotId);
+                    if (s.isReturn) {
+                      finalizeReturn(s.number);
+                    } else {
+                      finalizePlacement(s.number, s.targetSlot);
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          )}
           {/* Cyber Notification Toast Banner */}
           {rewardToast && (
             <div className="fixed top-5 inset-x-4 z-50 flex justify-center pointer-events-none animate-in fade-in slide-in-from-top-4 duration-200">
@@ -14166,7 +14129,7 @@ const PLAYER_COUNTRIES = [
                             setRewardToast(`+350 Coins & +15 Diamonds Claimed! Launching Level ${targetLvl}...`);
                             setTimeout(() => {
                               attemptStartLevel(targetLvl);
-                            }, 600);
+                            }, 80);
                           }
                         });
                       }}
