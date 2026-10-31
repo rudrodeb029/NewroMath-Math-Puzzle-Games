@@ -13999,25 +13999,6 @@ const PLAYER_COUNTRIES = [
                 </div>
               </div>
 
-              {/* 6. Google Play Billing Guarantee & Restore Purchases */}
-              <div className="rounded-2xl p-3 bg-white/[0.05] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left mt-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-sm text-emerald-300 shrink-0">
-                    🔒
-                  </div>
-                  <div className="text-[10px] text-slate-300">
-                    <span className="font-bold text-white block">Google Play In-App Billing</span>
-                    Official, secure encrypted transaction & instant item delivery
-                  </div>
-                </div>
-                <button
-                  onClick={handleRestorePurchases}
-                  className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-[10px] font-bold text-cyan-200 active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-xs"
-                >
-                  🔄 Restore Purchases
-                </button>
-              </div>
-
             </div>
 
             {/* Google Play Transaction Loading Modal */}
