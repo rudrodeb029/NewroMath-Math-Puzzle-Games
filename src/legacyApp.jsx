@@ -7317,9 +7317,9 @@ const PLAYER_COUNTRIES = [
                         <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.45" />
                       </linearGradient>
                       <linearGradient id="nmGoldHudChamberGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#7c5a1e" />
-                        <stop offset="48%" stopColor="#523b12" />
-                        <stop offset="100%" stopColor="#332309" />
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="48%" stopColor="#059669" />
+                        <stop offset="100%" stopColor="#064e3b" />
                       </linearGradient>
                       <linearGradient id="nmGoldHudStrokeGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#fef08a" />
@@ -7358,11 +7358,11 @@ const PLAYER_COUNTRIES = [
                       strokeWidth="1.8"
                     />
 
-                    {/* 5. Inner Gold Bevel Highlight & Tier Divider Line */}
+                    {/* 5. Inner Emerald-Gold Bevel Highlight & Tier Divider Line */}
                     <path
                       d="M 11 77.5 L 11 47.5 Q 11 44 15 42.8 L 155.5 10.2 Q 160 9 164.5 10.2 L 305 42.8 Q 309 44 309 47.5 L 309 77.5"
                       fill="none"
-                      stroke="rgba(254,240,138,0.35)"
+                      stroke="rgba(167,243,208,0.45)"
                       strokeWidth="1"
                     />
                     <line
@@ -7370,7 +7370,7 @@ const PLAYER_COUNTRIES = [
                       y1="46.5"
                       x2="302"
                       y2="46.5"
-                      stroke="rgba(253,224,71,0.24)"
+                      stroke="rgba(110,231,183,0.35)"
                       strokeWidth="1"
                     />
                   </svg>
@@ -7398,9 +7398,9 @@ const PLAYER_COUNTRIES = [
                       {activePuzzle?.stageDifficulty || profileDifficulty}
                     </span>
 
-                    {/* Center: 3D Stage Counter Pill */}
-                    <div className="px-2.5 py-1 rounded-full bg-[#1e1607] border border-yellow-400/50 shadow-inner flex items-center">
-                      <span className="text-[9px] sm:text-[9.5px] text-yellow-200 font-mono font-black tracking-wider leading-none">
+                    {/* Center: 3D Stage Counter Pill (True Horizontal Center Aligned with Roof Apex) */}
+                    <div className="absolute left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-gradient-to-b from-[#047857] via-[#065f46] to-[#022c22] border border-emerald-300/80 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_1px_2px_rgba(255,255,255,0.25)] flex items-center justify-center pointer-events-none">
+                      <span className="text-[9px] sm:text-[9.5px] text-white font-mono font-black tracking-wider leading-none drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.8)]">
                         GAME {stageNum}/{stageTotal}
                       </span>
                     </div>
@@ -9917,9 +9917,9 @@ const PLAYER_COUNTRIES = [
                         <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.45" />
                       </linearGradient>
                       <linearGradient id="nmDailyGoldHudChamberGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#7c5a1e" />
-                        <stop offset="48%" stopColor="#523b12" />
-                        <stop offset="100%" stopColor="#332309" />
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="48%" stopColor="#059669" />
+                        <stop offset="100%" stopColor="#064e3b" />
                       </linearGradient>
                       <linearGradient id="nmDailyGoldHudStrokeGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#fef08a" />
@@ -9953,7 +9953,7 @@ const PLAYER_COUNTRIES = [
                     <path
                       d="M 11 77.5 L 11 47.5 Q 11 44 15 42.8 L 155.5 10.2 Q 160 9 164.5 10.2 L 305 42.8 Q 309 44 309 47.5 L 309 77.5"
                       fill="none"
-                      stroke="rgba(254,240,138,0.35)"
+                      stroke="rgba(167,243,208,0.45)"
                       strokeWidth="1"
                     />
                     <line
@@ -9961,7 +9961,7 @@ const PLAYER_COUNTRIES = [
                       y1="46.5"
                       x2="302"
                       y2="46.5"
-                      stroke="rgba(253,224,71,0.24)"
+                      stroke="rgba(110,231,183,0.35)"
                       strokeWidth="1"
                     />
                   </svg>
@@ -9984,8 +9984,8 @@ const PLAYER_COUNTRIES = [
                       {difficulty}
                     </span>
 
-                    <div className="px-2.5 py-1 rounded-full bg-[#1e1607] border border-yellow-400/50 shadow-inner flex items-center">
-                      <span className="text-[9.5px] sm:text-[10px] text-yellow-200 font-mono font-black tracking-wider leading-none">
+                    <div className="absolute left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-gradient-to-b from-[#047857] via-[#065f46] to-[#022c22] border border-emerald-300/80 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_1px_2px_rgba(255,255,255,0.25)] flex items-center justify-center pointer-events-none">
+                      <span className="text-[9.5px] sm:text-[10px] text-white font-mono font-black tracking-wider leading-none drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.8)]">
                         DAY {dailyGameDay}
                       </span>
                     </div>
