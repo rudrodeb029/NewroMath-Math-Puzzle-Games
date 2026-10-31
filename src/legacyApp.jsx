@@ -5321,12 +5321,8 @@ const PLAYER_COUNTRIES = [
           if (warning !== prevWarning) {
             timerContainerRef.current.dataset.warning = warning ? '1' : '0';
             timerContainerRef.current.classList.toggle('animate-timer-warning', warning);
-            timerContainerRef.current.classList.toggle('text-red-100', warning);
-            timerContainerRef.current.classList.toggle('bg-[#881337]', warning);
-            timerContainerRef.current.classList.toggle('border-red-300', warning);
+            timerContainerRef.current.classList.toggle('text-red-300', warning);
             timerContainerRef.current.classList.toggle('text-yellow-100', !warning);
-            timerContainerRef.current.classList.toggle('bg-[#6b440b]', !warning);
-            timerContainerRef.current.classList.toggle('border-yellow-300/70', !warning);
           }
         }
       }
@@ -7379,18 +7375,18 @@ const PLAYER_COUNTRIES = [
                     />
                   </svg>
 
-                  {/* Upper Peak Loft: Game Timer Capsule Centered in the Roof Apex */}
-                  <div className="absolute top-[15px] sm:top-[16px] inset-x-0 flex items-center justify-center z-10 pointer-events-auto">
+                  {/* Upper Peak Loft: Game Timer Centered in the Roof Apex (No Pill Background) */}
+                  <div className="absolute top-[16px] sm:top-[17px] inset-x-0 flex items-center justify-center z-10 pointer-events-auto">
                     <div
                       ref={timerContainerRef}
                       data-warning={gameTimer <= 15 ? '1' : '0'}
-                      className={`flex items-center gap-1 px-2.5 py-[2.5px] rounded-full font-mono font-black text-[10.5px] sm:text-[11px] border shadow-[0_2px_5px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] ${
+                      className={`flex items-center gap-1 font-mono font-black text-[11px] sm:text-xs drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.85)] ${
                         gameTimer <= 15
-                          ? 'animate-timer-warning text-red-100 bg-[#881337] border-red-300'
-                          : 'text-yellow-100 bg-[#6b440b] border-yellow-300/70'
+                          ? 'animate-timer-warning text-red-300'
+                          : 'text-yellow-100'
                       }`}
                     >
-                      <span className="text-[9.5px] leading-none">⏱️</span>
+                      <span className="text-[10px] leading-none">⏱️</span>
                       <span ref={timerDisplayRef} className="tracking-wider leading-none">{formatTimer(gameTimer)}</span>
                     </div>
                   </div>
@@ -9970,12 +9966,12 @@ const PLAYER_COUNTRIES = [
                     />
                   </svg>
 
-                  {/* Upper Peak Loft: Daily Game Timer Capsule Centered in the Roof Apex */}
-                  <div className="absolute top-[15px] sm:top-[16px] inset-x-0 flex items-center justify-center z-10 pointer-events-auto">
-                    <div className={`flex items-center gap-1 px-2.5 py-[2.5px] rounded-full font-mono font-black text-[10.5px] sm:text-xs border shadow-[0_2px_5px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] ${
+                  {/* Upper Peak Loft: Daily Game Timer Centered in the Roof Apex (No Pill Background) */}
+                  <div className="absolute top-[16px] sm:top-[17px] inset-x-0 flex items-center justify-center z-10 pointer-events-auto">
+                    <div className={`flex items-center gap-1 font-mono font-black text-[11px] sm:text-xs drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.85)] ${
                       dailyGameTimer <= 15
-                        ? 'animate-timer-warning text-red-100 bg-[#881337] border-red-300'
-                        : 'text-yellow-100 bg-[#6b440b] border-yellow-300/70'
+                        ? 'animate-timer-warning text-red-300'
+                        : 'text-yellow-100'
                     }`}>
                       <span className="text-[10px] leading-none">⏱️</span>
                       <span className="tracking-wider leading-none">{formatTimer(dailyGameTimer)}</span>
@@ -11331,5 +11327,3042 @@ const PLAYER_COUNTRIES = [
                       </span>
                     </div>
                     {/* Pillar */}
-                    <div className="w-full h-24 rounded-t-2xl bg-gradient-to-b from-white/[0.16] via-[#163674]/60 to-black/40 border-t-2 border-x-2 border-cyan-300/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgb
-... [truncated for diff preview]
+                    <div className="w-full h-24 rounded-t-2xl bg-gradient-to-b from-white/[0.16] via-[#163674]/60 to-black/40 border-t-2 border-x-2 border-cyan-300/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(56,189,248,0.2),inset_0_1px_0_rgba(255,255,255,0.25)]">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-b from-slate-100 to-slate-300 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
+                        2
+                      </div>
+                      <span className="text-[9px] font-mono font-black text-cyan-200 tracking-wider">SILVER</span>
+                    </div>
+                  </div>
+
+                  {/* Rank 1 (Gold Champion - Center Elevated) */}
+                  <div className="flex-1 flex flex-col items-center -translate-y-2">
+                    <div className="relative mb-2 flex flex-col items-center">
+                      <span className="text-2xl -mb-1 animate-bounce filter drop-shadow-[0_0_10px_rgba(251,191,36,0.9)]">👑</span>
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-yellow-100 p-0.5 shadow-[0_0_24px_rgba(251,191,36,0.7),inset_0_1.5px_0_rgba(255,255,255,0.5)] backdrop-blur-md flex items-center justify-center text-2xl relative">
+                        {podium[1].avatar.startsWith('/') ? (
+                          <img src={podium[1].avatar} alt="" className="w-11 h-11 object-contain drop-shadow-md" />
+                        ) : (
+                          <span>{podium[1].avatar}</span>
+                        )}
+                        <span className="absolute -bottom-1 -right-1 text-sm">{podium[1].flag}</span>
+                      </div>
+                      <span className="text-xs font-black text-amber-200 truncate max-w-[90px] mt-1.5 block drop-shadow-sm">
+                        {podium[1].name}
+                      </span>
+                      <span className="text-[10px] font-mono text-yellow-300 font-black bg-amber-400/20 backdrop-blur-md px-2 py-0.5 rounded-full border border-amber-300/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] mt-0.5">
+                        {podium[1].score}
+                      </span>
+                    </div>
+                    {/* Pillar */}
+                    <div className="w-full h-32 rounded-t-2xl bg-gradient-to-b from-amber-400/25 via-[#35250c]/60 to-black/50 border-t-2 border-x-2 border-amber-300/90 backdrop-blur-md flex flex-col items-center justify-between py-2.5 shadow-[0_0_25px_rgba(251,191,36,0.3),inset_0_1px_0_rgba(255,255,255,0.3)]">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-b from-amber-200 via-yellow-400 to-amber-500 border-2 border-white text-amber-950 font-black text-sm flex items-center justify-center shadow-lg">
+                        1
+                      </div>
+                      <span className="text-[10px] font-mono font-black text-amber-300 tracking-widest uppercase">CHAMPION</span>
+                    </div>
+                  </div>
+
+                  {/* Rank 3 (Bronze) */}
+                  <div className="flex-1 flex flex-col items-center">
+                    <div className="relative mb-2 flex flex-col items-center">
+                      <span className="text-xl -mb-1 filter drop-shadow">🥉</span>
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600/90 via-orange-500/80 to-amber-700/90 border-2 border-orange-200/90 p-0.5 shadow-[0_0_16px_rgba(249,115,22,0.45),inset_0_1px_0_rgba(255,255,255,0.35)] backdrop-blur-md flex items-center justify-center text-xl relative">
+                        {podium[2].avatar.startsWith('/') ? (
+                          <img src={podium[2].avatar} alt="" className="w-9 h-9 object-contain drop-shadow-md" />
+                        ) : (
+                          <span>{podium[2].avatar}</span>
+                        )}
+                        <span className="absolute -bottom-1 -right-1 text-xs">{podium[2].flag}</span>
+                      </div>
+                      <span className="text-[11px] font-black text-white truncate max-w-[80px] mt-1.5 block drop-shadow-sm">
+                        {podium[2].name}
+                      </span>
+                      <span className="text-[9px] font-mono text-orange-200 font-bold bg-white/[0.08] px-1.5 py-0.2 rounded-md border border-white/10 mt-0.5">
+                        {podium[2].score}
+                      </span>
+                    </div>
+                    {/* Pillar */}
+                    <div className="w-full h-20 rounded-t-2xl bg-gradient-to-b from-white/[0.14] via-[#2c180e]/60 to-black/40 border-t-2 border-x-2 border-amber-500/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(249,115,22,0.2),inset_0_1px_0_rgba(255,255,255,0.2)]">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-b from-orange-300 to-amber-600 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
+                        3
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Leaderboard Table (Ranks 4 - 8) */}
+              <div className="space-y-2 pb-2">
+                <div className="flex items-center justify-between px-2 text-[10px] font-mono font-black uppercase tracking-wider text-cyan-300/70 pb-0.5">
+                  <span>Rank & Player</span>
+                  <span>Total Score</span>
+                </div>
+
+                {topPlayers.map((player) => (
+                  <div 
+                    key={player.rank}
+                    className="relative group bg-gradient-to-r from-white/[0.10] via-[#0d245c]/55 to-[#071536]/70 border border-white/20 hover:border-cyan-300/60 rounded-2xl p-3 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-xl transition-all hover:scale-[1.01]"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Rank Number Keycap */}
+                      <div className="w-9 h-9 rounded-xl bg-white/[0.10] border border-white/25 text-cyan-200 font-mono font-black text-sm flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md shrink-0">
+                        #{player.rank}
+                      </div>
+
+                      {/* Flag & Name */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">{player.flag}</span>
+                          <span className="font-black text-sm text-white truncate font-display">
+                            {player.name}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-cyan-300/80 block mt-0.5">
+                          {player.title}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Score Tag */}
+                    <div className="shrink-0 flex items-center gap-1.5 bg-black/35 border border-white/15 px-3 py-1.5 rounded-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-md">
+                      <span className="text-xs">⭐</span>
+                      <span className="font-mono font-black text-xs text-cyan-200">
+                        {player.score}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Sticky Player Rank Dock (You - Glassmorphic) */}
+              <div className="sticky bottom-0 z-20 -mx-3 px-3 py-2.5 bg-[#051029]/80 border-t border-white/20 backdrop-blur-2xl shadow-[0_-12px_32px_rgba(0,0,0,0.7)]">
+                <div className="bg-gradient-to-r from-cyan-500/85 via-blue-600/85 to-indigo-600/85 border-2 border-white/40 rounded-2xl p-3 flex items-center justify-between shadow-[0_8px_28px_rgba(0,229,255,0.5),inset_0_1.5px_0_rgba(255,255,255,0.45)] backdrop-blur-xl">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-white/95 text-blue-950 font-mono font-black text-sm flex items-center justify-center shadow-md shrink-0">
+                      #{playerRank}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-base">🇺🇸</span>
+                        <span className="font-black text-sm text-white truncate font-display">
+                          Player (YOU)
+                        </span>
+                        <span className="text-[9px] font-black uppercase bg-emerald-400 text-emerald-950 px-1.5 py-0.2 rounded-full font-mono shadow-xs">
+                          ACTIVE
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-cyan-100/90 block mt-0.5">
+                         Level {activePlayerLevel} • Tier Master
+                       </span>
+                     </div>
+                   </div>
+
+                   <div className="shrink-0 flex items-center gap-1.5 bg-black/30 border border-white/30 px-3 py-1.5 rounded-xl backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
+                     <span className="text-xs">⭐</span>
+                     <span className="font-mono font-black text-xs text-white">
+                       {playerScore.toLocaleString()}
+                     </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // ========================================================
+      // 14. PUZZLE HISTORY & SAVED ARCHIVES (Modern Sci-Fi Glassmorphism Edition)
+      // ========================================================
+      const renderHistoryScreen = () => {
+        // Filter based on active tab
+        const isSavedTab = historyTab === 'saved';
+        const displayList = isSavedTab
+          ? puzzleRecords.filter(item => savedPuzzleIds.includes(item.id))
+          : puzzleRecords;
+
+        const totalSolved = puzzleRecords.filter(r => r.solved).length;
+        const savedCount = savedPuzzleIds.length;
+        const accuracyRate = puzzleRecords.length > 0 
+          ? Math.round((totalSolved / puzzleRecords.length) * 100) 
+          : 100;
+
+        const handleCopyEquation = (eq) => {
+          sound.click();
+          if (navigator?.clipboard?.writeText) {
+            navigator.clipboard.writeText(eq).catch(() => {});
+          }
+          setRewardToast(`📋 Formula copied: ${eq}`);
+        };
+
+        return (
+          <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlays */}
+            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute top-1/3 -right-20 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 left-0 w-80 h-80 scifi-ambient-purple rounded-full pointer-events-none" />
+
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => { sound.click(); navigateTo('home'); }} 
+                  aria-label="Back to home" 
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center text-xl font-bold shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  ‹
+                </button>
+
+                <div className="flex flex-col items-center">
+                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase flex items-center gap-1.5">
+                    <span className="drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">📜</span>
+                    <span>Puzzle Archives</span>
+                  </h1>
+                  <span className="text-[10px] font-mono text-cyan-300/80 tracking-widest uppercase">
+                    {isSavedTab ? 'Saved Quantum Formulas' : 'Neural Mission Logs'}
+                  </span>
+                </div>
+
+                <button 
+                  onClick={() => {
+                    sound.click();
+                    if (!isSavedTab) {
+                      if (puzzleRecords.length > 0) {
+                        handleClearHistory();
+                      } else {
+                        setRewardToast('No history records to clear');
+                      }
+                    } else {
+                      setRewardToast(`🔖 Total Saved Formulas: ${savedCount}`);
+                    }
+                  }} 
+                  aria-label={!isSavedTab ? "Clear History" : "Saved Count"} 
+                  title={!isSavedTab ? "Clear History Logs" : "Saved Formulas Info"}
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center text-xs font-bold shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  {!isSavedTab ? (
+                    <svg className="w-4 h-4 text-rose-300/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </header>
+
+            {/* Scrollable Arena Body */}
+            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-3.5 relative z-10">
+
+              {/* Glassmorphic Metrics Telemetry Card */}
+              <div className="relative rounded-2xl p-3 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_12px_30px_rgba(2,10,32,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl overflow-hidden">
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+                <div className="relative z-10 grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-white/[0.06] border border-white/10 rounded-xl p-2 backdrop-blur-md shadow-inner">
+                    <span className="text-[9px] uppercase font-bold text-cyan-300 block tracking-wider">Total Solved</span>
+                    <span className="text-base font-black font-mono text-white block mt-0.5">
+                      {totalSolved}
+                    </span>
+                  </div>
+                  <div className="bg-white/[0.06] border border-white/10 rounded-xl p-2 backdrop-blur-md shadow-inner">
+                    <span className="text-[9px] uppercase font-bold text-amber-300 block tracking-wider">Saved</span>
+                    <span className="text-base font-black font-mono text-amber-300 block mt-0.5">
+                      {savedCount}
+                    </span>
+                  </div>
+                  <div className="bg-white/[0.06] border border-white/10 rounded-xl p-2 backdrop-blur-md shadow-inner">
+                    <span className="text-[9px] uppercase font-bold text-emerald-300 block tracking-wider">Accuracy</span>
+                    <span className="text-base font-black font-mono text-emerald-300 block mt-0.5">
+                      {accuracyRate}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Segmented Dual Glass Tab Switcher */}
+              <div className="p-1.5 rounded-2xl bg-white/[0.08] border border-white/15 backdrop-blur-xl flex items-center gap-1.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.3)]">
+                <button
+                  onClick={() => { sound.click(); setHistoryTab('history'); }}
+                  className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    !isSavedTab
+                      ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white shadow-[0_4px_16px_rgba(6,182,212,0.45),inset_0_1px_1px_rgba(255,255,255,0.4)]'
+                      : 'text-cyan-200/70 hover:text-white hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>History</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                    !isSavedTab ? 'bg-white/20 text-white' : 'bg-white/10 text-cyan-300'
+                  }`}>
+                    {puzzleRecords.length}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => { sound.click(); setHistoryTab('saved'); }}
+                  className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    isSavedTab
+                      ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-[0_4px_16px_rgba(245,158,11,0.45),inset_0_1px_1px_rgba(255,255,255,0.4)]'
+                      : 'text-cyan-200/70 hover:text-white hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill={isSavedTab ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  <span>Saved</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                    isSavedTab ? 'bg-white/20 text-white' : 'bg-white/10 text-amber-300'
+                  }`}>
+                    {savedCount}
+                  </span>
+                </button>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-2.5">
+                {displayList.map((item) => {
+                  const isSaved = savedPuzzleIds.includes(item.id);
+                  return (
+                    <div 
+                      key={item.id} 
+                      onClick={() => handleCopyEquation(item.eq)}
+                      className={`relative rounded-2xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d2258]/65 to-[#06143c]/80 border transition-all backdrop-blur-xl group overflow-hidden shadow-[0_8px_24px_rgba(2,10,32,0.4),inset_0_1px_0_rgba(255,255,255,0.18)] cursor-pointer hover:scale-[1.01] active:scale-[0.99] ${
+                        isSaved 
+                          ? 'border-amber-400/45 hover:border-amber-400/75 shadow-[0_8px_24px_rgba(245,158,11,0.12)]' 
+                          : 'border-white/15 hover:border-cyan-400/40'
+                      }`}
+                    >
+                      <div className="absolute inset-0 math-blueprint-grid opacity-10 pointer-events-none" />
+                      
+                      {/* Luminous Ambient Glow for Saved Items */}
+                      {isSaved && (
+                        <div className="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none" />
+                      )}
+
+                      <div className="relative z-10 flex items-center justify-between gap-3">
+                        {/* Left: 3D Holographic Math Tile Icon */}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center font-mono font-black text-sm shrink-0 shadow-lg backdrop-blur-md ${
+                            isSaved
+                              ? 'bg-gradient-to-br from-amber-500/30 to-amber-700/50 border-amber-400/60 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.35)]'
+                              : 'bg-gradient-to-br from-cyan-500/25 to-blue-600/40 border-cyan-400/40 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                          }`}>
+                            <span className="text-base select-none">🔢</span>
+                          </div>
+
+                          {/* Equation and Metadata */}
+                          <div className="min-w-0">
+                            <div className="text-xs sm:text-sm font-black font-mono tracking-wide text-white drop-shadow-[0_0_8px_rgba(56,189,248,0.45)] truncate">
+                              {item.eq}
+                            </div>
+                            <div className="flex items-center flex-wrap gap-1.5 mt-1">
+                              <span className="text-[10px] text-slate-300 font-medium flex items-center gap-1">
+                                <svg className="w-3 h-3 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {item.time}
+                              </span>
+                              <span className="text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-950/80 border border-cyan-400/30 text-cyan-300">
+                                Level {item.level}
+                              </span>
+                              {item.mode && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-md font-sans font-bold bg-white/[0.08] text-slate-300 border border-white/10 uppercase">
+                                  {item.mode}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {item.inProgress && (
+                            <div 
+                              title="In Progress"
+                              className="px-2 py-1 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[11px] font-bold font-mono flex items-center gap-1"
+                            >
+                              <span>⚡</span>
+                            </div>
+                          )}
+
+                          {/* Interactive Bookmark / Save Toggle */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSavePuzzle(item.id);
+                            }}
+                            aria-label={isSaved ? "Remove from saved" : "Save formula"}
+                            title={isSaved ? "Saved in Archives (Tap to Unpin)" : "Pin to Saved Archives"}
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md ${
+                              isSaved
+                                ? 'bg-gradient-to-b from-amber-500/30 to-amber-700/50 border border-amber-400/60 text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.45)] hover:scale-110 active:scale-95'
+                                : 'bg-white/[0.08] border border-white/20 text-slate-400 hover:text-amber-300 hover:border-amber-400/40 hover:bg-white/[0.14] hover:scale-105 active:scale-95'
+                            }`}
+                          >
+                            <svg 
+                              className="w-4 h-4 transition-transform group-hover:scale-110" 
+                              fill={isSaved ? "currentColor" : "none"} 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Empty State when no items in tab */}
+              {displayList.length === 0 && (
+                <div className="py-12 px-6 rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/15 backdrop-blur-xl text-center shadow-[0_12px_32px_rgba(2,10,32,0.4)] flex flex-col items-center">
+                  <div className={`w-16 h-16 rounded-3xl border flex items-center justify-center text-3xl mb-4 shadow-xl ${
+                    isSavedTab
+                      ? 'bg-gradient-to-b from-amber-500/20 to-orange-600/20 border-amber-400/30 text-amber-300 shadow-[0_0_24px_rgba(245,158,11,0.25)]'
+                      : 'bg-gradient-to-b from-cyan-500/20 to-blue-600/20 border-cyan-400/30 text-cyan-300 shadow-[0_0_24px_rgba(6,182,212,0.25)]'
+                  }`}>
+                    {isSavedTab ? '🔖' : '📜'}
+                  </div>
+                  <h3 className="text-base font-extrabold text-white font-display mb-1">
+                    {isSavedTab ? 'No Saved Formulas Yet' : 'No History Logs Recorded'}
+                  </h3>
+                  <p className="text-xs text-slate-300 max-w-xs leading-relaxed mb-6">
+                    {isSavedTab 
+                      ? 'Tap the bookmark ribbon on any equation from the History tab to pin it here for rapid study.'
+                      : 'Complete math puzzles in Campaign or Daily Challenge to record equations in your neural archives.'}
+                  </p>
+                  {isSavedTab ? (
+                    <button
+                      onClick={() => { sound.click(); setHistoryTab('history'); }}
+                      className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs shadow-[0_4px_16px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    >
+                      Browse History Archives
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => { sound.click(); navigateTo('game'); }}
+                      className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs shadow-[0_4px_16px_rgba(6,182,212,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    >
+                      Launch A Puzzle Mission
+                    </button>
+                  )}
+                </div>
+              )}
+
+            </div>
+          </div>
+        );
+      };
+
+      // ========================================================
+      // 15. PROFILE SCREEN (Modern Sci-Fi Cyber-Arcade Edition)
+      // ========================================================
+      const renderProfileScreen = () => {
+        const winRate = Math.min(98, Math.max(65, 70 + Math.round((activePlayerLevel * 1.8))));
+        const gamesStarted = Math.max(8, activePlayerLevel * 4 + 3);
+        const gamesWon = Math.round(gamesStarted * (winRate / 100));
+        const totalScore = (coins * 12 + activePlayerLevel * 500).toLocaleString();
+
+        const handleSaveName = (e) => {
+          if (e) e.preventDefault();
+          const trimmed = nameInput.trim();
+          if (trimmed) {
+            setPlayerName(trimmed);
+            try { GameStorage.setItem('newromath_player_name', trimmed); } catch (err) {}
+          }
+          setIsEditingName(false);
+        };
+
+        const ProfileSkeuomorphicCircle = ({ 
+          icon: IconContent, 
+          variant = 'cyan', 
+          size = 'sm', 
+          className = ''
+        }) => {
+          const config = {
+            cyan: {
+              rim: 'from-cyan-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-cyan-200 drop-shadow-[0_0_6px_rgba(6,182,212,0.8)]'
+            },
+            amber: {
+              rim: 'from-amber-200 via-amber-400 to-amber-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]'
+            },
+            emerald: {
+              rim: 'from-emerald-200 via-emerald-400 to-teal-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(16,185,129,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#047857_0%,#065f46_50%,#022c22_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-emerald-200 drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]'
+            },
+            sky: {
+              rim: 'from-sky-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(14,165,233,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#0369a1_0%,#075985_50%,#082f49_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-sky-200 drop-shadow-[0_0_6px_rgba(14,165,233,0.8)]'
+            },
+            orange: {
+              rim: 'from-amber-200 via-orange-400 to-red-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(249,115,22,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#c2410c_0%,#9a3412_50%,#431407_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-orange-200 drop-shadow-[0_0_6px_rgba(249,115,22,0.8)]'
+            },
+            purple: {
+              rim: 'from-purple-200 via-purple-400 to-indigo-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#3b186b_0%,#200b3d_50%,#0e041a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-purple-200 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]'
+            }
+          };
+
+          const s = config[variant] || config.cyan;
+
+          const sizeClasses = {
+            sm: 'w-7 h-7 p-[1px]',
+            md: 'w-7.5 h-7.5 p-[1.5px]',
+            lg: 'w-17 h-17 p-[2px]'
+          }[size] || 'w-7 h-7 p-[1px]';
+
+          return (
+            <div className={`relative ${sizeClasses} rounded-full bg-gradient-to-b ${s.rim} shrink-0 flex items-center justify-center ${className}`}>
+              <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-black/80 via-black/40 to-black/80 flex items-center justify-center shadow-inner">
+                <div className={`w-full h-full rounded-full ${s.disc} flex items-center justify-center relative overflow-hidden`}>
+                  <div className="absolute inset-x-1 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                  <div className="absolute bottom-0.5 w-[60%] h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                  <div className={`relative z-10 flex items-center justify-center ${s.glow}`}>
+                    {typeof IconContent === 'string' ? (
+                      <img src={IconContent} alt="" className="w-full h-full object-contain" />
+                    ) : (
+                      IconContent
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        return (
+          <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlay */}
+            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 right-0 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => { sound.click(); navigateTo('home'); }} 
+                  aria-label="Back to home" 
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5 text-cyan-200" />
+                </button>
+                <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase">
+                  Player Profile
+                </h1>
+                <button 
+                  onClick={() => { sound.click(); navigateTo('settings'); }} 
+                  aria-label="Settings" 
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  <SettingsIcon className="w-4 h-4 text-cyan-200" />
+                </button>
+              </div>
+            </header>
+
+            {/* Scrollable Profile Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-4 relative z-10">
+
+              {/* Glassmorphic Player Identity Card */}
+              <div className="relative rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl overflow-hidden">
+                <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+
+                {/* Avatar & Player Details */}
+                <div className="relative z-10 flex items-center gap-3.5">
+                  <div className="relative shrink-0">
+                    {/* Skeuomorphic Avatar Pedestal Circle */}
+                    <div className="relative w-17 h-17 rounded-full p-[2px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_6px_16px_rgba(0,0,0,0.6),0_0_16px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.9)] flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-blue-950 via-[#031533] to-cyan-950 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.25)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-2 top-0.5 h-[42%] bg-gradient-to-b from-white/50 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-8 h-1.5 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img 
+                            src={equippedAvatar || "/assets/icon_robot_3d.webp"} 
+                            alt="Player Avatar" 
+                            className="w-11 h-11 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.7)] relative z-10 transition-transform duration-300 hover:scale-110" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black text-[9px] px-1.5 py-0.5 rounded-full border border-white/80 shadow-[0_2px_6px_rgba(0,0,0,0.5)] leading-none z-20">
+                      LV.{activePlayerLevel}
+                    </div>
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-base sm:text-lg font-black font-display text-white tracking-wide truncate">
+                        {playerName}
+                      </h2>
+                      {/* Skeuomorphic Edit Profile Button */}
+                      <button 
+                        onClick={handleOpenProfileModal}
+                        aria-label="Edit Profile"
+                        title="Edit Profile"
+                        className="relative w-7 h-7 rounded-full p-[1.5px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_2px_6px_rgba(0,0,0,0.5),0_0_8px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-center active:scale-95 transition-all cursor-pointer hover:scale-105 shrink-0"
+                      >
+                        <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-blue-950 to-cyan-950 flex items-center justify-center shadow-inner">
+                          <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.8)] flex items-center justify-center relative overflow-hidden">
+                            <div className="absolute inset-x-0.5 top-0.5 h-[40%] bg-gradient-to-b from-white/45 to-transparent rounded-t-full pointer-events-none" />
+                            <Pencil className="w-3 h-3 text-cyan-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] relative z-10" />
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[10px] bg-cyan-400/15 border border-cyan-300/30 text-cyan-200 px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider backdrop-blur-sm">
+                        {activePlayerLevel >= 25 ? 'GRANDMASTER' : activePlayerLevel >= 15 ? 'MASTER CADET' : activePlayerLevel >= 5 ? 'CHALLENGER' : 'ROOKIE CADET'}
+                      </span>
+                      {/* Country Flag Badge */}
+                      <span className="text-[9.5px] bg-blue-500/20 border border-cyan-400/40 text-cyan-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm shadow-xs">
+                        <span>{PLAYER_COUNTRIES.find(c => c.name === playerCountry)?.flag || '🌍'}</span>
+                        <span className="truncate max-w-[100px]">{playerCountry}</span>
+                      </span>
+                      {playerPhone ? (
+                        <span className="text-[9.5px] bg-sky-950/50 border border-cyan-400/30 text-cyan-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm shadow-xs">
+                          <Phone className="w-2.5 h-2.5 text-cyan-300 shrink-0" />
+                          <span className="truncate max-w-[105px]">{playerPhone}</span>
+                        </span>
+                      ) : null}
+                      {playerEmail ? (
+                        <span className="text-[9.5px] bg-sky-950/50 border border-cyan-400/30 text-cyan-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm shadow-xs">
+                          <Mail className="w-2.5 h-2.5 text-cyan-300 shrink-0" />
+                          <span className="truncate max-w-[130px]">{playerEmail}</span>
+                        </span>
+                      ) : null}
+                      {(() => {
+                        const activeAward = LEVEL_AWARDS.find(a => a.icon === equippedAvatar);
+                        return activeAward ? (
+                          <span className="text-[9.5px] bg-amber-400/20 border border-amber-300/40 text-amber-200 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 backdrop-blur-sm">
+                            <Sparkles className="w-2.5 h-2.5 text-amber-300" />
+                            <span className="truncate max-w-[120px]">{activeAward.title}</span>
+                          </span>
+                        ) : null;
+                      })()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Level Progress */}
+                <div className="relative z-10 mt-3.5 bg-white/[0.06] border border-white/10 rounded-2xl p-2.5 backdrop-blur-md">
+                  <div className="flex items-center justify-between text-[10.5px] font-bold mb-1.5">
+                    <span className="text-cyan-300 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
+                      <span>Level {activePlayerLevel} Progress</span>
+                    </span>
+                    <span className="text-sky-200 font-mono">
+                      {playerXp} / {xpNeeded} XP
+                    </span>
+                  </div>
+                  <div className="w-full h-2.5 rounded-full bg-black/40 border border-white/15 overflow-hidden p-0.5 shadow-inner">
+                    <div 
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 shadow-[0_0_10px_rgba(0,229,255,0.7)] transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.max(10, Math.round((playerXp / xpNeeded) * 100)))}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Treasury & Metric Pillars with Skeuomorphic Pedestals */}
+                <div className="relative z-10 grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-white/10">
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <ProfileSkeuomorphicCircle 
+                      icon={<img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4.5 h-4.5 object-contain" />} 
+                      variant="amber" 
+                      size="sm" 
+                      className="mb-1"
+                    />
+                    <span className="text-xs font-black text-amber-300 font-display leading-none">
+                      {coins.toLocaleString()}
+                    </span>
+                    <span className="text-[8px] text-amber-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                      Coins
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <ProfileSkeuomorphicCircle 
+                      icon={<img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4.5 h-4.5 object-contain" />} 
+                      variant="cyan" 
+                      size="sm" 
+                      className="mb-1"
+                    />
+                    <span className="text-xs font-black text-cyan-300 font-display leading-none">
+                      {gems.toLocaleString()}
+                    </span>
+                    <span className="text-[8px] text-cyan-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                      Diamonds
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Flame className="w-3.5 h-3.5 text-orange-200 shrink-0" />} 
+                      variant="orange" 
+                      size="sm" 
+                      className="mb-1"
+                    />
+                    <span className="text-xs font-black text-orange-300 font-display leading-none">
+                      {streakDays}d
+                    </span>
+                    <span className="text-[8px] text-orange-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                      Streak
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-xs">
+                    <ProfileSkeuomorphicCircle 
+                      icon={<img src="/assets/icon_trophy_3d.webp" alt="Level" className="w-4.5 h-4.5 object-contain" />} 
+                      variant="purple" 
+                      size="sm" 
+                      className="mb-1"
+                    />
+                    <span className="text-xs font-black text-purple-300 font-display leading-none">
+                      Lv.{activePlayerLevel}
+                    </span>
+                    <span className="text-[8px] text-purple-200/70 font-semibold uppercase tracking-tight mt-0.5">
+                      Level
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Glassmorphic Gameplay Statistics Card with Skeuomorphic Badges */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                    Gameplay Statistics
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Puzzles Solved</span>
+                      <span className="text-base font-black text-emerald-300 font-display block leading-none">{gamesWon}</span>
+                    </div>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />} 
+                      variant="emerald" 
+                      size="sm" 
+                    />
+                  </div>
+
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Puzzles Played</span>
+                      <span className="text-base font-black text-white font-display block leading-none">{gamesStarted}</span>
+                    </div>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Gamepad2 className="w-3.5 h-3.5 text-sky-200" />} 
+                      variant="sky" 
+                      size="sm" 
+                    />
+                  </div>
+
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Win Accuracy</span>
+                      <span className="text-base font-black text-cyan-300 font-display block leading-none">{winRate}%</span>
+                    </div>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Target className="w-3.5 h-3.5 text-cyan-200" />} 
+                      variant="cyan" 
+                      size="sm" 
+                    />
+                  </div>
+
+                  <div className="bg-white/[0.07] border border-white/15 rounded-2xl p-2.5 backdrop-blur-md flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] text-slate-300 uppercase font-bold block mb-1">Total Score</span>
+                      <span className="text-base font-black text-amber-300 font-display block leading-none">{totalScore}</span>
+                    </div>
+                    <ProfileSkeuomorphicCircle 
+                      icon={<Trophy className="w-3.5 h-3.5 text-amber-200" />} 
+                      variant="amber" 
+                      size="sm" 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Glassmorphic Level Awards & 3D Trophies Gallery Card */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="absolute inset-0 math-blueprint-grid opacity-10 pointer-events-none" />
+
+                {/* Header: Title */}
+                <div className="relative z-10 mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                    Your Level Awards
+                  </h3>
+                </div>
+
+                {/* Filter Tabs: All, Unlocked, Locked */}
+                <div className="relative z-10 flex items-center gap-1.5 p-1 bg-black/30 border border-white/10 rounded-2xl mb-3.5 backdrop-blur-md">
+                  <button
+                    onClick={() => { sound.click(); setAwardFilter('all'); }}
+                    className={`flex-1 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer ${
+                      awardFilter === 'all'
+                        ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    All (25)
+                  </button>
+                  <button
+                    onClick={() => { sound.click(); setAwardFilter('unlocked'); }}
+                    className={`flex-1 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer ${
+                      awardFilter === 'unlocked'
+                        ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    Unlocked ({completedLevelsCount})
+                  </button>
+                  <button
+                    onClick={() => { sound.click(); setAwardFilter('locked'); }}
+                    className={`flex-1 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer ${
+                      awardFilter === 'locked'
+                        ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    Locked ({25 - completedLevelsCount})
+                  </button>
+                </div>
+
+                {/* Grid of Award Badges */}
+                <div className="relative z-10 grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                  {LEVEL_AWARDS.filter(award => {
+                    const isUnlocked = award.level < unlockedLevelMax;
+                    if (awardFilter === 'unlocked') return isUnlocked;
+                    if (awardFilter === 'locked') return !isUnlocked;
+                    return true;
+                  }).map(award => {
+                    const isUnlocked = award.level < unlockedLevelMax;
+                    const isEquipped = (equippedAvatar === award.icon);
+
+                    return (
+                      <div
+                        key={award.level}
+                        onClick={() => {
+                          if (isUnlocked) {
+                            sound.pop();
+                            setEquippedAvatar(award.icon);
+                            try { GameStorage.setItem('newromath_player_avatar', award.icon); } catch (e) {}
+                            setRewardToast(`🎉 Equipped Level ${award.level} "${award.title}" avatar!`);
+                          } else {
+                            sound.click();
+                            setRewardToast(`🔒 Locked: Solve Level ${award.level} to unlock "${award.title}"!`);
+                          }
+                        }}
+                        className={`relative group rounded-2xl p-2 flex flex-col items-center text-center transition-all cursor-pointer active:scale-95 border ${
+                          isEquipped
+                            ? 'bg-gradient-to-b from-cyan-950/70 via-[#0d2a63]/70 to-[#07163c]/80 border-cyan-300 shadow-[0_0_16px_rgba(0,229,255,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] ring-2 ring-cyan-400/60'
+                            : isUnlocked
+                              ? 'bg-gradient-to-b from-white/[0.12] to-white/[0.04] border-white/20 hover:bg-white/[0.18] hover:border-cyan-300/60 shadow-[0_4px_12px_rgba(0,0,0,0.25)]'
+                              : 'bg-black/40 border-white/10 opacity-75 hover:opacity-90'
+                        }`}
+                      >
+                        {/* Level Header Pill */}
+                        <div className="w-full flex items-center justify-between mb-1 px-0.5">
+                          <span className={`text-[8.5px] font-black font-display tracking-tight px-1.5 py-0.2 rounded-md ${
+                            isEquipped
+                              ? 'bg-cyan-400 text-slate-950 shadow-xs'
+                              : isUnlocked
+                                ? 'bg-white/20 text-white'
+                                : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            LV.{award.level}
+                          </span>
+                          {isEquipped ? (
+                            <span className="text-[7px] font-black uppercase tracking-tight bg-cyan-400 text-slate-950 px-1 py-0.2 rounded font-display shadow-xs">
+                              ACTIVE
+                            </span>
+                          ) : isUnlocked ? (
+                            <span className="text-[7.5px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-400/40 px-1 py-0.2 rounded">
+                              EQUIP
+                            </span>
+                          ) : (
+                            <Lock className="w-3 h-3 text-amber-300/80" />
+                          )}
+                        </div>
+
+                        {/* 3D Skeuomorphic Gaming Medallion */}
+                        <div className={`relative w-12 h-12 my-1 rounded-full overflow-hidden flex items-center justify-center p-1.5 shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1.5px_2px_rgba(255,255,255,0.25),inset_0_-2px_3px_rgba(0,0,0,0.45)] border ${
+                          isEquipped 
+                            ? 'border-cyan-300 ring-2 ring-cyan-400/60 bg-gradient-to-b from-[#18366d] to-[#0e2147]' 
+                            : isUnlocked 
+                              ? 'border-white/25 bg-gradient-to-b from-[#163366]/90 via-[#0f244d]/90 to-[#081533]/95 hover:border-cyan-300/60' 
+                              : 'border-white/10 bg-black/60 opacity-60'
+                        }`}>
+                          {/* Skeuomorphic Glass Specular Sheen */}
+                          <div className="absolute inset-x-0.5 top-0 h-[45%] bg-gradient-to-b from-white/35 via-white/5 to-transparent rounded-t-full pointer-events-none z-20" />
+
+                          {isUnlocked ? (
+                            <img
+                              src={award.icon}
+                              alt={award.title}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.7)] relative z-10 transition-transform duration-200 group-hover:scale-115"
+                            />
+                          ) : (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                              <img
+                                src={award.icon}
+                                alt={award.title}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-full h-full object-contain grayscale opacity-25 filter blur-[0.4px] brightness-50"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center z-30">
+                                <div className="w-6 h-6 rounded-full bg-black/80 border border-white/30 flex items-center justify-center shadow-lg">
+                                  <Lock className="w-3.5 h-3.5 text-amber-300" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Award Title */}
+                        <span className={`text-[10px] font-black font-display tracking-tight leading-tight line-clamp-1 mt-1 w-full text-center ${
+                          isEquipped ? 'text-cyan-200' : isUnlocked ? 'text-white' : 'text-slate-400'
+                        }`}>
+                          {award.title}
+                        </span>
+
+                        {/* Short Status */}
+                        <span className="text-[8px] text-slate-400 line-clamp-1 mt-0.5 w-full text-center">
+                          {isEquipped ? 'Equipped Avatar' : isUnlocked ? 'Tap to equip' : `Solve Lvl ${award.level}`}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+            </div>
+
+            {/* ======================================================== */}
+            {/* SKEUOMORPHIC PROFILE EDIT BANNER / MODAL */}
+            {/* ======================================================== */}
+            {isProfileModalOpen && (
+              <div 
+                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto"
+                onClick={() => setIsProfileModalOpen(false)}
+              >
+                {/* Outer 3D Skeuomorphic Chassis Plate */}
+                <div 
+                  className="relative w-full max-w-sm rounded-[28px] p-[2.5px] bg-gradient-to-b from-cyan-200 via-sky-500 to-blue-900 shadow-[0_25px_60px_rgba(0,0,0,0.95),0_0_35px_rgba(6,182,212,0.4)] overflow-hidden my-auto select-none"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Intermediate Beveled Ridge */}
+                  <div className="w-full h-full p-[3px] rounded-[26px] bg-gradient-to-b from-[#0e2759] via-[#051433] to-[#020a1c] shadow-[inset_0_1.5px_2px_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.8)]">
+                    {/* Inner Tactile Console Surface */}
+                    <div className="w-full h-full rounded-[23px] bg-gradient-to-b from-[#0b2452] via-[#081b3d] to-[#040e24] p-4 sm:p-5 relative overflow-hidden shadow-[inset_0_2px_4px_rgba(255,255,255,0.15),inset_0_-4px_10px_rgba(0,0,0,0.9)]">
+                      {/* Blueprint Grid Watermark */}
+                      <div className="absolute inset-0 math-blueprint-grid opacity-15 pointer-events-none" />
+
+                      {/* Top Curved Glass Specular Highlight */}
+                      <div className="absolute inset-x-2 top-0 h-32 bg-gradient-to-b from-white/25 via-white/5 to-transparent rounded-t-[23px] pointer-events-none" />
+
+                      {/* Header Bar */}
+                      <div className="relative z-10 flex items-center justify-between pb-3.5 mb-3 border-b border-cyan-400/25">
+                        <div className="flex items-center gap-2.5">
+                          {/* Skeuomorphic Icon Pedestal */}
+                          <div className="relative w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.9)] flex items-center justify-center shrink-0">
+                            <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-blue-950 to-cyan-950 flex items-center justify-center shadow-inner">
+                              <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.8)] flex items-center justify-center relative overflow-hidden">
+                                <div className="absolute inset-x-0.5 top-0.5 h-[40%] bg-gradient-to-b from-white/45 to-transparent rounded-t-full pointer-events-none" />
+                                <User className="w-4 h-4 text-cyan-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] relative z-10" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h3 className="text-sm sm:text-base font-black font-display text-white tracking-wide uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight">
+                              Player Profile
+                            </h3>
+                            <span className="text-[10px] text-cyan-300/80 font-bold tracking-tight block">
+                              Identity & Contact Information
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Skeuomorphic 3D Close Button */}
+                        <button
+                          type="button"
+                          onClick={() => { sound.click(); setIsProfileModalOpen(false); }}
+                          aria-label="Close"
+                          className="relative w-7 h-7 rounded-full p-[1.5px] bg-gradient-to-b from-white/40 via-slate-400 to-slate-700 shadow-[0_2px_6px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-center active:scale-95 transition-all cursor-pointer shrink-0"
+                        >
+                          <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-slate-900 to-black flex items-center justify-center shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#334155_0%,#1e293b_60%,#0f172a_100%)] flex items-center justify-center">
+                              <X className="w-3.5 h-3.5 text-slate-300 drop-shadow" />
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+
+                      {/* Form Body */}
+                      <form onSubmit={handleSaveProfileModal} noValidate className="relative z-10 space-y-3">
+                        {/* 1. Name Field */}
+                        <div className="space-y-1">
+                          <label className="flex items-center justify-between text-[11px] font-bold text-cyan-200 tracking-tight">
+                            <span className="flex items-center gap-1">
+                              <span>Player Name</span>
+                              <span className="text-rose-400">*</span>
+                            </span>
+                            <span className="text-[9px] font-mono text-cyan-400/60 uppercase">Max 20 chars</span>
+                          </label>
+                          {/* Skeuomorphic Inset Input Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-sm mr-2 text-cyan-400/70 shrink-0">👤</span>
+                              <input
+                                type="text"
+                                required
+                                maxLength={20}
+                                value={profileFormName}
+                                onChange={(e) => setProfileFormName(e.target.value)}
+                                placeholder="Enter your name"
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm placeholder:text-slate-500 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. Country Selection Field */}
+                        <div className="space-y-1">
+                          <label className="flex items-center justify-between text-[11px] font-bold text-cyan-200 tracking-tight">
+                            <span className="flex items-center gap-1">
+                              <span>Country / Region</span>
+                              <span className="text-rose-400">*</span>
+                            </span>
+                            <span className="text-[9px] font-mono text-cyan-400/60 uppercase">Leaderboard Flag</span>
+                          </label>
+                          {/* Skeuomorphic Inset Select Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-base mr-2 shrink-0">
+                                {PLAYER_COUNTRIES.find(c => c.name === profileFormCountry)?.flag || '🌍'}
+                              </span>
+                              <select
+                                value={profileFormCountry}
+                                onChange={(e) => setProfileFormCountry(e.target.value)}
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm outline-none cursor-pointer appearance-none"
+                                style={{ colorScheme: 'dark' }}
+                              >
+                                {PLAYER_COUNTRIES.map((country) => (
+                                  <option 
+                                    key={country.code} 
+                                    value={country.name}
+                                    className="bg-[#051433] text-white py-1"
+                                  >
+                                    {country.name}
+                                  </option>
+                                ))}
+                              </select>
+                              <span className="text-[10px] text-cyan-300 pointer-events-none ml-1 shrink-0">▼</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 3. Phone Number (Optional) */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-bold tracking-tight">
+                            <span className="text-cyan-200">Phone Number</span>
+                            <span className="text-[9px] font-mono font-bold text-slate-400 bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/10">
+                              Optional
+                            </span>
+                          </div>
+                          {/* Skeuomorphic Inset Input Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-sm mr-2 text-cyan-400/70 shrink-0">📱</span>
+                              <input
+                                type="tel"
+                                value={profileFormPhone}
+                                onChange={(e) => setProfileFormPhone(e.target.value)}
+                                placeholder="+1 (555) 000-0000"
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm placeholder:text-slate-500 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 4. Email Address (Optional) */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-bold tracking-tight">
+                            <span className="text-cyan-200">Email Address</span>
+                            <span className="text-[9px] font-mono font-bold text-slate-400 bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/10">
+                              Optional
+                            </span>
+                          </div>
+                          {/* Skeuomorphic Inset Input Well */}
+                          <div className="relative rounded-xl p-[1.5px] bg-gradient-to-b from-[#020b17] via-[#051733] to-[#0c2a57] shadow-[inset_0_2px_4px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.1)]">
+                            <div className="flex items-center bg-[#030d1e] rounded-[10px] px-2.5 py-1.5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.95)]">
+                              <span className="text-sm mr-2 text-cyan-400/70 shrink-0">✉️</span>
+                              <input
+                                type="email"
+                                value={profileFormEmail}
+                                onChange={(e) => setProfileFormEmail(e.target.value)}
+                                placeholder="player@example.com"
+                                className="w-full bg-transparent text-white font-bold text-xs sm:text-sm placeholder:text-slate-500 outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions: Save Button & Cancel */}
+                        <div className="pt-2 flex flex-col gap-2">
+                          {/* Skeuomorphic 3D Save Button */}
+                          <button
+                            type="submit"
+                            onClick={handleSaveProfileModal}
+                            className="relative w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black flex items-center justify-center gap-2 shadow-[0_4px_0_#92400e,0_8px_18px_rgba(245,158,11,0.45),inset_0_1px_1.5px_rgba(255,255,255,0.85)] active:translate-y-1 active:shadow-[0_1px_0_#92400e] cursor-pointer transition-all border border-amber-200/80 uppercase tracking-wider text-xs sm:text-sm overflow-hidden"
+                          >
+                            {/* Curved specular highlight */}
+                            <div className="absolute inset-x-2 top-0 h-1/2 bg-gradient-to-b from-white/45 to-transparent rounded-t-xl pointer-events-none" />
+                            <span className="text-xs">💾</span>
+                            <span className="relative z-10 drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]">
+                              Save Profile
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => { sound.click(); setIsProfileModalOpen(false); }}
+                            className="w-full py-1.5 text-center text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // ========================================================
+      // 16. SETTINGS SCREEN (Cyber Arcade Modernization)
+      // ========================================================
+      const renderSettingsScreen = () => {
+        const SkeuomorphicIconCircle = ({ 
+          icon: IconComponent, 
+          variant = 'cyan', 
+          active = true,
+          className = '' 
+        }) => {
+          const config = {
+            cyan: {
+              rim: 'from-cyan-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(6,182,212,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-cyan-200 drop-shadow-[0_0_6px_rgba(6,182,212,0.8)]'
+            },
+            teal: {
+              rim: 'from-teal-200 via-teal-400 to-emerald-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(20,184,166,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#115e59_0%,#0f4842_50%,#042f2e_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-teal-200 drop-shadow-[0_0_6px_rgba(20,184,166,0.8)]'
+            },
+            sky: {
+              rim: 'from-sky-200 via-sky-400 to-blue-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(14,165,233,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#0369a1_0%,#075985_50%,#082f49_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-sky-200 drop-shadow-[0_0_6px_rgba(14,165,233,0.8)]'
+            },
+            amber: {
+              rim: 'from-amber-200 via-amber-400 to-amber-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(245,158,11,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-amber-300 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]'
+            },
+            emerald: {
+              rim: 'from-emerald-200 via-emerald-400 to-teal-700 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(16,185,129,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#047857_0%,#065f46_50%,#022c22_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-emerald-200 drop-shadow-[0_0_6px_rgba(16,185,129,0.8)]'
+            },
+            indigo: {
+              rim: 'from-indigo-200 via-indigo-400 to-indigo-800 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(99,102,241,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#312e81_0%,#1e1b4b_50%,#0f172a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-indigo-200 drop-shadow-[0_0_6px_rgba(99,102,241,0.8)]'
+            },
+            rose: {
+              rim: 'from-rose-200 via-rose-400 to-red-800 shadow-[0_3px_8px_rgba(0,0,0,0.6),0_0_10px_rgba(244,63,94,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)]',
+              disc: 'bg-[radial-gradient(circle_at_50%_30%,#881337_0%,#4c0519_50%,#1f020a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.25)]',
+              glow: 'text-rose-200 drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]'
+            }
+          };
+
+          const s = active ? (config[variant] || config.cyan) : {
+            rim: 'from-slate-400/40 via-slate-600/40 to-slate-900/60 shadow-[0_2px_5px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.2)]',
+            disc: 'bg-[radial-gradient(circle_at_50%_30%,#1e293b_0%,#0f172a_50%,#020617_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]',
+            glow: 'text-slate-500'
+          };
+
+          return (
+            <div className={`relative w-8 h-8 rounded-full p-[1.5px] bg-gradient-to-b ${s.rim} shrink-0 flex items-center justify-center transition-all ${className}`}>
+              <div className="w-full h-full rounded-full p-[1px] bg-gradient-to-b from-black/80 via-black/40 to-black/80 flex items-center justify-center shadow-inner">
+                <div className={`w-full h-full rounded-full ${s.disc} flex items-center justify-center relative overflow-hidden`}>
+                  <div className="absolute inset-x-1 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                  <div className="absolute bottom-0.5 w-4 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                  <div className={`relative z-10 flex items-center justify-center ${s.glow}`}>
+                    {React.isValidElement(IconComponent) ? (
+                      IconComponent
+                    ) : typeof IconComponent === 'function' ? (
+                      <IconComponent className="w-4 h-4" />
+                    ) : (
+                      IconComponent
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const GlassToggle = ({ checked, onChange, label, sublabel, icon: IconComponent, variant = 'cyan' }) => (
+          <div 
+            onClick={() => {
+              sound.click();
+              onChange(!checked);
+            }}
+            className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 hover:border-white/30 hover:bg-white/[0.1] transition-all cursor-pointer group active:scale-[0.99] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
+          >
+            <div className="flex items-center gap-3 min-w-0 pr-3">
+              {IconComponent && (
+                <SkeuomorphicIconCircle 
+                  icon={IconComponent} 
+                  variant={variant} 
+                  active={checked} 
+                />
+              )}
+              <div className="min-w-0">
+                <div className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                  {label}
+                </div>
+                {sublabel && (
+                  <div className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                    {sublabel}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Samsung One UI Style Switch Toggle */}
+            <div 
+              className={`relative shrink-0 w-11 h-6 rounded-full transition-all duration-300 border p-0.5 ${
+                checked 
+                  ? 'bg-gradient-to-r from-cyan-400 to-blue-600 border-cyan-300 shadow-[0_0_12px_rgba(0,229,255,0.6)]' 
+                  : 'bg-black/40 border-white/20 shadow-inner'
+              }`}
+            >
+              <div 
+                className={`w-5 h-5 rounded-full bg-white transition-all duration-300 shadow-md flex items-center justify-center ${
+                  checked 
+                    ? 'translate-x-5 text-cyan-600' 
+                    : 'translate-x-0 text-slate-400'
+                }`}
+              >
+                {checked && <Check className="w-3 h-3 text-cyan-600 stroke-[3]" />}
+              </div>
+            </div>
+          </div>
+        );
+
+        const GlassNavRow = ({ label, sublabel, icon: IconComponent, variant = 'cyan', onClick }) => (
+          <button 
+            onClick={() => {
+              sound.click();
+              onClick();
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 hover:border-white/30 hover:bg-white/[0.1] transition-all cursor-pointer group active:scale-[0.99] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] text-left"
+          >
+            <div className="flex items-center gap-3 min-w-0 pr-3">
+              {IconComponent && (
+                <SkeuomorphicIconCircle 
+                  icon={IconComponent} 
+                  variant={variant} 
+                  active={true} 
+                />
+              )}
+              <div className="min-w-0">
+                <div className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                  {label}
+                </div>
+                {sublabel && (
+                  <div className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                    {sublabel}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="w-7 h-7 rounded-xl bg-white/[0.08] border border-white/20 flex items-center justify-center text-cyan-300 group-hover:translate-x-0.5 transition-all">
+              <ChevronRight className="w-4 h-4 text-cyan-300" />
+            </div>
+          </button>
+        );
+
+        return (
+          <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlay */}
+            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 right-0 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => { sound.click(); navigateTo('profile'); }} 
+                  aria-label="Back to profile" 
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5 text-cyan-200" />
+                </button>
+                <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase">
+                  Settings
+                </h1>
+                <div className="w-10 h-10" />
+              </div>
+            </header>
+
+            {/* Scrollable Settings Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-4 relative z-10">
+
+              {/* 1. Audio & Sensory (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                    Audio & Sensory Feedback
+                  </h3>
+                </div>
+
+                <div className="space-y-2">
+                  <GlassToggle 
+                    checked={soundEnabled}
+                    onChange={(val) => {
+                      setSoundEnabled(val);
+                      sound.muted = !val;
+                      if (val) {
+                        setTimeout(() => sound.click(), 50);
+                      }
+                    }}
+                    label="Sound Effects"
+                    sublabel="Tactile arcade clicks, fanfare & audio fx"
+                    icon={<Volume2 className="w-4 h-4" />}
+                    variant="cyan"
+                  />
+                  <GlassToggle 
+                    checked={hapticsEnabled}
+                    onChange={(val) => setHapticsEnabled(val)}
+                    label="Haptic Feedback"
+                    sublabel="Vibration pulses on keypad presses and matches"
+                    icon={<Vibrate className="w-4 h-4" />}
+                    variant="teal"
+                  />
+                  <GlassToggle 
+                    checked={timerEnabled}
+                    onChange={(val) => setTimerEnabled(val)}
+                    label="Game Timer"
+                    sublabel="Display countdown clock during puzzle battles"
+                    icon={<Timer className="w-4 h-4" />}
+                    variant="sky"
+                  />
+                </div>
+              </div>
+
+              {/* 2. Gameplay & Display (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                    Gameplay & Display
+                  </h3>
+                </div>
+
+                <div className="space-y-2">
+                  <GlassToggle 
+                    checked={explanationEnabled}
+                    onChange={(val) => setExplanationEnabled(val)}
+                    label="Show Explanation Button"
+                    sublabel="Reveal step-by-step mathematical reasoning"
+                    icon={<Lightbulb className="w-4 h-4" />}
+                    variant="amber"
+                  />
+                  <GlassToggle 
+                    checked={autoSubmitEnabled}
+                    onChange={(val) => setAutoSubmitEnabled(val)}
+                    label="Auto Submit Answer"
+                    sublabel="Automatically verify once equation is filled"
+                    icon={<Zap className="w-4 h-4" />}
+                    variant="emerald"
+                  />
+                  <GlassToggle 
+                    checked={largeFontEnabled}
+                    onChange={(val) => setLargeFontEnabled(val)}
+                    label="Large Math Font"
+                    sublabel="High-legibility enlarged arithmetic tiles"
+                    icon={<Type className="w-4 h-4" />}
+                    variant="indigo"
+                  />
+
+                  {/* Division Symbol Notation Selector */}
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <div className="flex items-center gap-3">
+                      <SkeuomorphicIconCircle 
+                        icon={<Divide className="w-4 h-4" />} 
+                        variant="indigo" 
+                        active={true} 
+                      />
+                      <div>
+                        <div className="text-xs sm:text-sm font-bold text-white tracking-wide">Division Notation</div>
+                        <div className="text-[10px] text-slate-400 font-medium">Choose arithmetic operator symbol</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/15 shadow-inner">
+                      {['÷', '/'].map(sym => (
+                        <button
+                          key={sym}
+                          onClick={() => {
+                            sound.click();
+                            setDivisionSymbol(sym);
+                          }}
+                          className={`w-9 h-7 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                            divisionSymbol === sym
+                              ? 'bg-gradient-to-r from-cyan-400 to-blue-600 text-white shadow-[0_0_10px_rgba(0,229,255,0.6)]'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {sym}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Information & Help (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                    Rules & Help
+                  </h3>
+                </div>
+
+                <div className="space-y-2">
+                  <GlassNavRow 
+                    label="How to Play" 
+                    sublabel="Master rules, tips & tactical formulas"
+                    icon={<BookOpen className="w-4 h-4" />}
+                    variant="emerald"
+                    onClick={() => navigateTo('help')}
+                  />
+                </div>
+              </div>
+
+              {/* 4. Google Play Membership & Billing (Glassmorphic) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-amber-200">
+                    Membership & Billing
+                  </h3>
+                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                    purchaseState.isProUser 
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40' 
+                      : 'bg-white/10 text-slate-300 border-white/20'
+                  }`}>
+                    {purchaseState.isProUser ? 'PRO VIP MEMBER' : 'FREE PLAYER'}
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {!purchaseState.isProUser ? (
+                    <button
+                      onClick={() => {
+                        sound.click();
+                        navigateTo('rewards');
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-600/20 border border-amber-400/40 hover:border-amber-300 transition-all cursor-pointer text-left active:scale-[0.99] backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-3">
+                        <SkeuomorphicIconCircle 
+                          icon={<Crown className="w-4 h-4" />} 
+                          variant="amber" 
+                          active={true} 
+                        />
+                        <div>
+                          <div className="text-xs sm:text-sm font-bold text-amber-200">Upgrade to PRO VIP Pass</div>
+                          <div className="text-[10px] text-amber-300/70 font-medium">Remove ads & get bonus coins + gems</div>
+                        </div>
+                      </div>
+                      <span className="text-xs font-black text-amber-300 px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-400/40">
+                        {purchaseService.getPrice('newromath_pro_noads')}
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 flex items-center gap-3">
+                      <SkeuomorphicIconCircle 
+                        icon={<Crown className="w-4 h-4" />} 
+                        variant="emerald" 
+                        active={true} 
+                      />
+                      <div>
+                        <div className="text-xs sm:text-sm font-bold text-emerald-200">PRO VIP Lifetime Active</div>
+                        <div className="text-[10px] text-emerald-300/70 font-medium">Enjoy unlimited ad-free math puzzles</div>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={async () => {
+                      sound.click();
+                      setRewardToast("🔄 Contacting Google Play to restore purchases...");
+                      const res = await purchaseService.restorePurchases();
+                      if (res.success) {
+                        sound.correct();
+                        setRewardToast(res.message);
+                      } else {
+                        sound.wrong();
+                        setRewardToast(res.message);
+                      }
+                    }}
+                    className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/[0.07] border border-white/15 hover:bg-white/[0.1] hover:border-white/30 transition-all cursor-pointer text-left active:scale-[0.99] backdrop-blur-md"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SkeuomorphicIconCircle 
+                        icon={<RotateCcw className="w-4 h-4" />} 
+                        variant="cyan" 
+                        active={true} 
+                      />
+                      <div>
+                        <div className="text-xs sm:text-sm font-bold text-white">Restore Google Play Purchases</div>
+                        <div className="text-[10px] text-slate-400 font-medium">Recover previous purchases on this account</div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-cyan-300" />
+                  </button>
+                </div>
+              </div>
+
+              {/* 5. Campaign Progress Reset (Start Newly) */}
+              <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.10] via-[#1a1236]/60 to-[#100c24]/75 border border-rose-500/30 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.15)] backdrop-blur-xl relative overflow-hidden">
+                <div className="mb-3 px-1">
+                  <h3 className="text-xs font-black font-display uppercase tracking-wider text-rose-300">
+                    Campaign Management
+                  </h3>
+                </div>
+
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => {
+                      sound.click();
+                      if (window.confirm("Start fresh from Level 1? Your campaign level and unlocked stages will be reset to Level 1.")) {
+                        resetAllProgress();
+                      }
+                    }}
+                    className="w-full flex items-center justify-between p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all cursor-pointer text-rose-300 font-bold text-xs sm:text-sm active:scale-[0.99] backdrop-blur-md shadow-inner"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SkeuomorphicIconCircle 
+                        icon={<Trash2 className="w-4 h-4" />} 
+                        variant="rose" 
+                        active={true} 
+                      />
+                      <div className="text-left">
+                        <div className="text-xs sm:text-sm font-bold text-rose-200">Start Fresh from Level 1</div>
+                        <div className="text-[10px] text-rose-300/70 font-medium">Reset campaign progress to beginning</div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-black text-rose-300 px-2.5 py-1 rounded-lg bg-rose-950/70 border border-rose-500/40 shrink-0">
+                      Level 1
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="pt-2 pb-8 text-center space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/15 text-[10.5px] text-cyan-300 font-mono shadow-inner backdrop-blur-md">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-300" /> NewroMath v1.0.0
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono">
+                  Think • Solve • Grow
+                </div>
+              </div>
+
+            </div>
+          </div>
+        );
+      };
+
+      // ========================================================
+      // 17. HELP & SUPPORT (Glassmorphic Arcade Style)
+      // ==========================================
+      const renderHelpScreen = () => {
+        const faqItems = [
+          {
+            q: "How do I earn 3 Stars on each level?",
+            a: "To achieve a 3-Star mastery rating: (1) Complete the puzzle without making incorrect equation submissions, (2) Finish before the bonus time milestone, and (3) Use at most 1 hint. Flawless solves award bonus Coins and XP!",
+            icon: "⭐"
+          },
+          {
+            q: "How do intersecting equations work?",
+            a: "In Cross-Math, whenever a horizontal row and a vertical column cross, they share the exact same number tile. That tile must simultaneously balance both the row equation and the column equation.",
+            icon: "📐"
+          },
+          {
+            q: "What order of operations is used?",
+            a: "Equations evaluate in straightforward sequential order from left-to-right and top-to-bottom as written on the grid, matching classic arcade crossword math rules.",
+            icon: "🔢"
+          },
+          {
+            q: "What happens if I miss a Daily Challenge?",
+            a: "You can protect your streak using a Streak Saver shield or unlock missed calendar dates from the calendar view using your earned Coins to keep your Monthly Trophy progress on track.",
+            icon: "📅"
+          },
+          {
+            q: "Can I play NewroMath completely offline?",
+            a: "Yes! All campaign levels and offline practice modes are fully playable without an internet connection. Your stars, coins, and records will automatically sync to cloud leaderboards once reconnected.",
+            icon: "📶"
+          },
+          {
+            q: "How does the Weekly League Leaderboard work?",
+            a: "Earn XP across Campaign, Daily Challenges, and Speed Runs to rise through Bronze, Silver, Gold, Diamond, and Master Leagues. The top 10 solvers promote every Sunday midnight with rare reward chests!",
+            icon: "🏆"
+          }
+        ];
+
+        const tabs = [
+          { id: 'all', label: 'All Topics', icon: '🌐' },
+          { id: 'rules', label: 'How to Play', icon: '📐' },
+          { id: 'tools', label: 'Tools & Boosters', icon: '⚡' },
+          { id: 'faqs', label: 'FAQs', icon: '❓' },
+          { id: 'tips', label: 'Pro Tips', icon: '🧠' },
+          { id: 'contact', label: 'Contact & Feedback', icon: '✉️' },
+        ];
+
+        const handleSendFeedback = () => {
+          if (!feedbackText.trim()) {
+            sound.wrong();
+            return;
+          }
+          sound.correct();
+          const ticketNumber = `NM-${Math.floor(10000 + Math.random() * 90000)}`;
+          setFeedbackTicketId(ticketNumber);
+          setFeedbackSent(true);
+        };
+
+        const handleCopyEmail = () => {
+          sound.click();
+          if (navigator && navigator.clipboard) {
+            navigator.clipboard.writeText('support@newromath.com');
+          }
+          setCopiedSupportEmail(true);
+          setTimeout(() => setCopiedSupportEmail(false), 2500);
+        };
+
+        return (
+          <div className="flex-1 scifi-game-bg flex flex-col overflow-hidden text-white relative select-none">
+            {/* Mathematical Coordinate Blueprint Overlay & Luminous Underlay */}
+            <div className="absolute inset-0 math-blueprint-grid opacity-20 pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 scifi-ambient-cyan rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 right-0 w-80 h-80 scifi-ambient-blue rounded-full pointer-events-none" />
+
+            {/* Sticky Modern Frosted Glass Header */}
+            <header className="sticky top-0 z-20 scifi-header-bg border-b border-white/15 px-4 py-3 shrink-0 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => { 
+                    sound.click(); 
+                    if (navigationStackRef.current.length > 1) {
+                      navigateBack();
+                    } else {
+                      navigateTo('settings');
+                    }
+                  }} 
+                  aria-label="Back" 
+                  className="w-10 h-10 rounded-2xl bg-white/[0.12] border border-white/20 text-cyan-200 flex items-center justify-center text-xl font-bold shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  ‹
+                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🛟</span>
+                  <h1 className="text-base sm:text-lg font-black font-display tracking-wider bg-gradient-to-r from-cyan-200 via-sky-100 to-white bg-clip-text text-transparent uppercase">
+                    Help & Support
+                  </h1>
+                </div>
+                <div className="w-10 h-10" />
+              </div>
+
+              {/* Horizontal Category Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-2.5 pb-0.5">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      sound.click();
+                      setHelpTab(tab.id);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
+                      helpTab === tab.id
+                        ? 'bg-gradient-to-r from-cyan-400 to-blue-600 text-white shadow-[0_0_14px_rgba(0,229,255,0.5)] border border-cyan-300'
+                        : 'bg-white/[0.08] text-slate-300 border border-white/10 hover:bg-white/[0.15] hover:text-white'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+            </header>
+
+            {/* Scrollable Help Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-4 relative z-10">
+
+              {/* SECTION 1: HOW TO PLAY CROSS-MATH */}
+              {(helpTab === 'all' || helpTab === 'rules') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-sm text-cyan-300">
+                      📐
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      How to Play Cross-Math
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                    Your goal is to complete the intersecting mathematical crossword by placing numbers from your dock into the blank grid tiles so that every row and column forms a valid equation.
+                  </p>
+
+                  {/* Visual Intersecting Equation Demonstration */}
+                  <div className="p-3.5 rounded-2xl bg-black/40 border border-white/15 shadow-inner mb-3">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-cyan-300 mb-2.5 flex items-center justify-between">
+                      <span>Interactive Grid Preview</span>
+                      <span className="text-emerald-400">Balanced ✓</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {/* Horizontal Equation */}
+                      <div className="flex items-center gap-1.5 text-xs font-mono">
+                        <span className="text-slate-400 text-[10px] w-10 shrink-0">ROW:</span>
+                        <div className="w-7 h-7 rounded-lg bg-white/[0.12] border border-white/20 flex items-center justify-center font-bold text-white shadow-sm">
+                          7
+                        </div>
+                        <span className="text-cyan-300 font-bold">+</span>
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 border border-cyan-200 flex items-center justify-center font-black text-white shadow-[0_0_8px_rgba(0,229,255,0.6)] animate-pulse">
+                          5
+                        </div>
+                        <span className="text-slate-400 font-bold">=</span>
+                        <div className="w-8 h-7 rounded-lg bg-white/[0.18] border border-white/25 flex items-center justify-center font-bold text-emerald-300">
+                          12
+                        </div>
+                      </div>
+
+                      {/* Vertical Equation Intersection Indicator */}
+                      <div className="flex items-center gap-1.5 text-xs font-mono">
+                        <span className="text-slate-400 text-[10px] w-10 shrink-0">COL:</span>
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 border border-cyan-200 flex items-center justify-center font-black text-white shadow-[0_0_8px_rgba(0,229,255,0.6)]">
+                          5
+                        </div>
+                        <span className="text-cyan-300 font-bold">×</span>
+                        <div className="w-7 h-7 rounded-lg bg-white/[0.12] border border-white/20 flex items-center justify-center font-bold text-white shadow-sm">
+                          3
+                        </div>
+                        <span className="text-slate-400 font-bold">=</span>
+                        <div className="w-8 h-7 rounded-lg bg-white/[0.18] border border-white/25 flex items-center justify-center font-bold text-emerald-300">
+                          15
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 text-[10.5px] text-slate-300 bg-white/[0.06] p-2 rounded-xl border border-white/10">
+                      💡 The shared tile <span className="font-bold text-cyan-300">[ 5 ]</span> satisfies both equations simultaneously (<span className="text-white">7 + 5 = 12</span> and <span className="text-white">5 × 3 = 15</span>).
+                    </div>
+                  </div>
+
+                  {/* Core Mechanics Steps */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        1
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">Select & Place</div>
+                        <div className="text-[10px] text-slate-300">Tap a number in your dock, then tap the target blank cell to place it.</div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        2
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">Recall Anytime</div>
+                        <div className="text-[10px] text-slate-300">Tap any placed number to instantly send it back to your dock with zero penalty.</div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        3
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">Color Verification</div>
+                        <div className="text-[10px] text-slate-300">Balanced equations glow emerald green, while mismatched totals highlight red.</div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-2xl bg-white/[0.06] border border-white/10 flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center shrink-0 text-xs">
+                        4
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-[11px]">3-Star Mastery</div>
+                        <div className="text-[10px] text-slate-300">Clear all equations within the target time to unlock the full 3-star rating!</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 2: IN-GAME TOOLS & BOOSTERS */}
+              {(helpTab === 'all' || helpTab === 'tools') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-sm text-amber-300">
+                      ⚡
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      In-Game Tools & Boosters
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-lg shrink-0">
+                        💡
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Smart Hint</span>
+                          <span className="text-[9px] font-mono text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/30">50 Coins</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Instantly reveals and secures the correct number in the most bottlenecked blank cell.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-lg shrink-0">
+                        🔄
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Undo / Board Reset</span>
+                          <span className="text-[9px] font-mono text-cyan-300 bg-cyan-400/10 px-2 py-0.5 rounded-md border border-cyan-400/30">Free</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Recalls all placed tiles back into your tray so you can test alternative strategies without penalty.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-purple-400/20 border border-purple-400/40 flex items-center justify-center text-lg shrink-0">
+                        🎲
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Tray Shuffle</span>
+                          <span className="text-[9px] font-mono text-purple-300 bg-purple-400/10 px-2 py-0.5 rounded-md border border-purple-400/30">Free</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Reorders your dock numbers to stimulate pattern recognition and spot complementary factor pairs.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/15 flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-rose-400/20 border border-rose-400/40 flex items-center justify-center text-lg shrink-0">
+                        🛡️
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Streak Saver</span>
+                          <span className="text-[9px] font-mono text-rose-300 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/30">Protective</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Preserves your daily streak multiplier if you ever miss a calendar puzzle day.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 3: PRO SOLVING STRATEGIES */}
+              {(helpTab === 'all' || helpTab === 'tips') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-sm text-purple-300">
+                      🧠
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      Pro Math Strategies
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10">
+                      <div className="flex items-center gap-2 font-bold text-xs text-cyan-300 mb-1">
+                        <span>🎯</span> 1. Anchor Multiplication & Division First
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Multiplication and division equations have far fewer valid factor pairs than addition or subtraction. For example, in single digits <span className="font-mono text-white">_ × _ = 28</span> can only be 4 and 7. Solving these first anchors key grid intersections!
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10">
+                      <div className="flex items-center gap-2 font-bold text-xs text-cyan-300 mb-1">
+                        <span>🧩</span> 2. Intersection Cross-Checking
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        When two candidate numbers could fit horizontally, inspect the vertical column equation. Only one candidate will satisfy both directions simultaneously.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/[0.06] border border-white/10">
+                      <div className="flex items-center gap-2 font-bold text-xs text-cyan-300 mb-1">
+                        <span>⚖️</span> 3. Parity Elimination (Even vs. Odd)
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Use parity rules: <span className="font-mono text-white">Even + Odd = Odd</span> and <span className="font-mono text-white">Even + Even = Even</span>. If the target total is even and your known tile is odd, the missing tile MUST be odd. This cuts possibilities in half!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 4: FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION) */}
+              {(helpTab === 'all' || helpTab === 'faqs') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-sm text-blue-300">
+                      ❓
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      Frequently Asked Questions
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2">
+                    {faqItems.map((item, index) => {
+                      const isOpen = openFaqIndex === index;
+                      return (
+                        <div
+                          key={index}
+                          className="rounded-2xl border border-white/15 bg-white/[0.06] overflow-hidden transition-all backdrop-blur-md"
+                        >
+                          <button
+                            onClick={() => {
+                              sound.click();
+                              setOpenFaqIndex(isOpen ? -1 : index);
+                            }}
+                            className="w-full p-3 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.08] transition-all"
+                          >
+                            <div className="flex items-center gap-2.5 pr-2">
+                              <span className="text-sm shrink-0">{item.icon}</span>
+                              <span className="text-xs font-bold text-white tracking-wide">
+                                {item.q}
+                              </span>
+                            </div>
+                            <div className={`w-6 h-6 rounded-lg bg-white/[0.1] border border-white/20 flex items-center justify-center text-xs font-bold text-cyan-300 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                              ▾
+                            </div>
+                          </button>
+                          {isOpen && (
+                            <div className="px-3 pb-3 pt-1 text-[11px] text-slate-300 leading-relaxed border-t border-white/10 bg-black/20">
+                              {item.a}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 5: DIRECT CONTACT & IN-APP FEEDBACK */}
+              {(helpTab === 'all' || helpTab === 'contact') && (
+                <div className="rounded-3xl p-4 bg-gradient-to-b from-white/[0.14] via-[#0f2766]/65 to-[#07163c]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.25)] backdrop-blur-xl relative overflow-hidden">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-sm text-emerald-300">
+                      ✉️
+                    </div>
+                    <h3 className="text-xs font-black font-display uppercase tracking-wider text-cyan-200">
+                      Contact & In-App Feedback
+                    </h3>
+                  </div>
+
+                  {/* Direct Email Pill */}
+                  <div className="p-3 rounded-2xl bg-black/40 border border-white/15 flex items-center justify-between mb-3.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-sm text-cyan-300 shrink-0">
+                        📬
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[10px] text-slate-400 font-mono uppercase">Official Developer Support</div>
+                        <div className="text-xs font-mono font-bold text-cyan-200 truncate">support@newromath.com</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleCopyEmail}
+                      className="px-3 py-1.5 rounded-xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/20 text-xs font-bold text-white transition-all active:scale-95 cursor-pointer shrink-0"
+                    >
+                      {copiedSupportEmail ? '✓ Copied' : 'Copy'}
+                    </button>
+                  </div>
+
+                  {feedbackSent ? (
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-400/40 text-center space-y-2">
+                      <div className="w-12 h-12 mx-auto rounded-full bg-emerald-400/20 border border-emerald-400/50 flex items-center justify-center text-2xl">
+                        ✓
+                      </div>
+                      <h4 className="text-sm font-black font-display text-white">Message Received!</h4>
+                      <p className="text-xs text-slate-300">
+                        Thank you for helping us polish NewroMath. We review submissions within 24-48 hours.
+                      </p>
+                      <div className="inline-block px-3 py-1 rounded-full bg-black/40 border border-white/20 text-[10px] font-mono text-cyan-300">
+                        Ticket Ref: {feedbackTicketId}
+                      </div>
+                      <div className="pt-2">
+                        <button
+                          onClick={() => {
+                            sound.click();
+                            setFeedbackSent(false);
+                            setFeedbackText('');
+                          }}
+                          className="px-4 py-2 rounded-xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/20 text-xs font-bold text-white transition-all cursor-pointer"
+                        >
+                          Send Another Message
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Category Selection */}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-300 mb-1.5">Select Category</div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {['Bug Report', 'Feature Idea', 'Math Question', 'Account'].map((cat) => (
+                            <button
+                              key={cat}
+                              onClick={() => {
+                                sound.click();
+                                setFeedbackCategory(cat);
+                              }}
+                              className={`py-1.5 px-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer border ${
+                                feedbackCategory === cat
+                                  ? 'bg-gradient-to-r from-cyan-400 to-blue-600 text-white border-cyan-300 shadow-[0_0_10px_rgba(0,229,255,0.4)]'
+                                  : 'bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/[0.1]'
+                              }`}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Optional Email */}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-300 mb-1">Your Email (Optional for reply)</div>
+                        <input
+                          type="email"
+                          value={feedbackEmail}
+                          onChange={(e) => setFeedbackEmail(e.target.value)}
+                          placeholder="e.g. player@example.com"
+                          className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+                        />
+                      </div>
+
+                      {/* Message Textarea */}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-300 mb-1">Description</div>
+                        <textarea
+                          rows={3}
+                          value={feedbackText}
+                          onChange={(e) => setFeedbackText(e.target.value)}
+                          placeholder="Please provide details about your issue or idea..."
+                          className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 resize-none"
+                        />
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        onClick={handleSendFeedback}
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-blue-600 text-white font-bold text-xs tracking-wider uppercase shadow-[0_0_16px_rgba(0,229,255,0.5)] border border-cyan-300 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <span>🚀</span>
+                        <span>Submit Feedback</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SECTION 6: SYSTEM SPECIFICATIONS & LEGAL */}
+              <div className="pt-2 pb-8 text-center space-y-2">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] border border-white/15 text-[10.5px] text-cyan-300 font-mono shadow-inner backdrop-blur-md">
+                  <span>⚡</span> NewroMath v1.0.0 • Engine Build 2026
+                </div>
+                <div className="flex items-center justify-center gap-4 text-[10.5px] text-slate-400 font-medium">
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      alert("Privacy Policy:\nNewroMath does not collect, sell, or transmit any personal identification data. All gameplay records, coins, and campaign achievements are stored safely on your device and private profile.");
+                    }}
+                    className="hover:text-cyan-300 transition-colors cursor-pointer"
+                  >
+                    Privacy Policy
+                  </button>
+                  <span>•</span>
+                  <button
+                    onClick={() => {
+                      sound.click();
+                      alert("Terms of Service:\nNewroMath is provided free for cognitive mathematics practice, education, and entertainment. Play fair and enjoy sharpening your math mind!");
+                    }}
+                    className="hover:text-cyan-300 transition-colors cursor-pointer"
+                  >
+                    Terms of Service
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        );
+      };
+
+      // ========================================================
+      // 18. OFFLINE MODE (Pixel Perfect to Screen 18)
+      // ==========================================
+      const renderOfflineScreen = () => (
+        <div className="flex-1 flex flex-col bg-white select-none relative overflow-hidden">
+          <StatusBar />
+
+          <div className="my-auto px-6 flex flex-col items-center text-center">
+            {/* Crossed Signals Graphic */}
+            <div className="w-20 h-20 rounded-3xl bg-blue-50 border border-blue-100 flex items-center justify-center text-3xl shadow-sm mb-6">
+              📡
+            </div>
+
+            <h2 className="text-2xl font-black font-display text-slate-900">Offline Mode</h2>
+            <p className="text-xs text-slate-500 mt-2 max-w-xs leading-relaxed">
+              You're offline.<br />No internet connection detected.<br />You can still play saved puzzles and access some features.
+            </p>
+
+            <button
+              onClick={() => navigateTo('home')}
+              className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base shadow-lg shadow-blue-500/25 mt-6 active:scale-95 transition-all"
+            >
+              Continue Offline
+            </button>
+
+            <button
+              onClick={() => navigateTo('home')}
+              className="text-xs font-bold text-blue-600 hover:underline mt-4"
+            >
+              Check Connection
+            </button>
+          </div>
+
+          {/* Subtle Mountain Landscape Graphic at bottom */}
+          <div className="w-full relative h-20">
+            <svg className="absolute bottom-0 w-full" viewBox="0 0 400 80" fill="none">
+              <path d="M0 50L60 30L140 60L220 20L310 60L400 35V80H0Z" fill="#f1f5f9" />
+              <path d="M0 65L80 45L180 70L280 40L400 60V80H0Z" fill="#e2e8f0" opacity="0.6" />
+            </svg>
+          </div>
+        </div>
+      );
+
+      // ========================================================
+      // 19. REWARDS & SHOP (3D Sci-Fi Arcade Rewards Store)
+      // ========================================================
+      const renderRewardsScreen = () => {
+        const handleClaimDailyGift = () => {
+          if (dailyGiftClaimed) return;
+          sound.correct();
+          confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 } });
+          try { GameStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
+          setDailyGiftClaimed(true);
+          setCoins(c => {
+            const next = c + 350;
+            coinsRef.current = next;
+            try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+            return next;
+          });
+          setGems(g => {
+            const next = g + 5;
+            gemsRef.current = next;
+            try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+            return next;
+          });
+          setRewardToast("🎁 Claimed Daily Gift: +350 Coins & +5 Diamonds!");
+        };
+
+        const handleClaimDailyGiftWithAd = () => {
+          if (dailyGiftClaimed) return;
+          handleWatchAd('both', 0, 'Daily Double Gift Sponsor', {
+            coinAmount: 700,
+            gemAmount: 15,
+            onComplete: () => {
+              try { GameStorage.setItem('newromath_daily_crate_last_claimed', todayCrateKey); } catch (e) {}
+              setDailyGiftClaimed(true);
+            }
+          });
+        };
+
+        const handleExchangeCoins = (costGems, coinsToGet) => {
+          sound.click();
+          const numCost = Number(costGems) || 0;
+          const numCoins = Number(coinsToGet) || 0;
+          if (gemsRef.current >= numCost) {
+            setGems(g => {
+              const next = Math.max(0, g - numCost);
+              gemsRef.current = next;
+              try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+              return next;
+            });
+            setCoins(c => {
+              const next = c + numCoins;
+              coinsRef.current = next;
+              try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+              return next;
+            });
+            sound.correct();
+            confetti({ particleCount: 70, spread: 60, origin: { y: 0.5 } });
+            setRewardToast(`🪙 Exchanged ${numCost} 💎 for +${numCoins.toLocaleString()} Gold Coins!`);
+          } else {
+            sound.wrong();
+            setRewardToast("❌ Need more Diamonds! Watch an ad to collect free Diamonds.");
+          }
+        };
+
+        const handleBuyPackage = async (sku) => {
+          sound.click();
+          const pack = IAP_CATALOG.find(p => p.id === sku);
+          if (!pack) return;
+
+          setRewardToast(`⏳ Connecting to Google Play Store...`);
+          const res = await purchaseService.purchaseProduct(sku);
+          if (res.success) {
+            if (typeof sound.victory === 'function') {
+              sound.victory();
+            } else {
+              sound.correct();
+            }
+            confetti({ particleCount: 110, spread: 80, origin: { y: 0.5 } });
+            if (pack.type === 'coins') {
+              setCoins(c => {
+                const next = c + pack.amount;
+                try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+                return next;
+              });
+              setRewardToast(`🎉 Google Play Purchase: +${pack.amount.toLocaleString()} Coins Added!`);
+            } else if (pack.type === 'gems') {
+              setGems(g => {
+                const next = g + pack.amount;
+                try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+                return next;
+              });
+              setRewardToast(`💎 Google Play Purchase: +${pack.amount.toLocaleString()} Diamonds Added!`);
+            } else if (pack.type === 'pro') {
+              setCoins(c => {
+                const next = c + 2000;
+                try { GameStorage.setItem('newromath_coins', next.toString()); } catch (e) {}
+                return next;
+              });
+              setGems(g => {
+                const next = g + 50;
+                try { GameStorage.setItem('newromath_gems', next.toString()); } catch (e) {}
+                return next;
+              });
+              setRewardToast(`👑 PRO VIP Pass Activated! Ads Removed + 2,000 🪙 + 50 💎 Added!`);
+            }
+          } else {
+            sound.wrong();
+            if (res.error && !res.error.toLowerCase().includes('cancel')) {
+              setRewardToast(`❌ ${res.error}`);
+            } else {
+              setRewardToast(`Purchase was cancelled.`);
+            }
+          }
+        };
+
+        const handleRestorePurchases = async () => {
+          sound.click();
+          setRewardToast("🔄 Connecting to Google Play to restore purchases...");
+          const res = await purchaseService.restorePurchases();
+          if (res.success) {
+            sound.correct();
+            setRewardToast(res.message);
+          } else {
+            sound.wrong();
+            setRewardToast(res.message);
+          }
+        };
+
+        return (
+          <div className="flex-1 flex flex-col scifi-game-bg select-none overflow-hidden relative text-white">
+            {/* Top Bar Header */}
+            <div className="sticky top-0 z-20 scifi-header-bg border-b border-cyan-400/20 flex items-center justify-between px-3 pt-2.5 pb-2 shrink-0">
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => navigateTo('home')} 
+                  className="w-8 h-8 rounded-xl bg-[#133273] border border-cyan-400/60 flex items-center justify-center text-cyan-300 hover:text-white hover:bg-[#1a4294] active:scale-95 transition-all shadow-[0_0_10px_rgba(0,229,255,0.3)] cursor-pointer"
+                  title="Back to Home"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+              </div>
+
+              {/* Right Currencies */}
+              {/* Right Currencies */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {/* Coins */}
+                <div className="flex items-center gap-1.5 bg-[#0a1f4d]/70 backdrop-blur-md border border-amber-400/50 rounded-xl px-2.5 py-1 shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]">
+                  <img 
+                    src="/assets/icon_gold_coin_3d_clean.webp" 
+                    alt="Coins" 
+                    className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_2px_4px_rgba(245,158,11,0.6)]" 
+                  />
+                  <span className="text-amber-300 font-black text-xs font-display tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                    {coins.toLocaleString()}
+                  </span>
+                </div>
+                {/* Gems */}
+                <div className="flex items-center gap-1.5 bg-[#0a1f4d]/70 backdrop-blur-md border border-cyan-400/50 rounded-xl px-2.5 py-1 shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]">
+                  <img 
+                    src="/assets/icon_gem_3d_clean.webp" 
+                    alt="Diamonds" 
+                    className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_2px_5px_rgba(6,182,212,0.6)]" 
+                  />
+                  <span className="text-cyan-200 font-black text-xs font-display tracking-tight drop-shadow-[0_0_6px_rgba(0,229,255,0.5)]">
+                    {gems.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-8 space-y-4 max-w-md mx-auto w-full">
+              
+              {/* Toast Notification if present */}
+              {rewardToast && (
+                <div className="sticky top-2 z-30 bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90 backdrop-blur-md border border-emerald-300/80 rounded-2xl p-2.5 text-center text-xs font-black shadow-[0_4px_20px_rgba(16,185,129,0.5)] animate-in slide-in-from-top duration-200">
+                  {rewardToast}
+                </div>
+              )}
+
+              {/* 1. Daily Free Gift Banner - Premium Glassmorphism */}
+              <div className="relative rounded-[26px] bg-gradient-to-br from-white/[0.12] via-[#15347a]/60 to-[#0c1f4d]/80 backdrop-blur-xl border border-white/25 p-3 sm:p-3.5 shadow-[0_12px_32px_rgba(3,12,38,0.5),inset_0_1.5px_0_rgba(255,255,255,0.25)] flex items-center justify-between gap-2.5 sm:gap-3 overflow-hidden">
+                <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-amber-400/15 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="flex items-center gap-2.5 sm:gap-3 relative z-10 min-w-0 flex-1">
+                  <img 
+                    src="/assets/reward_gift_dial_full.webp" 
+                    alt="Daily Reward" 
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)]" 
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-xs sm:text-sm font-black text-white truncate">Daily Mystery Chest</h3>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[9.5px] sm:text-[10px] font-bold text-amber-300 flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 rounded-full px-2 py-0.5 shrink-0">
+                        <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain" />
+                        +350
+                      </span>
+                      <span className="text-[9.5px] sm:text-[10px] font-bold text-cyan-200 flex items-center gap-1 bg-cyan-500/15 border border-cyan-400/30 rounded-full px-2 py-0.5 shrink-0">
+                        <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-3 h-3 object-contain" />
+                        +5
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5 shrink-0 justify-center w-28 sm:w-32 relative z-10">
+                  <button
+                    disabled={dailyGiftClaimed}
+                    onClick={handleClaimDailyGift}
+                    className={`w-full py-2 sm:py-2.5 px-3 rounded-xl text-[10.5px] sm:text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 text-center flex items-center justify-center whitespace-nowrap ${
+                      dailyGiftClaimed
+                        ? 'bg-slate-700/60 border border-slate-600/50 text-slate-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 border border-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.5)] cursor-pointer'
+                    }`}
+                  >
+                    {dailyGiftClaimed ? 'Claimed ✓' : 'Claim Free'}
+                  </button>
+                </div>
+              </div>
+
+              {/* 2. PRO VIP Pass - Lifetime Ad-Free & Exclusive Member Perks */}
+              <div className="relative rounded-[26px] bg-gradient-to-br from-amber-400/20 via-[#27134d]/80 to-[#100624]/95 backdrop-blur-xl border-2 border-amber-400/60 p-4 shadow-[0_14px_36px_rgba(245,158,11,0.25),inset_0_1.5px_0_rgba(255,255,255,0.35)] overflow-hidden">
+                <div className="absolute -right-8 -top-8 w-36 h-36 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="flex items-start justify-between gap-3 relative z-10 mb-2.5">
+                  <div className="flex items-center gap-3">
+                    {/* Skeuomorphic VIP Crown Pedestal Circle */}
+                    <div className="relative w-13 h-13 rounded-full p-[2px] bg-gradient-to-b from-amber-200 via-amber-400 to-amber-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_16px_rgba(245,158,11,0.4),inset_0_1px_1px_rgba(255,255,255,0.85)] shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-amber-950 via-[#1a0e02] to-amber-900 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <span className="text-2xl leading-none drop-shadow-[0_3px_6px_rgba(0,0,0,0.8)] relative z-10 transition-transform hover:scale-110 select-none">
+                            👑
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-sm sm:text-base font-black text-white font-display">
+                        PRO VIP Lifetime Pass
+                      </h3>
+                      <p className="text-[10px] text-amber-200/90 font-medium">
+                        Permanent Ad-Free & Master Bundle
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Perk Pills */}
+                <div className="grid grid-cols-2 gap-2 my-2.5 relative z-10">
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">🚫</span>
+                    <span className="text-[9.5px] font-bold text-slate-200">Remove Ads Forever</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">🪙</span>
+                    <span className="text-[9.5px] font-bold text-amber-300">+2,000 Bonus Coins</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">💎</span>
+                    <span className="text-[9.5px] font-bold text-cyan-200">+50 Bonus Diamonds</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
+                    <span className="text-sm">👑</span>
+                    <span className="text-[9.5px] font-bold text-amber-300">VIP Crown Status</span>
+                  </div>
+                </div>
+
+                {/* Purchase Action Button */}
+                <div className="mt-2.5 relative z-10">
+                  {purchaseState.isProUser ? (
+                    <div className="w-full py-2.5 rounded-2xl bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                      <span>👑</span>
+                      <span>ACTIVE PRO VIP MEMBER ✓</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleBuyPackage('newromath_pro_noads')}
+                      className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-xs uppercase tracking-wider shadow-[0_4px_0_#b45309,0_8px_20px_rgba(245,158,11,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-amber-200"
+                    >
+                      <span>⚡</span>
+                      <span>Unlock PRO Pass — {purchaseService.getPrice('newromath_pro_noads')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. Collect via Ads Section */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-cyan-400 text-xs">🎬</span>
+                    <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-cyan-200">
+                      Watch Ads & Collect Free
+                    </h2>
+                  </div>
+                  <span className="text-[9px] font-bold text-cyan-400/80 bg-cyan-950/70 border border-cyan-500/30 rounded-full px-2 py-0.5">
+                    Instant
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  {/* Ad Option 1: Gold Coins - Glassmorphic Card */}
+                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
+                    {/* Skeuomorphic Golden Coin Pedestal Circle */}
+                    <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-amber-200 via-amber-400 to-amber-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-amber-950 via-[#1a0e02] to-amber-900 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img 
+                            src="/assets/icon_gold_coin_3d_clean.webp" 
+                            alt="Coins" 
+                            className="w-8 h-8 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs font-black text-amber-300 font-display">+250 Coins</span>
+                    <span className="text-[9.5px] text-slate-300/80 mb-2.5 font-medium">Instant Reward</span>
+                    <button
+                      onClick={() => handleWatchAd('coins', 250, 'Coin Sponsor Video')}
+                      className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 font-black text-[11px] shadow-[0_3px_0_#b45309,0_6px_14px_rgba(245,158,11,0.35)] hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer border border-amber-200/80"
+                    >
+                      <span>▶</span>
+                      <span>Watch Ad</span>
+                    </button>
+                  </div>
+
+                  {/* Ad Option 2: Diamonds - Glassmorphic Card */}
+                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
+                    {/* Skeuomorphic Diamond Pedestal Circle */}
+                    <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-blue-950 via-[#031533] to-cyan-950 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img 
+                            src="/assets/icon_gem_3d_clean.webp" 
+                            alt="Diamonds" 
+                            className="w-7 h-7 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs font-black text-cyan-200 font-display">+10 Diamonds</span>
+                    <span className="text-[9.5px] text-slate-300/80 mb-2.5 font-medium">Instant Reward</span>
+                    <button
+                      onClick={() => handleWatchAd('gems', 10, 'Diamond Sponsor Video')}
+                      className="w-full py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[11px] shadow-[0_3px_0_#0284c7,0_6px_14px_rgba(6,182,212,0.35)] hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer border border-cyan-200/80"
+                    >
+                      <span>▶</span>
+                      <span>Watch Ad</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Ad Option 3: Big Jackpot Chest Ad - Glassmorphic Banner */}
+                <div className="rounded-[22px] bg-gradient-to-r from-white/[0.10] via-[#1c2c63]/60 to-[#12224d]/80 backdrop-blur-xl border border-white/20 p-2.5 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.4),inset_0_1.5px_0_rgba(255,255,255,0.2)]">
+                  <div className="flex items-center gap-2.5">
+                    {/* Skeuomorphic Purple Pedestal */}
+                    <div className="relative w-11 h-11 rounded-full p-[2px] bg-gradient-to-b from-purple-200 via-purple-400 to-indigo-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] shrink-0 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-purple-950 via-[#1e0b36] to-indigo-950 flex items-center justify-center shadow-inner">
+                        <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#3b186b_0%,#200b3d_50%,#0e041a_100%)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),inset_0_-1px_1px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                          <div className="absolute inset-x-1 top-0.5 h-[40%] bg-gradient-to-b from-white/40 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                          <div className="absolute bottom-0.5 w-5 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                          <img src="/assets/icon_chest_3d.webp" alt="Chest" className="w-6 h-6 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-xs font-black text-purple-200 block">Jackpot Ad Chest</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-amber-300 font-bold flex items-center gap-0.5">
+                          <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain" />
+                          +600
+                        </span>
+                        <span className="text-[10px] text-cyan-200 font-bold flex items-center gap-0.5">
+                          <img src="/assets/icon_gem_3d_clean.webp" alt="Diamond" className="w-3 h-3 object-contain" />
+                          +15
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleWatchAd('jackpot', 600, 'Jackpot Mega Sponsor')}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-[10px] border border-purple-300/70 shadow-[0_3px_0_#581c87,0_6px_14px_rgba(168,85,247,0.35)] active:scale-95 transition-all cursor-pointer"
+                  >
+                    ▶ Watch (15s)
+                  </button>
+                </div>
+              </div>
+
+              {/* 4. Gold Coin Store (Google Play In-App Purchases & Gem Exchange) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain" />
+                    <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-amber-200">
+                      Gold Coin Store
+                    </h2>
+                  </div>
+                  <span className="text-[9px] font-bold text-amber-400/80">
+                    Google Play or Gems
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  {IAP_CATALOG.filter(p => p.type === 'coins').map((pack) => (
+                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
+                      {pack.badge && (
+                        <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-amber-200/70 z-10">
+                          {pack.badge}
+                        </span>
+                      )}
+                      <div className="text-center pt-1 flex flex-col items-center">
+                        {/* Skeuomorphic Golden Coin Pedestal Circle */}
+                        <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-amber-200 via-amber-400 to-amber-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                          <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-amber-950 via-[#1a0e02] to-amber-900 flex items-center justify-center shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#244585_0%,#122752_50%,#061129_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                              <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                              <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                              {pack.isCustomImg ? (
+                                <img src={pack.customIcon} alt={pack.name} className="w-8 h-8 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" />
+                              ) : (
+                                <span className="text-2xl block relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{pack.icon}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
+                        <span className="text-xs font-black text-amber-300 font-display block mt-0.5">
+                          +{pack.amount.toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 mt-2.5">
+                        {pack.gemsCost && (
+                          <button
+                            onClick={() => handleExchangeCoins(pack.gemsCost, pack.amount)}
+                            className="w-full py-1.5 rounded-xl bg-gradient-to-r from-[#0c245c] to-[#123075] hover:brightness-110 border border-cyan-400/50 text-[10px] font-bold text-cyan-200 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer shadow-xs"
+                            title="Exchange with Gems"
+                          >
+                            <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-3 h-3 object-contain" />
+                            <span>{pack.gemsCost} Gems</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleBuyPackage(pack.id)}
+                          className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#b45309] border border-amber-200/80 flex items-center justify-center gap-1"
+                        >
+                          <span>{purchaseService.getPrice(pack.id)}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 5. Diamond Store (Google Play In-App Purchases) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain" />
+                    <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-cyan-200">
+                      Diamond Store
+                    </h2>
+                  </div>
+                  <span className="text-[9px] font-bold text-cyan-400/80">
+                    Premium Gems
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  {IAP_CATALOG.filter(p => p.type === 'gems').map((pack) => (
+                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
+                      {pack.badge && (
+                        <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-cyan-200/70 z-10">
+                          {pack.badge}
+                        </span>
+                      )}
+                      <div className="text-center pt-1 flex flex-col items-center">
+                        {/* Skeuomorphic Diamond Pedestal Circle */}
+                        <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
+                          <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-blue-950 via-[#031533] to-cyan-950 flex items-center justify-center shadow-inner">
+                            <div className="w-full h-full rounded-full bg-[radial-gradient(circle_at_50%_30%,#18458a_0%,#0d2857_50%,#041029_100%)] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] flex items-center justify-center relative overflow-hidden">
+                              <div className="absolute inset-x-1.5 top-0.5 h-[42%] bg-gradient-to-b from-white/45 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                              <div className="absolute bottom-1 w-6 h-1 rounded-full bg-black/60 blur-[1px] pointer-events-none" />
+                              {pack.isCustomImg ? (
+                                <img src={pack.customIcon} alt={pack.name} className="w-7 h-7 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.65)] relative z-10 transition-transform duration-200 hover:scale-110 active:scale-95" />
+                              ) : (
+                                <span className="text-2xl block relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{pack.icon}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <h4 className="text-[11px] font-extrabold text-white leading-tight">{pack.name}</h4>
+                        <span className="text-xs font-black text-cyan-200 font-display block mt-0.5">
+                          +{pack.amount.toLocaleString()}
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => handleBuyPackage(pack.id)}
+                        className="w-full mt-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 hover:brightness-110 text-white text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#0284c7] border border-cyan-300/40 flex items-center justify-center gap-1"
+                      >
+                        <span>{purchaseService.getPrice(pack.id)}</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 6. Google Play Billing Guarantee & Restore Purchases */}
+              <div className="rounded-2xl p-3 bg-white/[0.05] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left mt-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-sm text-emerald-300 shrink-0">
+                    🔒
+                  </div>
+                  <div className="text-[10px] text-slate-300">
+                    <span className="font-bold text-white block">Google Play In-App Billing</span>
+                    Official, secure encrypted transaction & instant item delivery
+                  </div>
+                </div>
+                <button
+                  onClick={handleRestorePurchases}
+                  className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-[10px] font-bold text-cyan-200 active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-xs"
+                >
+                  🔄 Restore Purchases
+                </button>
+              </div>
+
+            </div>
+
+            {/* Google Play Transaction Loading Modal */}
+            {purchaseState.isLoading && (
+              <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+                <div className="rounded-3xl p-5 bg-gradient-to-b from-[#152758] to-[#0a1638] border border-cyan-400/50 shadow-[0_0_30px_rgba(0,229,255,0.4)] flex flex-col items-center text-center max-w-xs w-full animate-in zoom-in-95 duration-200">
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-300 flex items-center justify-center text-2xl mb-3 animate-spin">
+                    ⚙️
+                  </div>
+                  <h4 className="text-sm font-black text-white font-display mb-1">
+                    Google Play In-App Billing
+                  </h4>
+                  <p className="text-xs text-cyan-200 font-medium">
+                    Connecting to Google Play Store... Please complete the transaction in the Google Play dialog.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // ==========================================
+      // MAIN SCREEN ROUTER
+      // ==========================================
+      const renderActiveScreen = () => {
+        switch (currentScreen) {
+          case 'splash': return renderSplashScreen();
+          case 'onboarding': return renderOnboardingScreen();
+          case 'home': return renderHomeScreen();
+          case 'categories': return renderLevelSelectScreen();
+          case 'levels': return renderLevelSelectScreen();
+          case 'game': return renderGameScreen();
+          case 'hint': return renderHintScreen();
+          case 'correct': return renderCorrectScreen();
+          case 'wrong': return renderWrongScreen();
+          case 'daily': return renderDailyScreen();
+          case 'daily_game': return renderDailyGameScreen();
+          case 'battle': return renderBattleScreen();
+          case 'stats': return renderHomeScreen();
+          case 'achievements': return renderAchievementsScreen();
+          case 'leaderboard': return renderLeaderboardScreen();
+          case 'history': return renderHistoryScreen();
+          case 'profile': return renderProfileScreen();
+          case 'settings': return renderSettingsScreen();
+          case 'help': return renderHelpScreen();
+          case 'offline': return renderOfflineScreen();
+          case 'rewards': return renderRewardsScreen();
+          default: return renderHomeScreen();
+        }
+      };
+
+      return (
+        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans bg-[#173272]">
+          <PageTransition screenKey={currentScreen} direction={transitionDirection} isWaitingForLoad={isPageLoading}>
+            {renderActiveScreen()}
+          </PageTransition>
+
+          {isPageLoading && <SlidingTileLoader />}
+
+          {/* 3D Cyber-Arcade Flying Number Tiles Layer (Mounted only during active flight) */}
+          {flyingPool.some(slot => slot.active) && (
+            <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
+              {flyingPool.map(slot => (
+                <PooledFlyingTileItem
+                  key={slot.slotId}
+                  slot={slot}
+                  largeFontEnabled={largeFontEnabled}
+                  onComplete={(s) => {
+                    recycleFlyingTile(s.slotId);
+                    if (s.isReturn) {
+                      finalizeReturn(s.number);
+                    } else {
+                      finalizePlacement(s.number, s.targetSlot);
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          {/* Cyber Notification Toast Banner */}
+          {rewardToast && (
+            <div className="fixed top-5 inset-x-4 z-50 flex justify-center pointer-events-none animate-in fade-in slide-in-from-top-4 duration-200">
+              <div className="bg-gradient-to-r from-[#0d2254]/95 via-[#153473]/95 to-[#0c1f4a]/95 border-2 border-cyan-400/80 rounded-2xl px-4 py-2.5 shadow-[0_8px_25px_rgba(0,229,255,0.6)] text-white font-black text-xs font-display flex items-center justify-center text-center backdrop-blur-md">
+                <span>{rewardToast}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Insufficient Resources — 3D Glassmorphism Banner Modal */}
+          {insufficientFundsModal.isOpen && (() => {
+            const need = insufficientFundsModal.cost;
+            const rows = [
+              { key: 'coins', icon: '/assets/icon_gold_coin_3d_clean.webp', have: coins, need: need.coins, tone: 'amber' },
+              { key: 'gems', icon: '/assets/icon_gem_3d_clean.webp', have: gems, need: need.gems, tone: 'cyan' }
+            ];
+            const closeModal = () => {
+              sound.click();
+              setInsufficientFundsModal(prev => ({ ...prev, isOpen: false }));
+            };
+            return (
+              <div
+                className="fixed inset-0 z-50 bg-[#06122c]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200"
+                onClick={closeModal}
+              >
+                {/* Glassmorphic Popup Card */}
+                <div
+                  className="relative w-full max-w-[320px] sm:max-w-[335px] rounded-[36px] p-5 sm:p-6 pt-14 sm:pt-16 bg-gradient-to-b from-white/95 via-[#f0f7ff]/95 to-[#e0efff]/95 border-2 border-white/90 shadow-[0_25px_60px_-10px_rgba(8,24,68,0.6),inset_0_2px_4px_rgba(255,255,255,0.95),inset_0_-2px_4px_rgba(56,189,248,0.2)] text-center overflow-visible"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Top Close Button (Top-Right) */}
+                  <button
+                    onClick={closeModal}
+                    aria-label="Close"
+                    title="Close"
+                    className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-blue-100/90 hover:bg-blue-200 border border-white text-[#1e3a8a] flex items-center justify-center font-black active:scale-90 transition-all cursor-pointer shadow-sm"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+
+                  {/* 3D Floating Hero: Glowing Coin & Diamond Pod + Splash Petals + Arched 3D Banner */}
+                  <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-52 flex flex-col items-center pointer-events-none z-20">
+                    {/* Cloud base & Splash petals behind hero */}
+                    <div className="relative flex items-center justify-center">
+                      <div className="absolute -bottom-2 w-28 h-10 bg-gradient-to-t from-[#bae6fd] to-white rounded-full blur-[1px] shadow-sm -z-10" />
+
+                      {/* Left Splashes */}
+                      <svg className="absolute -left-1 top-1.5 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+                      <svg className="absolute -left-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] -rotate-45" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+
+                      {/* Right Splashes */}
+                      <svg className="absolute -right-1 top-1.5 w-7 h-7 text-[#38bdf8] drop-shadow-[0_2px_6px_rgba(56,189,248,0.5)] rotate-12 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+                      <svg className="absolute -right-3 top-6 w-5 h-5 text-[#0ea5e9] drop-shadow-[0_2px_4px_rgba(14,165,233,0.4)] rotate-45 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                      </svg>
+
+                      {/* 3D Circular Gloss Pod for Coin & Gem */}
+                      <div className="relative w-16 h-16 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-white/90 shadow-[0_8px_20px_rgba(14,165,233,0.45),inset_0_2px_4px_rgba(255,255,255,0.7)] flex items-center justify-center">
+                        <div className="absolute inset-1 rounded-full bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
+                        <img src="/assets/icon_gold_coin_3d_clean.webp" alt="" className="w-8 h-8 object-contain -translate-x-1.5 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
+                        <img src="/assets/icon_gem_3d_clean.webp" alt="" className="absolute w-7 h-7 object-contain translate-x-3.5 translate-y-2.5 drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]" />
+                        {/* Exclamation badge */}
+                        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white flex items-center justify-center shadow-md">
+                          <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                            <path d="M12 7v6M12 17h.01" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Arched 3D Banner "Need Funds" */}
+                    <div className="relative -mt-2.5 w-48 h-10 flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(29,78,216,0.45)]">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 220 52" fill="none">
+                        <path d="M12 36 L0 26 L12 16 L22 22 L22 34 Z" fill="#1e40af" />
+                        <path d="M22 22 L35 14 L35 34 L22 34 Z" fill="#172554" />
+                        <path d="M208 36 L220 26 L208 16 L198 22 L198 34 Z" fill="#1e40af" />
+                        <path d="M198 22 L185 14 L185 34 L198 34 Z" fill="#172554" />
+                        <path d="M18 20 C60 6, 160 6, 202 20 C206 36, 196 46, 185 45 C150 38, 70 38, 35 45 C24 46, 14 36, 18 20 Z" fill="url(#fundsRibbonGrad)" stroke="#60a5fa" strokeWidth="2" />
+                        <defs>
+                          <linearGradient id="fundsRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="50%" stopColor="#2563eb" />
+                            <stop offset="100%" stopColor="#1d4ed8" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="relative z-10 flex items-center justify-center pb-1 select-none">
+                        <span className="font-black text-base sm:text-[17px] tracking-tight text-white drop-shadow-[0_1.5px_3px_rgba(0,0,0,0.6)] font-display">
+                          Need <span className="text-[#fde047] drop-shadow-[0_1.5px_3px_rgba(180,83,9,0.8)]">Funds</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Coin / Diamond Divider */}
+                  <div className="flex items-center justify-center gap-3 my-3">
+                    <div className="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-300 to-blue-400 rounded-full" />
+                    <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 shadow-inner">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 6v12M8 10h8" />
+                      </svg>
+                    </div>
+                    <div className="h-[2px] w-12 bg-gradient-to-l from-transparent via-blue-300 to-blue-400 rounded-full" />
+                  </div>
+
+                  {/* Headline & Description */}
+                  <h2 className="text-[#152a55] font-black text-xl tracking-tight font-display mb-1">
+                    Get More Resources!
+                  </h2>
+                  <p className="text-[#4b618a] text-xs font-semibold px-2 leading-relaxed mb-4">
+                    Claim free rewards or visit the shop to unlock this stage.
+                  </p>
+
+                  {/* Have / Need meters with Glassmorphism styling */}
+                  <div className="space-y-2 mb-4 text-left">
+                    {rows.map(r => {
+                      const ok = r.have >= r.need;
+                      const pct = Math.min(100, Math.round((r.have / Math.max(1, r.need)) * 100));
+                      return (
+                        <div
+                          key={r.key}
+                          className={`flex items-center gap-2.5 rounded-2xl px-3 py-2 border shadow-sm ${
+                            ok
+                              ? 'bg-emerald-50/90 border-emerald-300/80'
+                              : 'bg-rose-50/90 border-rose-300/80'
+                          }`}
+                        >
+                          <img src={r.icon} alt={r.key} className="w-7 h-7 object-contain shrink-0 drop-shadow-sm" />
+                          <div className="flex-1 min-w-0">
+                            <div className="h-2 rounded-full bg-slate-200 overflow-hidden border border-slate-300/60">
+                              <div
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  ok
+                                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500'
+                                    : 'bg-gradient-to-r from-rose-500 to-amber-500'
+                                }`}
+                                style={{ width: `${Math.max(6, pct)}%` }}
+                              />
+                            </div>
+                            <div className="mt-1 flex items-center justify-between font-mono font-black text-[11px] leading-none">
+                              <span className={ok ? 'text-emerald-700' : 'text-rose-700'}>{r.have.toLocaleString()}</span>
+                              <span className="text-slate-500">/ {r.need.toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <span
+                            className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
+                              ok ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
+                            }`}
+                          >
+                            {ok ? (
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M5 12.5l4.5 4.5L19 7.5" />
+                              </svg>
+                            ) : (
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round">
+                                <path d="M6 6l12 12M18 6L6 18" />
+                              </svg>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Action Controls */}
+                  <div className="flex items-stretch gap-2.5 pt-1">
+                    {/* Watch ad: free coins + gems (Glossy 3D Green pill) */}
+                    <button
+                      aria-label="Watch ad for free coins and gems"
+                      title="Watch ad: +350 coins, +15 gems"
+                      onClick={() => {
+                        sound.click();
+                        const targetLvl = insufficientFundsModal.targetLvl;
+                        setInsufficientFundsModal(prev => ({ ...prev, isOpen: false }));
+                        handleWatchAd('both', 0, 'Quantum Supply Depot Sponsor', {
+                          coinAmount: 350,
+                          gemAmount: 15,
+                          onComplete: () => {
+                            setRewardToast(`+350 Coins & +15 Diamonds Claimed! Launching Level ${targetLvl}...`);
+                            setTimeout(() => {
+                              attemptStartLevel(targetLvl);
+                            }, 80);
+                          }
+                        });
+                      }}
+                      className="flex-1 rounded-2xl py-2.5 bg-gradient-to-b from-emerald-400 via-emerald-500 to-teal-600 border-2 border-emerald-200/90 shadow-[0_4px_0_#065f46,0_8px_20px_rgba(16,185,129,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all cursor-pointer flex flex-col items-center justify-center gap-1 text-white"
+                    >
+                      <svg className="w-6 h-6 text-white stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2.5" y="5" width="19" height="14" rx="3.5" />
+                        <path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor" />
+                      </svg>
+                      <span className="flex items-center gap-1 font-mono font-black text-[11px] leading-none drop-shadow-sm">
+                        <span>+350</span>
+                        <img src="/assets/icon_gold_coin_3d_clean.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                        <span>+15</span>
+                        <img src="/assets/icon_gem_3d_clean.webp" alt="" className="w-3.5 h-3.5 object-contain" />
+                      </span>
+                    </button>
+
+                    {/* Store (Glossy 3D Blue pill) */}
+                    <button
+                      aria-label="Open store"
+                      title="Open store"
+                      onClick={() => {
+                        sound.click();
+                        setInsufficientFundsModal(prev => ({ ...prev, isOpen: false }));
+                        navigateTo('rewards');
+                      }}
+                      className="w-[72px] rounded-2xl bg-gradient-to-b from-[#3b82f6] via-[#2563eb] to-[#1d4ed8] border-2 border-blue-200/90 shadow-[0_4px_0_#1e40af,0_8px_20px_rgba(37,99,235,0.35),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all cursor-pointer flex items-center justify-center text-white"
+                    >
+                      <svg className="w-7 h-7 text-white stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2" />
+                        <circle cx="9.5" cy="19.2" r="1.4" fill="currentColor" />
+                        <circle cx="16.5" cy="19.2" r="1.4" fill="currentColor" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Fixed-Height Google AdMob Bottom Banner Ad (Zero Layout Shift) */}
+          {adMobState.bannerVisible && currentScreen !== 'splash' && currentScreen !== 'onboarding' && (
+            <AdMobBanner isNative={adMobState.isNative} />
+          )}
+
+          {/* Google AdMob Rewarded Video Ad Modal */}
+          <AdMobRewardedModal
+            isOpen={adModalOpen}
+            onClose={() => setAdModalOpen(false)}
+            onReward={handleClaimAdReward}
+            rewardInfo={adReward}
+          />
+        </div>
+      );
+    }
+
+    const root = createRoot(document.getElementById('root'));
+    root.render(<App />);
