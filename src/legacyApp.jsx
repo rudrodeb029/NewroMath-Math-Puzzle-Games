@@ -9100,25 +9100,6 @@ const PLAYER_COUNTRIES = [
                   })}
                 </div>
 
-                {/* Status Legend Indicator */}
-                <div className="flex flex-wrap items-center justify-center gap-3 pt-2.5 mt-2.5 border-t border-white/10 text-[9px] font-bold">
-                  <div className="flex items-center gap-1.5 text-emerald-300">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
-                    <span>Completed (★)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-rose-300">
-                    <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_#f43f5e]" />
-                    <span>Missed / Incomplete (✕)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-cyan-300">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />
-                    <span>Today</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <span className="w-2 h-2 rounded-full bg-slate-500" />
-                    <span>Locked (🔒)</span>
-                  </div>
-                </div>
               </div>
 
               {/* 3. Selected Day Mission Card (Glassmorphic) */}
