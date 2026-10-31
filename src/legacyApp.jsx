@@ -13670,8 +13670,7 @@ const PLAYER_COUNTRIES = [
                     className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-[0_0_16px_rgba(251,191,36,0.6)]" 
                   />
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-xs sm:text-sm font-black text-white truncate">Daily Mystery Chest</h3>
-                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[9.5px] sm:text-[10px] font-bold text-amber-300 flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 rounded-full px-2 py-0.5 shrink-0">
                         <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain" />
                         +350
@@ -13775,9 +13774,6 @@ const PLAYER_COUNTRIES = [
                       Watch Ads & Collect Free
                     </h2>
                   </div>
-                  <span className="text-[9px] font-bold text-cyan-400/80 bg-cyan-950/70 border border-cyan-500/30 rounded-full px-2 py-0.5">
-                    Instant
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
@@ -13850,8 +13846,7 @@ const PLAYER_COUNTRIES = [
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs font-black text-purple-200 block">Jackpot Ad Chest</span>
-                      <div className="flex items-center gap-2 mt-0.5">
+                      <div className="flex items-center gap-2">
                         <span className="text-[10px] text-amber-300 font-bold flex items-center gap-0.5">
                           <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coin" className="w-3 h-3 object-contain" />
                           +600
@@ -13881,9 +13876,6 @@ const PLAYER_COUNTRIES = [
                       Gold Coin Store
                     </h2>
                   </div>
-                  <span className="text-[9px] font-bold text-amber-400/80">
-                    Google Play or Gems
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
@@ -13947,9 +13939,6 @@ const PLAYER_COUNTRIES = [
                       Diamond Store
                     </h2>
                   </div>
-                  <span className="text-[9px] font-bold text-cyan-400/80">
-                    Premium Gems
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
