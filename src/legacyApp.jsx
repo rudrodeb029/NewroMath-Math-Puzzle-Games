@@ -6430,11 +6430,11 @@ const PLAYER_COUNTRIES = [
               <div className="flex items-center justify-between px-1 mb-1.5">
                 <div className="flex items-center gap-1.5">
                   <span className="text-cyan-300 text-xs">📐</span>
-                  <span className="text-cyan-200 font-extrabold text-[11px] uppercase tracking-wider font-display drop-shadow-[0_0_8px_rgba(0,229,255,0.7)]">
+                  <span className="text-amber-950 font-black text-[11px] uppercase tracking-wider font-display drop-shadow-[0_1px_0_rgba(255,255,255,0.65)]">
                     Top Champions
                   </span>
                 </div>
-                <div className="flex items-center gap-1 text-[10px] text-cyan-300/80 font-bold tracking-tight">
+                <div className="flex items-center gap-1 text-[10px] text-amber-950 font-black tracking-tight drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]">
                   <span>Swipe</span>
                   <span className="animate-pulse">➔</span>
                 </div>
@@ -6888,7 +6888,7 @@ const PLAYER_COUNTRIES = [
               </div>
 
               {/* Difficulty World Filter Tabs */}
-              <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-cyan-400/30 rounded-xl">
+              <div className="flex items-center gap-1.5 p-1 bg-[#0d2254]/95 border border-cyan-400/50 rounded-xl shadow-md">
                 {filterTabs.map(tab => {
                   const isActive = levelFilterTab === tab.id;
                   return (
@@ -6918,10 +6918,10 @@ const PLAYER_COUNTRIES = [
               {/* Quick Jump Ribbon (Horizontal Scroll 1 to 25) */}
               <div className="space-y-1">
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-[10px] font-mono text-cyan-300/80 font-bold uppercase tracking-wider">
+                  <span className="text-[10px] font-mono text-amber-950 font-black uppercase tracking-wider drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
                     Quick Jump Ribbon
                   </span>
-                  <span className="text-[9px] font-mono text-slate-400">Scroll ➔</span>
+                  <span className="text-[9px] font-mono text-amber-950/90 font-bold drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]">Scroll ➔</span>
                 </div>
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 px-0.5">
                   {ALL_LEVELS.map(lvl => {
@@ -7110,7 +7110,7 @@ const PLAYER_COUNTRIES = [
                         sound.click();
                         attemptStartLevel(selectedLevelNum);
                       }}
-                      className="w-full max-w-[270px] py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 hover:brightness-110 text-amber-950 font-black shadow-[0_4px_16px_rgba(245,158,11,0.45),inset_0_1px_0_rgba(255,255,255,0.7)] active:scale-[0.98] transition-all flex flex-col items-center justify-center border border-amber-200 cursor-pointer"
+                      className="w-full max-w-[270px] py-2 px-3 rounded-xl bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 hover:brightness-105 text-amber-950 font-black shadow-[0_6px_18px_rgba(69,26,3,0.45),0_2px_0_#78350f,inset_0_1.5px_0_rgba(255,255,255,0.85)] active:scale-[0.98] transition-all flex flex-col items-center justify-center border-2 border-amber-950/30 cursor-pointer"
                     >
                       <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-black">
                         <span className="text-xs">🚀</span>
@@ -8585,10 +8585,10 @@ const PLAYER_COUNTRIES = [
               ✓
             </div>
             
-            <h2 className="text-2xl font-black font-display text-white tracking-tight">
+            <h2 className="text-2xl font-black font-display text-amber-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.7)] tracking-tight">
               {lastResult.levelCleared ? 'MISSION ACCOMPLISHED!' : 'PUZZLE SOLVED!'}
             </h2>
-            <p className="text-xs text-cyan-200/80 mt-1">
+            <p className="text-xs text-amber-950/90 font-bold mt-1">
               {lastResult.levelCleared
                 ? `Level ${lastResult.level} Cleared • All ${lastResult.total} Puzzles Done!`
                 : `Level ${lastResult.level} • Puzzle ${lastResult.stage} of ${lastResult.total} Complete`}
@@ -8673,10 +8673,10 @@ const PLAYER_COUNTRIES = [
               ✕
             </div>
 
-            <h2 className="text-2xl font-black font-display text-white tracking-tight">
+            <h2 className="text-2xl font-black font-display text-amber-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.7)] tracking-tight">
               CALCULATION ERROR!
             </h2>
-            <p className="text-xs text-rose-200/80 mt-1">
+            <p className="text-xs text-rose-950 font-bold mt-1">
               One or more equations don't balance.
             </p>
 
@@ -9001,7 +9001,7 @@ const PLAYER_COUNTRIES = [
               </div>
 
               {/* 2. Tactile Cyber Calendar Matrix (Glassmorphic) */}
-              <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/65 to-[#071536]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
+              <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/95 to-[#071536]/98 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <DailySkeuomorphicCircle 
@@ -9122,7 +9122,7 @@ const PLAYER_COUNTRIES = [
               </div>
 
               {/* 3. Selected Day Mission Card (Glassmorphic) */}
-              <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/65 to-[#071536]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
+              <div className="rounded-3xl p-3.5 bg-gradient-to-b from-white/[0.12] via-[#0d245c]/95 to-[#071536]/98 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl relative overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <DailySkeuomorphicCircle 
@@ -9206,7 +9206,7 @@ const PLAYER_COUNTRIES = [
               </div>
 
               {/* 4. Daily Supply Crate (Glassmorphic) */}
-              <div className="rounded-3xl p-3 bg-gradient-to-b from-white/[0.12] via-[#0f2762]/65 to-[#071330]/80 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl flex items-center justify-between">
+              <div className="rounded-3xl p-3 bg-gradient-to-b from-white/[0.12] via-[#0f2762]/95 to-[#071330]/98 border border-white/20 shadow-[0_16px_36px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.22)] backdrop-blur-xl flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <DailySkeuomorphicCircle 
                     icon={
@@ -11327,7 +11327,7 @@ const PLAYER_COUNTRIES = [
                       </span>
                     </div>
                     {/* Pillar */}
-                    <div className="w-full h-24 rounded-t-2xl bg-gradient-to-b from-white/[0.16] via-[#163674]/60 to-black/40 border-t-2 border-x-2 border-cyan-300/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(56,189,248,0.2),inset_0_1px_0_rgba(255,255,255,0.25)]">
+                    <div className="w-full h-24 rounded-t-2xl bg-gradient-to-b from-white/[0.16] via-[#163674]/95 to-[#071536]/98 border-t-2 border-x-2 border-cyan-300/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(56,189,248,0.2),inset_0_1px_0_rgba(255,255,255,0.25)]">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-b from-slate-100 to-slate-300 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
                         2
                       </div>
@@ -11383,7 +11383,7 @@ const PLAYER_COUNTRIES = [
                       </span>
                     </div>
                     {/* Pillar */}
-                    <div className="w-full h-20 rounded-t-2xl bg-gradient-to-b from-white/[0.14] via-[#2c180e]/60 to-black/40 border-t-2 border-x-2 border-amber-500/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(249,115,22,0.2),inset_0_1px_0_rgba(255,255,255,0.2)]">
+                    <div className="w-full h-20 rounded-t-2xl bg-gradient-to-b from-white/[0.14] via-[#2c180e]/95 to-[#170b05]/98 border-t-2 border-x-2 border-amber-500/70 backdrop-blur-md flex flex-col items-center justify-between py-2 shadow-[0_0_15px_rgba(249,115,22,0.2),inset_0_1px_0_rgba(255,255,255,0.2)]">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-b from-orange-300 to-amber-600 border border-white text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
                         3
                       </div>
@@ -11394,7 +11394,7 @@ const PLAYER_COUNTRIES = [
 
               {/* Leaderboard Table (Ranks 4 - 8) */}
               <div className="space-y-2 pb-2">
-                <div className="flex items-center justify-between px-2 text-[10px] font-mono font-black uppercase tracking-wider text-cyan-300/70 pb-0.5">
+                <div className="flex items-center justify-between px-2 text-[10px] font-mono font-black uppercase tracking-wider text-amber-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.6)] pb-0.5">
                   <span>Rank & Player</span>
                   <span>Total Score</span>
                 </div>
@@ -11402,7 +11402,7 @@ const PLAYER_COUNTRIES = [
                 {topPlayers.map((player) => (
                   <div 
                     key={player.rank}
-                    className="relative group bg-gradient-to-r from-white/[0.10] via-[#0d245c]/55 to-[#071536]/70 border border-white/20 hover:border-cyan-300/60 rounded-2xl p-3 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-xl transition-all hover:scale-[1.01]"
+                    className="relative group bg-gradient-to-r from-white/[0.10] via-[#0d245c]/95 to-[#071536]/98 border border-white/20 hover:border-cyan-300/60 rounded-2xl p-3 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-xl transition-all hover:scale-[1.01]"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {/* Rank Number Keycap */}
@@ -13797,7 +13797,7 @@ const PLAYER_COUNTRIES = [
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
                     <span className="text-cyan-400 text-xs">🎬</span>
-                    <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-cyan-200">
+                    <h2 className="text-[11px] font-black uppercase tracking-wider font-display text-amber-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.65)]">
                       Watch Ads & Collect Free
                     </h2>
                   </div>
@@ -13808,7 +13808,7 @@ const PLAYER_COUNTRIES = [
 
                 <div className="grid grid-cols-2 gap-2.5">
                   {/* Ad Option 1: Gold Coins - Glassmorphic Card */}
-                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
+                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/95 to-[#071536]/98 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
                     {/* Skeuomorphic Golden Coin Pedestal Circle */}
                     <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-amber-200 via-amber-400 to-amber-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(245,158,11,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
                       <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-amber-950 via-[#1a0e02] to-amber-900 flex items-center justify-center shadow-inner">
@@ -13835,7 +13835,7 @@ const PLAYER_COUNTRIES = [
                   </div>
 
                   {/* Ad Option 2: Diamonds - Glassmorphic Card */}
-                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
+                  <div className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/95 to-[#071536]/98 backdrop-blur-xl border border-white/20 p-3.5 flex flex-col justify-between items-center text-center shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
                     {/* Skeuomorphic Diamond Pedestal Circle */}
                     <div className="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-b from-cyan-200 via-sky-400 to-blue-700 shadow-[0_5px_15px_rgba(0,0,0,0.6),0_0_14px_rgba(6,182,212,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] mb-2 shrink-0 flex items-center justify-center">
                       <div className="w-full h-full rounded-full p-[1.5px] bg-gradient-to-b from-blue-950 via-[#031533] to-cyan-950 flex items-center justify-center shadow-inner">
@@ -13863,7 +13863,7 @@ const PLAYER_COUNTRIES = [
                 </div>
 
                 {/* Ad Option 3: Big Jackpot Chest Ad - Glassmorphic Banner */}
-                <div className="rounded-[22px] bg-gradient-to-r from-white/[0.10] via-[#1c2c63]/60 to-[#12224d]/80 backdrop-blur-xl border border-white/20 p-2.5 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.4),inset_0_1.5px_0_rgba(255,255,255,0.2)]">
+                <div className="rounded-[22px] bg-gradient-to-r from-white/[0.10] via-[#1c2c63]/95 to-[#12224d]/98 backdrop-blur-xl border border-white/20 p-2.5 flex items-center justify-between shadow-[0_8px_24px_rgba(2,10,32,0.4),inset_0_1.5px_0_rgba(255,255,255,0.2)]">
                   <div className="flex items-center gap-2.5">
                     {/* Skeuomorphic Purple Pedestal */}
                     <div className="relative w-11 h-11 rounded-full p-[2px] bg-gradient-to-b from-purple-200 via-purple-400 to-indigo-700 shadow-[0_4px_12px_rgba(0,0,0,0.6),0_0_12px_rgba(168,85,247,0.35),inset_0_1px_1px_rgba(255,255,255,0.8)] shrink-0 flex items-center justify-center">
@@ -13903,18 +13903,18 @@ const PLAYER_COUNTRIES = [
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
                     <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain" />
-                    <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-amber-200">
+                    <h2 className="text-[11px] font-black uppercase tracking-wider font-display text-amber-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.65)]">
                       Gold Coin Store
                     </h2>
                   </div>
-                  <span className="text-[9px] font-bold text-amber-400/80">
+                  <span className="text-[9px] font-black text-amber-950/90 bg-white/45 px-2 py-0.5 rounded-full border border-amber-900/20">
                     Google Play or Gems
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   {IAP_CATALOG.filter(p => p.type === 'coins').map((pack) => (
-                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
+                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/95 to-[#071536]/98 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-amber-400/40 transition-all">
                       {pack.badge && (
                         <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-amber-200/70 z-10">
                           {pack.badge}
@@ -13969,18 +13969,18 @@ const PLAYER_COUNTRIES = [
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-center gap-1.5">
                     <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain" />
-                    <h2 className="text-[11px] font-extrabold uppercase tracking-wider font-display text-cyan-200">
+                    <h2 className="text-[11px] font-black uppercase tracking-wider font-display text-amber-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.65)]">
                       Diamond Store
                     </h2>
                   </div>
-                  <span className="text-[9px] font-bold text-cyan-400/80">
+                  <span className="text-[9px] font-black text-amber-950/90 bg-white/45 px-2 py-0.5 rounded-full border border-amber-900/20">
                     Premium Gems
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   {IAP_CATALOG.filter(p => p.type === 'gems').map((pack) => (
-                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/70 to-[#071536]/85 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
+                    <div key={pack.id} className="relative rounded-[24px] bg-gradient-to-b from-white/[0.10] via-[#0d2250]/95 to-[#071536]/98 backdrop-blur-xl border border-white/20 p-3 flex flex-col justify-between shadow-[0_10px_28px_rgba(2,10,32,0.45),inset_0_1.5px_0_rgba(255,255,255,0.2)] hover:border-cyan-400/40 transition-all">
                       {pack.badge && (
                         <span className="absolute -top-1.5 right-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-950 font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-tight shadow-sm border border-cyan-200/70 z-10">
                           {pack.badge}
@@ -14090,7 +14090,7 @@ const PLAYER_COUNTRIES = [
       };
 
       return (
-        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans bg-[#173272]">
+        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans bg-[#f59e0b]">
           <PageTransition screenKey={currentScreen} direction={transitionDirection} isWaitingForLoad={isPageLoading}>
             {renderActiveScreen()}
           </PageTransition>
