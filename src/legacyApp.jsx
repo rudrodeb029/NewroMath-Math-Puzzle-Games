@@ -8993,10 +8993,6 @@ const PLAYER_COUNTRIES = [
                       style={{ width: `${monthlyProgressPct}%` }}
                     />
                   </div>
-                  <div className="flex items-center justify-between text-[8.5px] text-slate-300/80 font-medium mt-1">
-                    <span>{completedCount} Days Completed (★)</span>
-                    <span>{Math.max(0, daysInCurrentMonth - completedCount)} Days Remaining</span>
-                  </div>
                 </div>
               </div>
 
