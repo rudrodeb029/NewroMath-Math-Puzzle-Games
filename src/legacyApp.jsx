@@ -8969,9 +8969,6 @@ const PLAYER_COUNTRIES = [
                         <h2 className="text-sm sm:text-base font-black font-display text-white tracking-wide">
                           {currentMonthName} Cup
                         </h2>
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-300/40 backdrop-blur-sm">
-                          SEASON {currentSeasonNum}
-                        </span>
                       </div>
                     </div>
                   </div>
