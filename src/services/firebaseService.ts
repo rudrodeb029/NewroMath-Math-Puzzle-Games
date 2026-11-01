@@ -268,8 +268,8 @@ export function buildLocalPlayerSnapshot(): PlayerCloudSnapshot {
   const playerLevel = Math.max(1, parseInt(localStorage.getItem('newromath_player_level') || '1', 10) || 1);
   const selectedLevelNum = Math.max(1, parseInt(localStorage.getItem('newromath_selected_level') || '1', 10) || 1);
   const playerXp = Math.max(0, parseInt(localStorage.getItem('newromath_player_xp') || '0', 10) || 0);
-  const coins = Math.max(0, parseInt(localStorage.getItem('newromath_coins') || '2450', 10) || 0);
-  const gems = Math.max(0, parseInt(localStorage.getItem('newromath_gems') || '25', 10) || 0);
+  const coins = Math.max(0, parseInt(localStorage.getItem('newromath_coins') || '500', 10) || 0);
+  const gems = Math.max(0, parseInt(localStorage.getItem('newromath_gems') || '50', 10) || 0);
   const isProUser = localStorage.getItem('newromath_is_pro_user') === 'true';
   const dailyCrateLastClaimed = localStorage.getItem('newromath_daily_crate_last_claimed') || '';
 

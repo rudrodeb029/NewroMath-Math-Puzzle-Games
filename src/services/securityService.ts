@@ -93,15 +93,15 @@ export function isProtectedEconomyKey(key: string): boolean {
 }
 
 function readCurrentEconomyFromStorage(getter: (k: string) => string | null) {
-  const rawCoins = parseInt(getter('newromath_coins') ?? '2450', 10);
-  const rawGems = parseInt(getter('newromath_gems') ?? '25', 10);
+  const rawCoins = parseInt(getter('newromath_coins') ?? '500', 10);
+  const rawGems = parseInt(getter('newromath_gems') ?? '50', 10);
   const rawXp = parseInt(getter('newromath_player_xp') ?? '0', 10);
   const rawUnlocked = parseInt(getter('newromath_unlocked_level') ?? '1', 10);
   const rawLevel = parseInt(getter('newromath_player_level') ?? '1', 10);
 
   return {
-    coins: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_COINS, Number.isFinite(rawCoins) ? rawCoins : 2450)),
-    gems: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_GEMS, Number.isFinite(rawGems) ? rawGems : 25)),
+    coins: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_COINS, Number.isFinite(rawCoins) ? rawCoins : 500)),
+    gems: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_GEMS, Number.isFinite(rawGems) ? rawGems : 50)),
     xp: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_XP, Number.isFinite(rawXp) ? rawXp : 0)),
     unlockedLevel: Math.max(1, Math.min(ECONOMY_LIMITS.MAX_LEVEL, Number.isFinite(rawUnlocked) ? rawUnlocked : 1)),
     playerLevel: Math.max(1, Math.min(25, Number.isFinite(rawLevel) ? rawLevel : 1)),

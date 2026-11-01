@@ -4566,17 +4566,17 @@ const PLAYER_COUNTRIES = [
       const [coins, setCoins] = useState(() => {
         try {
           const saved = GameStorage.getItem('newromath_coins');
-          return saved ? Math.max(0, parseInt(saved, 10)) : 2450;
+          return saved ? Math.max(0, parseInt(saved, 10)) : 500;
         } catch (e) {
-          return 2450;
+          return 500;
         }
       });
       const [gems, setGems] = useState(() => {
         try {
           const saved = GameStorage.getItem('newromath_gems');
-          return saved ? Math.max(0, parseInt(saved, 10)) : 25;
+          return saved ? Math.max(0, parseInt(saved, 10)) : 50;
         } catch (e) {
-          return 25;
+          return 50;
         }
       });
       const [selectedLevelNum, setSelectedLevelNum] = useState(() => {
