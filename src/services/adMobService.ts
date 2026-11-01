@@ -1,8 +1,11 @@
-// Google AdMob Service — Instant Preloaded Rewarded Ads + Fixed-Height Banner Ads
-// All unsolicited popup Interstitial Ads remain disabled across the entire app.
+// Google AdMob Service — Official Demo/Test Banner, Interstitial & Rewarded Video Ads
 import { Capacitor } from '@capacitor/core';
 import {
   AdMob,
+  BannerAdPosition,
+  BannerAdSize,
+  BannerAdPluginEvents,
+  InterstitialAdPluginEvents,
   RewardAdPluginEvents,
   AdMobRewardItem,
 } from '@capacitor-community/admob';
@@ -31,7 +34,12 @@ class AdMobService {
   private isInitialized: boolean = false;
   private bannerVisible: boolean = true;
   private interstitialActive: boolean = false;
+  private interstitialReady: boolean = false;
+  private isPreloadingInterstitial: boolean = false;
+  private interstitialPreloadPromise: Promise<boolean> | null = null;
   private lastInterstitialTime: number = 0;
+  private readonly INTERSTITIAL_COOLDOWN_MS = 45000;
+  private pendingInterstitialCallback: (() => void) | null = null;
   private adsDisabled: boolean = false;
   private rewardedReady: boolean = false;
   private isPreloadingRewarded: boolean = false;
@@ -55,9 +63,13 @@ class AdMobService {
   public setAdsDisabled(disabled: boolean) {
     this.adsDisabled = disabled;
     this.bannerVisible = !disabled;
-    this.interstitialActive = false;
-    if (disabled && this.isNative) {
-      AdMob.hideBanner().catch(() => {});
+    if (disabled) {
+      this.interstitialActive = false;
+      if (this.isNative) {
+        AdMob.hideBanner().catch(() => {});
+      }
+    } else if (this.isNative && this.isInitialized) {
+      this.showBanner().catch(() => {});
     }
     this.notify();
   }
@@ -79,7 +91,7 @@ class AdMobService {
       isInitialized: this.isInitialized,
       isNative: this.isNative,
       bannerVisible: this.adsDisabled ? false : this.bannerVisible,
-      interstitialActive: false,
+      interstitialActive: this.adsDisabled ? false : this.interstitialActive,
       lastInterstitialTime: this.lastInterstitialTime,
       rewardedReady: this.rewardedReady,
     };
@@ -96,7 +108,7 @@ class AdMobService {
     });
   }
 
-  // Initialize AdMob, enable bottom Banner, and immediately preload Rewarded Video Ad in background
+  // Initialize AdMob, display Demo Banner at bottom, and preload Interstitial + Rewarded Ads
   public async initialize(): Promise<void> {
     if (this.isInitialized && this.isNative) return;
 
@@ -106,7 +118,61 @@ class AdMobService {
           initializeForTesting: true,
         });
 
-        // Automatically warm up the next Rewarded Ad whenever one finishes or fails
+        // Banner listeners
+        AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
+          this.bannerVisible = !this.adsDisabled;
+          this.notify();
+        });
+
+        AdMob.addListener(BannerAdPluginEvents.FailedToLoad, (err) => {
+          console.warn('[AdMob Native] Banner failed to load:', err);
+        });
+
+        // Interstitial listeners
+        AdMob.addListener(InterstitialAdPluginEvents.Loaded, () => {
+          this.interstitialReady = true;
+          this.isPreloadingInterstitial = false;
+        });
+
+        AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+          this.interstitialActive = false;
+          this.interstitialReady = false;
+          this.lastInterstitialTime = Date.now();
+          this.notify();
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('nm-webview-repaint'));
+          }
+          if (this.pendingInterstitialCallback) {
+            const cb = this.pendingInterstitialCallback;
+            this.pendingInterstitialCallback = null;
+            cb();
+          }
+          setTimeout(() => {
+            this.preloadInterstitial().catch(() => {});
+          }, 400);
+        });
+
+        AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => {
+          this.interstitialReady = false;
+          this.isPreloadingInterstitial = false;
+        });
+
+        AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
+          this.interstitialActive = false;
+          this.interstitialReady = false;
+          this.isPreloadingInterstitial = false;
+          this.notify();
+          if (this.pendingInterstitialCallback) {
+            const cb = this.pendingInterstitialCallback;
+            this.pendingInterstitialCallback = null;
+            cb();
+          }
+          setTimeout(() => {
+            this.preloadInterstitial().catch(() => {});
+          }, 500);
+        });
+
+        // Rewarded listeners
         AdMob.addListener(RewardAdPluginEvents.Loaded, () => {
           this.rewardedReady = true;
           this.isPreloadingRewarded = false;
@@ -116,7 +182,6 @@ class AdMobService {
         AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
           this.rewardedReady = false;
           this.notify();
-          // Preload next ad immediately in background so next click has 0ms delay
           setTimeout(() => {
             this.preloadRewarded().catch(() => {});
           }, 300);
@@ -141,7 +206,11 @@ class AdMobService {
         this.bannerVisible = !this.adsDisabled;
         this.notify();
 
-        // Preload first Rewarded Video Ad right away in the background
+        // Show Demo Bottom Banner and preload Demo Interstitial + Rewarded Ads
+        if (!this.adsDisabled) {
+          this.showBanner().catch(() => {});
+          this.preloadInterstitial().catch(() => {});
+        }
         this.preloadRewarded().catch(() => {});
       } catch (e) {
         console.warn('[AdMob] Native initialization fallback:', e);
@@ -153,9 +222,45 @@ class AdMobService {
     } else {
       this.isInitialized = true;
       this.bannerVisible = !this.adsDisabled;
+      this.interstitialReady = true;
       this.rewardedReady = true;
       this.notify();
     }
+  }
+
+  // Background preload for Interstitial Ads
+  public async preloadInterstitial(): Promise<boolean> {
+    if (this.adsDisabled) return false;
+    if (!this.isNative) {
+      this.interstitialReady = true;
+      return true;
+    }
+    if (this.interstitialReady) return true;
+    if (this.isPreloadingInterstitial && this.interstitialPreloadPromise) {
+      return this.interstitialPreloadPromise;
+    }
+
+    this.isPreloadingInterstitial = true;
+    this.interstitialPreloadPromise = (async () => {
+      try {
+        await AdMob.prepareInterstitial({
+          adId: ADMOB_DEMO_IDS.interstitial,
+          isTesting: true,
+        });
+        this.interstitialReady = true;
+        this.isPreloadingInterstitial = false;
+        return true;
+      } catch (err) {
+        console.warn('[AdMob] Background preloadInterstitial failed:', err);
+        this.interstitialReady = false;
+        this.isPreloadingInterstitial = false;
+        return false;
+      } finally {
+        this.interstitialPreloadPromise = null;
+      }
+    })();
+
+    return this.interstitialPreloadPromise;
   }
 
   // Background preload for Rewarded Video Ads so clicking "Watch Ad" opens with 0ms delay
@@ -194,7 +299,7 @@ class AdMobService {
     return this.preloadPromise;
   }
 
-  // Show fixed-height bottom Banner Ad without resizing the native WebView surface
+  // Show fixed-height bottom Demo Banner Ad
   public async showBanner(): Promise<boolean> {
     if (this.adsDisabled) {
       this.bannerVisible = false;
@@ -203,6 +308,22 @@ class AdMobService {
     }
     this.bannerVisible = true;
     this.notify();
+
+    if (this.isNative) {
+      try {
+        await AdMob.showBanner({
+          adId: ADMOB_DEMO_IDS.banner,
+          adSize: BannerAdSize.ADAPTIVE_BANNER,
+          position: BannerAdPosition.BOTTOM_CENTER,
+          margin: 0,
+          isTesting: true,
+        });
+        return true;
+      } catch (err) {
+        console.warn('[AdMob Native] Failed to show banner:', err);
+        return false;
+      }
+    }
     return true;
   }
 
@@ -217,21 +338,61 @@ class AdMobService {
     return true;
   }
 
-  // Unsolicited popup Interstitial ads remain disabled everywhere; immediately invoke onClose
+  // Show Demo AdMob Interstitial Ad (Native or Web Modal fallback)
   public async showInterstitial(options?: { force?: boolean; onClose?: () => void }): Promise<boolean> {
-    this.interstitialActive = false;
-    if (options?.onClose) {
-      options.onClose();
+    if (this.adsDisabled) {
+      if (options?.onClose) options.onClose();
+      return false;
     }
-    return false;
+
+    const now = Date.now();
+    const timeSinceLast = now - this.lastInterstitialTime;
+
+    if (!options?.force && this.lastInterstitialTime > 0 && timeSinceLast < this.INTERSTITIAL_COOLDOWN_MS) {
+      if (options?.onClose) options.onClose();
+      return false;
+    }
+
+    if (this.isNative) {
+      try {
+        if (!this.interstitialReady) {
+          const readyInTime = await Promise.race([
+            this.preloadInterstitial(),
+            new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 650)),
+          ]);
+          if (!readyInTime) {
+            // Fall back to in-app demo interstitial modal if native network is slow
+            this.preloadInterstitial().catch(() => {});
+            this.pendingInterstitialCallback = options?.onClose || null;
+            this.interstitialActive = true;
+            this.notify();
+            return true;
+          }
+        }
+
+        this.pendingInterstitialCallback = options?.onClose || null;
+        this.interstitialReady = false;
+        this.interstitialActive = true;
+        this.notify();
+        await AdMob.showInterstitial();
+        return true;
+      } catch (err) {
+        console.warn('[AdMob Native] Interstitial display error, using demo modal fallback:', err);
+        this.interstitialReady = false;
+        this.pendingInterstitialCallback = options?.onClose || null;
+        this.interstitialActive = true;
+        this.notify();
+        return true;
+      }
+    } else {
+      // Web / Demo Preview Mode
+      this.pendingInterstitialCallback = options?.onClose || null;
+      this.interstitialActive = true;
+      this.notify();
+      return true;
+    }
   }
 
-  /**
-   * Show Rewarded Video Ad immediately.
-   * - If native ad is already preloaded (`rewardedReady === true`), launches in 0ms.
-   * - If not yet preloaded, waits at most 650ms for preload; if still not ready, returns false
-   *   so the caller immediately displays the zero-flash dark in-app Rewarded Ad modal.
-   */
   public async showRewarded(onReward?: (reward?: AdMobRewardItem) => void): Promise<boolean> {
     if (!this.isNative) {
       return false; // Caller opens instant in-app AdMobRewardedModal
@@ -239,13 +400,11 @@ class AdMobService {
 
     try {
       if (!this.rewardedReady) {
-        // Wait at most 650ms so user never experiences a multi-second freeze or delay
         const readyInTime = await Promise.race([
           this.preloadRewarded(),
           new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 650)),
         ]);
         if (!readyInTime) {
-          // Trigger background preload for next time and fall back to instant in-app modal now
           this.preloadRewarded().catch(() => {});
           return false;
         }
@@ -266,7 +425,6 @@ class AdMobService {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('nm-webview-repaint'));
       }
-      // Warm up next ad in background
       setTimeout(() => {
         this.preloadRewarded().catch(() => {});
       }, 400);
@@ -283,11 +441,13 @@ class AdMobService {
 
   public dismissWebInterstitial() {
     this.interstitialActive = false;
+    this.lastInterstitialTime = Date.now();
     this.notify();
-  }
-
-  public async preloadInterstitial(): Promise<void> {
-    // No-op: unsolicited interstitials disabled
+    if (this.pendingInterstitialCallback) {
+      const cb = this.pendingInterstitialCallback;
+      this.pendingInterstitialCallback = null;
+      cb();
+    }
   }
 }
 

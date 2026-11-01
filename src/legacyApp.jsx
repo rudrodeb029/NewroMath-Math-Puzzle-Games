@@ -257,7 +257,7 @@ import './index.css';
 import { adMobService } from './services/adMobService';
 import { purchaseService, IAP_CATALOG } from './services/purchaseService';
 import { initFirebaseCloudSync, scheduleFirebaseSync, syncPlayerToFirebaseNow, submitFeedbackTicketToFirebase } from './services/firebaseService';
-import { AdMobBanner, AdMobRewardedModal } from './components/AdMobComponents';
+import { AdMobBanner, AdMobInterstitialModal, AdMobRewardedModal } from './components/AdMobComponents';
 import { clampEconomyValue, isProtectedEconomyKey, updateEconomySeal } from './services/securityService';
 import {
   Volume2,
@@ -5267,8 +5267,12 @@ const PLAYER_COUNTRIES = [
       const continueToNextStage = () => {
         sound.click();
         setIsCorrectModalOpen(false);
-        resetPuzzle(selectedLevelNum);
-        navigateTo('game');
+        adMobService.showInterstitial({
+          onClose: () => {
+            resetPuzzle(selectedLevelNum);
+            navigateTo('game');
+          }
+        });
       };
 
       // Retry the same puzzle after a wrong answer
@@ -7321,7 +7325,7 @@ const PLAYER_COUNTRIES = [
                 <button 
                   onClick={() => {
                     sound.click();
-                    setShowMainInstructionsModal(true);
+                    adMobService.showInterstitial({ force: true, onClose: () => setShowMainInstructionsModal(true) });
                   }} 
                   aria-label="Mission Instructions & How to Play" 
                   title="Mission Instructions" 
@@ -8406,7 +8410,10 @@ const PLAYER_COUNTRIES = [
                       onClick={() => {
                         sound.click();
                         setIsCorrectModalOpen(false);
-                        attemptStartLevel(Math.min(25, selectedLevelNum));
+                        adMobService.showInterstitial({
+                          force: true,
+                          onClose: () => attemptStartLevel(Math.min(25, selectedLevelNum))
+                        });
                       }}
                       aria-label="Next Mission"
                       className="w-full h-12 rounded-full bg-gradient-to-b from-[#4ade80] via-[#22c55e] to-[#15803d] border-2 border-emerald-200/90 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-[0_4px_0_#14532d,0_8px_20px_rgba(34,197,94,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#14532d] transition-all cursor-pointer"
@@ -10289,7 +10296,7 @@ const PLAYER_COUNTRIES = [
                 <button 
                   onClick={() => {
                     sound.click();
-                    setShowDailyInstructionsModal(true);
+                    adMobService.showInterstitial({ force: true, onClose: () => setShowDailyInstructionsModal(true) });
                   }} 
                   aria-label="Mission Instructions & How to Play" 
                   className="relative grid h-[54px] w-[54px] place-items-center rounded-2xl bg-gradient-to-b from-[#fbbf24] via-[#f59e0b] to-[#d97706] border-2 border-yellow-200 shadow-[0_4px_0_#92400e,0_8px_24px_rgba(245,158,11,0.65),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:scale-105 active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all cursor-pointer"
@@ -10737,7 +10744,7 @@ const PLAYER_COUNTRIES = [
                     onClick={() => {
                       sound.click();
                       setDailyGameVictoryModal(false);
-                      navigateTo('daily');
+                      adMobService.showInterstitial({ force: true, onClose: () => navigateTo('daily') });
                     }}
                     className="w-full h-12 rounded-full bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] border-2 border-emerald-200/90 text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center shadow-[0_4px_0_#064e3b,0_8px_20px_rgba(16,185,129,0.4),inset_0_2px_3px_rgba(255,255,255,0.7)] hover:brightness-105 active:translate-y-1 active:shadow-[0_1px_0_#064e3b] transition-all cursor-pointer"
                   >
@@ -14381,6 +14388,12 @@ const PLAYER_COUNTRIES = [
           {adMobState.bannerVisible && currentScreen !== 'splash' && currentScreen !== 'onboarding' && (
             <AdMobBanner isNative={adMobState.isNative} />
           )}
+
+          {/* Google AdMob Demo Interstitial Ad Modal */}
+          <AdMobInterstitialModal
+            isOpen={adMobState.interstitialActive}
+            onClose={() => adMobService.dismissWebInterstitial()}
+          />
 
           {/* Google AdMob Rewarded Video Ad Modal */}
           <AdMobRewardedModal
