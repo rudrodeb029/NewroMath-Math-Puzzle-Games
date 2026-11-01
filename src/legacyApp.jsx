@@ -13907,24 +13907,12 @@ const PLAYER_COUNTRIES = [
                         </span>
                       </div>
 
-                      <div className="space-y-1 mt-2.5">
-                        {pack.gemsCost && (
-                          <button
-                            onClick={() => handleExchangeCoins(pack.gemsCost, pack.amount)}
-                            className="w-full py-1.5 rounded-xl bg-gradient-to-r from-[#0c245c] to-[#123075] hover:brightness-110 border border-cyan-400/50 text-[10px] font-bold text-cyan-200 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer shadow-xs"
-                            title="Exchange with Gems"
-                          >
-                            <img src="/assets/icon_gem_3d_clean.webp" alt="Gem" className="w-3 h-3 object-contain" />
-                            <span>{pack.gemsCost} Gems</span>
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleBuyPackage(pack.id)}
-                          className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#b45309] border border-amber-200/80 flex items-center justify-center gap-1"
-                        >
-                          <span>{purchaseService.getPrice(pack.id)}</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleBuyPackage(pack.id)}
+                        className="w-full mt-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 text-[10px] font-black active:scale-95 transition-all cursor-pointer shadow-[0_2px_0_#b45309] border border-amber-200/80 flex items-center justify-center gap-1"
+                      >
+                        <span>{purchaseService.getPrice(pack.id)}</span>
+                      </button>
                     </div>
                   ))}
                 </div>
