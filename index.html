@@ -289,25 +289,25 @@
     /* Direction: Forward (Next screen slides in from right to left, old slides out to left) */
     .page-anim-in-forward {
       z-index: 2;
-      animation: pageSlideInFromRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
-      -webkit-animation: pageSlideInFromRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation: pageSlideInFromRight 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      -webkit-animation: pageSlideInFromRight 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .page-anim-out-forward {
       z-index: 1;
-      animation: pageSlideOutToLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
-      -webkit-animation: pageSlideOutToLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation: pageSlideOutToLeft 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      -webkit-animation: pageSlideOutToLeft 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
 
     /* Direction: Back (Previous screen slides in from left to right, old slides out to right) */
     .page-anim-in-back {
       z-index: 1;
-      animation: pageSlideInFromLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
-      -webkit-animation: pageSlideInFromLeft 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation: pageSlideInFromLeft 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      -webkit-animation: pageSlideInFromLeft 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .page-anim-out-back {
       z-index: 3;
-      animation: pageSlideOutToRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
-      -webkit-animation: pageSlideOutToRight 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation: pageSlideOutToRight 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      -webkit-animation: pageSlideOutToRight 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
 
     /* Hint Screen: Slide Up / Down */
@@ -331,16 +331,31 @@
     .page-anim-in-hint {
       z-index: 3;
       background: transparent !important;
-      animation: hintSlideInUp 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
-      -webkit-animation: hintSlideInUp 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation: hintSlideInUp 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      -webkit-animation: hintSlideInUp 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .page-anim-out-hint {
       z-index: 3;
-      animation: hintSlideOutDown 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
-      -webkit-animation: hintSlideOutDown 280ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation: hintSlideOutDown 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      -webkit-animation: hintSlideOutDown 300ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .page-transition-layer.hint-layer {
       background: transparent;
+    }
+
+
+    /* Smooth transition helpers (compositor-only: transform/opacity) */
+    .page-anim-in-forward, .page-anim-in-back, .page-anim-in-hint, .page-anim-out-forward, .page-anim-out-back, .page-anim-out-hint {
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      contain: layout paint;
+    }
+    .page-transition-outgoing { pointer-events: none; }
+    @keyframes pageFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .page-anim-in-fade { animation: pageFadeIn 120ms linear both; }
+    @media (prefers-reduced-motion: reduce) {
+      .page-anim-in-forward, .page-anim-in-back { animation-duration: 1ms !important; }
     }
 
     /* Result Screens (Correct / Wrong) */

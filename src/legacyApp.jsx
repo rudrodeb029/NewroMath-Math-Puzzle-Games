@@ -984,11 +984,100 @@ const PLAYER_COUNTRIES = [
       }
     }
 
-    function PageTransition({ screenKey, children }) {
+    function PageTransition({ screenKey, direction, children }) {
+      const stageRef = useRef(null);
+      const layerRef = useRef(null);
+      const prevKeyRef = useRef(screenKey);
+      const prevScreenRef = useRef(null);
+      const cloneRef = useRef(null);
+      const cleanupRef = useRef(null);
       const isHintLayer = screenKey === 'hint';
+
+      // Render phase: DOM still shows the OLD screen -> snapshot it (zero React re-render cost, no ref clashes)
+      if (prevKeyRef.current !== screenKey) {
+        if (layerRef.current) {
+          try { cloneRef.current = layerRef.current.cloneNode(true); } catch (e) { cloneRef.current = null; }
+        }
+        prevScreenRef.current = prevKeyRef.current;
+        prevKeyRef.current = screenKey;
+      }
+
+      useLayoutEffect(() => {
+        const clone = cloneRef.current;
+        cloneRef.current = null;
+        const stage = stageRef.current;
+        const incoming = layerRef.current;
+        if (!clone || !stage || !incoming) return undefined;
+
+        if (cleanupRef.current) cleanupRef.current(); // finish any running transition instantly
+
+        const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const leavingHint = prevScreenRef.current === 'hint';
+        const enteringHint = screenKey === 'hint';
+        const back = direction === 'back';
+
+        let inClass = back ? 'page-anim-in-back' : 'page-anim-in-forward';
+        let outClass = back ? 'page-anim-out-back' : 'page-anim-out-forward';
+        if (enteringHint) { inClass = 'page-anim-in-hint'; outClass = ''; }
+        else if (leavingHint) { inClass = ''; outClass = 'page-anim-out-hint'; }
+        if (reduced) { inClass = 'page-anim-in-fade'; outClass = ''; }
+
+        clone.classList.remove('page-transition-current', 'hint-layer', 'page-anim-in-forward', 'page-anim-in-back', 'page-anim-in-hint');
+        clone.classList.add('page-transition-outgoing');
+        clone.setAttribute('aria-hidden', 'true');
+        clone.setAttribute('inert', '');
+        clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+        stage.appendChild(clone);
+        stage.style.pointerEvents = 'none'; // input lock while sliding
+
+        let done = false;
+        let fallback = null;
+        let decodeTimer = null;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          clearTimeout(fallback);
+          clearTimeout(decodeTimer);
+          incoming.removeEventListener('animationend', onEnd);
+          if (inClass) incoming.classList.remove(inClass);
+          incoming.style.visibility = '';
+          if (clone.parentNode) clone.parentNode.removeChild(clone);
+          stage.style.pointerEvents = '';
+          cleanupRef.current = null;
+        };
+        const onEnd = (e) => { if (e.target === incoming) finish(); };
+        cleanupRef.current = finish;
+
+        const run = () => {
+          if (done) return;
+          incoming.style.visibility = '';
+          incoming.addEventListener('animationend', onEnd);
+          if (outClass) clone.classList.add(outClass);
+          if (inClass) incoming.classList.add(inClass);
+          fallback = setTimeout(finish, 460);
+          if (!inClass && !outClass) finish();
+        };
+
+        // Pre-decode incoming images (max 120ms) so nothing pops in mid-slide
+        const pending = Array.from(incoming.querySelectorAll('img')).filter(img => img.getAttribute('loading') !== 'lazy' && !img.complete);
+        if (pending.length === 0) {
+          run();
+        } else {
+          incoming.style.visibility = 'hidden';
+          let started = false;
+          const go = () => { if (!started) { started = true; run(); } };
+          decodeTimer = setTimeout(go, 120);
+          Promise.all(pending.map(img => (img.decode ? img.decode().catch(() => {}) : Promise.resolve()))).then(go);
+        }
+        return undefined;
+      }, [screenKey]);
+
+      useEffect(() => () => { if (cleanupRef.current) cleanupRef.current(); }, []);
+
       return (
-        <div className="page-transition-stage">
+        <div ref={stageRef} className="page-transition-stage">
           <div
+            ref={layerRef}
             key={`current-${screenKey}`}
             className={`page-transition-layer page-transition-current ${isHintLayer ? 'hint-layer' : ''}`}
           >
