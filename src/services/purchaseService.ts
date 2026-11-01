@@ -28,7 +28,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'pro',
     amount: 1,
     name: 'PRO VIP Lifetime Pass',
-    defaultPrice: '$2.99',
+    defaultPrice: '$1.99',
     badge: 'POPULAR VIP',
     icon: '👑',
     isConsumable: false,
@@ -41,7 +41,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'coins',
     amount: 1500,
     name: 'Handful of Gold',
-    defaultPrice: '$0.99',
+    defaultPrice: '$0.49',
     badge: null,
     isCustomImg: true,
     customIcon: '/assets/icon_gold_coin_3d_clean.webp',
@@ -54,7 +54,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'coins',
     amount: 5000,
     name: 'Pouch of Gold',
-    defaultPrice: '$1.99',
+    defaultPrice: '$0.99',
     badge: 'POPULAR',
     isCustomImg: true,
     customIcon: '/assets/awards/award_lvl_07.webp',
@@ -67,7 +67,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'coins',
     amount: 15000,
     name: 'Chest of Gold',
-    defaultPrice: '$4.99',
+    defaultPrice: '$1.99',
     badge: 'BEST VALUE',
     isCustomImg: true,
     customIcon: '/assets/icon_chest_3d.webp',
@@ -80,7 +80,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'coins',
     amount: 45000,
     name: 'Vault of Gold',
-    defaultPrice: '$9.99',
+    defaultPrice: '$3.99',
     badge: 'MEGA PACK',
     isCustomImg: true,
     customIcon: '/assets/awards/award_lvl_20.webp',
@@ -95,7 +95,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'gems',
     amount: 50,
     name: 'Pile of Gems',
-    defaultPrice: '$0.99',
+    defaultPrice: '$0.49',
     badge: null,
     isCustomImg: true,
     customIcon: '/assets/icon_gem_3d_clean.webp',
@@ -107,7 +107,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'gems',
     amount: 200,
     name: 'Crystal Casket',
-    defaultPrice: '$2.99',
+    defaultPrice: '$0.99',
     badge: 'HOT',
     isCustomImg: true,
     customIcon: '/assets/awards/award_lvl_18.webp',
@@ -119,7 +119,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'gems',
     amount: 600,
     name: 'Crown of Gems',
-    defaultPrice: '$6.99',
+    defaultPrice: '$2.49',
     badge: 'POPULAR',
     isCustomImg: true,
     customIcon: '/assets/awards/award_lvl_23.webp',
@@ -131,7 +131,7 @@ export const IAP_CATALOG: IAPProductConfig[] = [
     type: 'gems',
     amount: 2000,
     name: 'Diamond Mountain',
-    defaultPrice: '$19.99',
+    defaultPrice: '$4.99',
     badge: 'BEST DEAL',
     isCustomImg: true,
     customIcon: '/assets/awards/award_lvl_15.webp',
@@ -159,6 +159,7 @@ class PurchaseService {
   private isLoading: boolean = false;
   private isProUser: boolean = false;
   private prices: Record<string, string> = {};
+  private liveStoreSkus: Set<string> = new Set();
   private activePurchaseSku: string | null = null;
   private errorMessage: string | null = null;
   private listeners: PurchaseListener[] = [];
@@ -236,8 +237,11 @@ class PurchaseService {
 
           if (productsRes && productsRes.products && productsRes.products.length > 0) {
             productsRes.products.forEach((prod: Product) => {
-              if (prod.identifier && prod.priceString) {
-                this.prices[prod.identifier] = prod.priceString;
+              if (prod.identifier) {
+                this.liveStoreSkus.add(prod.identifier);
+                if (prod.priceString) {
+                  this.prices[prod.identifier] = prod.priceString;
+                }
               }
             });
             console.log('[IAP] Real prices loaded from Google Play Store:', this.prices);
@@ -307,7 +311,7 @@ class PurchaseService {
     this.errorMessage = null;
     this.notify();
 
-    if (this.isNative && this.isSupported) {
+    if (this.isNative && this.isSupported && this.liveStoreSkus.has(sku)) {
       try {
         const transaction = await NativePurchases.purchaseProduct({
           productIdentifier: sku,
@@ -354,7 +358,7 @@ class PurchaseService {
         };
       }
     } else {
-      // Development / Web Preview Fallback Simulation
+      // Development / Sideloaded APK / Web Preview Fallback Simulation
       return new Promise(resolve => {
         setTimeout(() => {
           if (sku === 'newromath_pro_noads') {
@@ -376,7 +380,7 @@ class PurchaseService {
             sku,
             transactionId: 'simulated_tx_' + Date.now()
           });
-        }, 1200);
+        }, 650);
       });
     }
   }

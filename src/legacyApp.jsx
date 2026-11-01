@@ -13733,11 +13733,11 @@ const PLAYER_COUNTRIES = [
                     <span className="text-[9.5px] font-bold text-slate-200">Remove Ads Forever</span>
                   </div>
                   <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
-                    <span className="text-sm">🪙</span>
+                    <img src="/assets/icon_gold_coin_3d_clean.webp" alt="Coins" className="w-4 h-4 object-contain shrink-0" />
                     <span className="text-[9.5px] font-bold text-amber-300">+2,000 Bonus Coins</span>
                   </div>
                   <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
-                    <span className="text-sm">💎</span>
+                    <img src="/assets/icon_gem_3d_clean.webp" alt="Diamonds" className="w-4 h-4 object-contain shrink-0" />
                     <span className="text-[9.5px] font-bold text-cyan-200">+50 Bonus Diamonds</span>
                   </div>
                   <div className="p-2 rounded-xl bg-white/[0.06] border border-white/10 flex items-center gap-1.5">
