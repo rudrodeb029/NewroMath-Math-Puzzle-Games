@@ -973,7 +973,15 @@ const PLAYER_COUNTRIES = [
     const GameStorage = new FastGameStorage();
     if (typeof window !== 'undefined') {
       window.GameStorage = GameStorage;
-      setTimeout(() => { void initFirebaseCloudSync(GameStorage.cache); }, 300);
+      {
+        const startSync = () => { void initFirebaseCloudSync(GameStorage.cache); };
+        const afterLoad = () => {
+          if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(startSync, { timeout: 4000 });
+          else setTimeout(startSync, 2500);
+        };
+        if (document.readyState === 'complete') setTimeout(afterLoad, 1500);
+        else window.addEventListener('load', () => setTimeout(afterLoad, 1500), { once: true });
+      }
     }
 
     function PageTransition({ screenKey, children }) {
@@ -6363,7 +6371,7 @@ const PLAYER_COUNTRIES = [
               <img 
                 src="/assets/card_continue_clean_bg.webp" 
                 alt="Continue" 
-                loading="lazy"
+
                 decoding="async"
                 className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]" 
               />
@@ -6400,7 +6408,7 @@ const PLAYER_COUNTRIES = [
               <img 
                 src="/assets/card_newgame_clean_bg.webp" 
                 alt="New Game" 
-                loading="lazy"
+
                 decoding="async"
                 className="w-full h-auto object-contain block pointer-events-none drop-shadow-[0_4px_10px_rgba(0,0,0,0.4)]" 
               />
