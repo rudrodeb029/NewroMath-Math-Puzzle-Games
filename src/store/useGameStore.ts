@@ -686,17 +686,16 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   triggerAd: (type, onDone) => {
-    set({ activeModal: 'ad', adInfo: { type, timer: 3 } });
     if (type === 'rewarded') {
       adMobService.showRewarded(() => {
         if (onDone) onDone();
       });
     } else {
-      adMobService.showInterstitial();
-      setTimeout(() => {
-        set({ activeModal: 'none', adInfo: null });
-        if (onDone) onDone();
-      }, 2500);
+      adMobService.showInterstitial({
+        onClose: () => {
+          if (onDone) onDone();
+        },
+      });
     }
   }
 }));

@@ -338,7 +338,7 @@ class AdMobService {
     return true;
   }
 
-  // Show Demo AdMob Interstitial Ad (Native or Web Modal fallback)
+  // Show Demo AdMob Interstitial Ad (Native only; no custom code fallback ads)
   public async showInterstitial(options?: { force?: boolean; onClose?: () => void }): Promise<boolean> {
     if (this.adsDisabled) {
       if (options?.onClose) options.onClose();
@@ -358,54 +358,51 @@ class AdMobService {
         if (!this.interstitialReady) {
           const readyInTime = await Promise.race([
             this.preloadInterstitial(),
-            new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 650)),
+            new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 800)),
           ]);
           if (!readyInTime) {
-            // Fall back to in-app demo interstitial modal if native network is slow
+            // Preload for next time, but do not show custom mock ad
             this.preloadInterstitial().catch(() => {});
-            this.pendingInterstitialCallback = options?.onClose || null;
-            this.interstitialActive = true;
-            this.notify();
-            return true;
+            if (options?.onClose) options.onClose();
+            return false;
           }
         }
 
         this.pendingInterstitialCallback = options?.onClose || null;
         this.interstitialReady = false;
-        this.interstitialActive = true;
-        this.notify();
         await AdMob.showInterstitial();
+        this.lastInterstitialTime = Date.now();
         return true;
       } catch (err) {
-        console.warn('[AdMob Native] Interstitial display error, using demo modal fallback:', err);
+        console.warn('[AdMob Native] Interstitial display error:', err);
         this.interstitialReady = false;
-        this.pendingInterstitialCallback = options?.onClose || null;
-        this.interstitialActive = true;
-        this.notify();
-        return true;
+        if (options?.onClose) options.onClose();
+        return false;
       }
     } else {
-      // Web / Demo Preview Mode
-      this.pendingInterstitialCallback = options?.onClose || null;
-      this.interstitialActive = true;
-      this.notify();
+      // In web/desktop preview: do not show custom simulated ads
+      if (options?.onClose) options.onClose();
       return true;
     }
   }
 
   public async showRewarded(onReward?: (reward?: AdMobRewardItem) => void): Promise<boolean> {
     if (!this.isNative) {
-      return false; // Caller opens instant in-app AdMobRewardedModal
+      // In web/preview: grant reward directly without simulated custom ads
+      if (onReward) onReward();
+      return true;
     }
 
     try {
       if (!this.rewardedReady) {
         const readyInTime = await Promise.race([
           this.preloadRewarded(),
-          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 650)),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 800)),
         ]);
         if (!readyInTime) {
           this.preloadRewarded().catch(() => {});
+          // If native test ad is not ready, grant reward without showing custom mock ads
+          if (onReward) onReward();
           return false;
         }
       }
@@ -430,11 +427,12 @@ class AdMobService {
       }, 400);
       return true;
     } catch (err) {
-      console.warn('[AdMob Native] showRewarded error, falling back to instant modal:', err);
+      console.warn('[AdMob Native] showRewarded error:', err);
       this.rewardedReady = false;
       setTimeout(() => {
         this.preloadRewarded().catch(() => {});
       }, 500);
+      if (onReward) onReward();
       return false;
     }
   }

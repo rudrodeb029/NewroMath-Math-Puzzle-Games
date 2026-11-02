@@ -4842,17 +4842,17 @@ const PLAYER_COUNTRIES = [
         setAdReward(payload);
 
         if (adMobState.isNative) {
-          // Native Android: launch preloaded AdMob Rewarded Video immediately, or fall back to zero-flash modal
+          // Native Android: launch preloaded Google AdMob Rewarded Video
           adMobService.showRewarded(() => {
             handleClaimAdReward(payload);
           }).then((shownNatively) => {
             if (!shownNatively) {
-              setAdModalOpen(true);
+              handleClaimAdReward(payload);
             }
           });
         } else {
-          // Web / Browser Preview: show instant zero-flash AdMob Rewarded Video modal
-          setAdModalOpen(true);
+          // Web / Preview: directly claim reward without custom fake ad
+          handleClaimAdReward(payload);
         }
       };
 
@@ -14388,20 +14388,6 @@ const PLAYER_COUNTRIES = [
           {adMobState.bannerVisible && currentScreen !== 'splash' && currentScreen !== 'onboarding' && (
             <AdMobBanner isNative={adMobState.isNative} />
           )}
-
-          {/* Google AdMob Demo Interstitial Ad Modal */}
-          <AdMobInterstitialModal
-            isOpen={adMobState.interstitialActive}
-            onClose={() => adMobService.dismissWebInterstitial()}
-          />
-
-          {/* Google AdMob Rewarded Video Ad Modal */}
-          <AdMobRewardedModal
-            isOpen={adModalOpen}
-            onClose={() => setAdModalOpen(false)}
-            onReward={handleClaimAdReward}
-            rewardInfo={adReward}
-          />
         </div>
       );
     }

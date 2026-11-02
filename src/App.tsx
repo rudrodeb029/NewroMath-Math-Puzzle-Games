@@ -12,7 +12,6 @@ import { StatsModal } from './components/StatsModal';
 import { DifficultyModal } from './components/DifficultyModal';
 import { VictoryModal } from './components/VictoryModal';
 import { GameOverModal } from './components/GameOverModal';
-import { AdModal } from './components/AdModal';
 
 export const App: React.FC = () => {
   const [isHome, setIsHome] = useState(true);
@@ -113,7 +112,6 @@ export const App: React.FC = () => {
       <DifficultyModal />
       <VictoryModal />
       <GameOverModal />
-      <AdModal />
     </div>
   );
 };
