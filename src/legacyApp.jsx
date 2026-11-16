@@ -4565,7 +4565,12 @@ const PLAYER_COUNTRIES = [
       const [xpNeeded, setXpNeeded] = useState(300);
       const [coins, setCoins] = useState(() => {
         try {
+          const isCalibrated = GameStorage.getItem('newromath_starter_calibrated_v2');
           const saved = GameStorage.getItem('newromath_coins');
+          if (!isCalibrated && (saved === '2450' || !saved)) {
+            GameStorage.setItem('newromath_coins', '500');
+            return 500;
+          }
           return saved ? Math.max(0, parseInt(saved, 10)) : 500;
         } catch (e) {
           return 500;
@@ -4573,7 +4578,14 @@ const PLAYER_COUNTRIES = [
       });
       const [gems, setGems] = useState(() => {
         try {
+          const isCalibrated = GameStorage.getItem('newromath_starter_calibrated_v2');
           const saved = GameStorage.getItem('newromath_gems');
+          if (!isCalibrated && (saved === '25' || !saved)) {
+            GameStorage.setItem('newromath_gems', '50');
+            GameStorage.setItem('newromath_starter_calibrated_v2', 'true');
+            return 50;
+          }
+          GameStorage.setItem('newromath_starter_calibrated_v2', 'true');
           return saved ? Math.max(0, parseInt(saved, 10)) : 50;
         } catch (e) {
           return 50;
@@ -14126,7 +14138,7 @@ const PLAYER_COUNTRIES = [
       };
 
       return (
-        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans bg-[#173272]">
+        <div ref={gameContainerRef} className="flex-1 flex flex-col h-full relative font-sans bg-[#eaf5fd]">
           <PageTransition screenKey={currentScreen} direction={transitionDirection} isWaitingForLoad={isPageLoading}>
             {renderActiveScreen()}
           </PageTransition>

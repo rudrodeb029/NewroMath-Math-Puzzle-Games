@@ -35,13 +35,13 @@ class LevelCardTheme {
 class AppTheme {
   AppTheme._();
 
-  // Core Navy Stage Colors
-  static const Color navyStage = Color(0xFF173272);
-  static const Color navyRoot = Color(0xFF183278);
-  static const Color navyDeep = Color(0xFF0E1D47);
-  static const Color navyTop = Color(0xFF1B357D);
-  static const Color navyMid = Color(0xFF162B69);
-  static const Color navyBottom = Color(0xFF0F1E4D);
+  // Core Background Stage Colors — Modern Crystal Ice / Sky Blue Gradient (matching uploaded reference)
+  static const Color navyStage = Color(0xFFEAF5FD);
+  static const Color navyRoot = Color(0xFFE1F2FD);
+  static const Color navyDeep = Color(0xFFA6D8F4);
+  static const Color navyTop = Color(0xFFF1F8FE);
+  static const Color navyMid = Color(0xFFD6EEFD);
+  static const Color navyBottom = Color(0xFFA4D7F3);
   static const Color navyCardDark = Color(0xFF0A1638);
   static const Color navyCardMid = Color(0xFF152758);
   static const Color navyGlass = Color(0xFF0D2254);
@@ -85,12 +85,17 @@ class AppTheme {
   static const Color lightInk = Color(0xFF151923);
   static const Color lightMuted = Color(0xFF9299A8);
 
-  // Gradients
+  // Gradients — Modern Crystal Ice / Sky Blue Multi-Facet Gradient
   static const LinearGradient gameBackgroundGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [navyTop, navyMid, navyBottom],
-    stops: [0.0, 0.5, 1.0],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFF1F8FE), // Crisp crystal ice top
+      Color(0xFFE1F1FD), // Soft sky frost
+      Color(0xFFCEEAFA), // Pale azure facet
+      Color(0xFFA6D8F4), // Clean cyan-blue base
+    ],
+    stops: [0.0, 0.32, 0.68, 1.0],
   );
 
   static const LinearGradient headerBackgroundGradient = LinearGradient(

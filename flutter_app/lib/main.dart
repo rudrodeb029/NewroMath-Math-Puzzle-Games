@@ -107,6 +107,8 @@ class _NewroMathShell extends StatefulWidget {
 class _NewroMathShellState extends State<_NewroMathShell> {
   double? _edgeDragStartX;
   double _edgeDragAccumulatedDx = 0;
+  bool _interstitialDismissed = false;
+  bool _prevInterstitialActive = false;
 
   Widget _buildActiveScreen(AppScreen screen) {
     switch (screen) {
@@ -164,6 +166,11 @@ class _NewroMathShellState extends State<_NewroMathShell> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<GameController>();
+    final interstitialActive = controller.isInterstitialActive;
+    if (interstitialActive && !_prevInterstitialActive) {
+      _interstitialDismissed = false;
+    }
+    _prevInterstitialActive = interstitialActive;
     final shouldInterceptBack =
         controller.canGoBack || controller.insufficientFundsModal.isOpen;
 
@@ -226,13 +233,8 @@ class _NewroMathShellState extends State<_NewroMathShell> {
               if (controller.insufficientFundsModal.isOpen)
                 _InsufficientFundsModal(controller: controller),
               AdMobInterstitialModal(
-                isVisible: controller.isInterstitialActive,
-                onClose: controller.clearRewardToast,
-              ),
-              AdMobRewardedModal(
-                reward: null,
-                onClaim: () {},
-                onCancel: () {},
+                isVisible: interstitialActive && !_interstitialDismissed,
+                onClose: () => setState(() => _interstitialDismissed = true),
               ),
             ],
           ),

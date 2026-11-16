@@ -93,11 +93,22 @@ export function isProtectedEconomyKey(key: string): boolean {
 }
 
 function readCurrentEconomyFromStorage(getter: (k: string) => string | null) {
-  const rawCoins = parseInt(getter('newromath_coins') ?? '500', 10);
-  const rawGems = parseInt(getter('newromath_gems') ?? '50', 10);
+  let rawCoins = parseInt(getter('newromath_coins') ?? '500', 10);
+  let rawGems = parseInt(getter('newromath_gems') ?? '50', 10);
   const rawXp = parseInt(getter('newromath_player_xp') ?? '0', 10);
   const rawUnlocked = parseInt(getter('newromath_unlocked_level') ?? '1', 10);
   const rawLevel = parseInt(getter('newromath_player_level') ?? '1', 10);
+
+  // Auto-calibrate legacy mock starters (2450 coins & 25 gems) to standard starter (500 coins & 50 gems)
+  if (rawCoins === 2450 && rawGems === 25) {
+    rawCoins = 500;
+    rawGems = 50;
+    try {
+      localStorage.setItem('newromath_coins', '500');
+      localStorage.setItem('newromath_gems', '50');
+      localStorage.setItem('newromath_starter_calibrated_v2', 'true');
+    } catch (_) {}
+  }
 
   return {
     coins: Math.max(0, Math.min(ECONOMY_LIMITS.MAX_COINS, Number.isFinite(rawCoins) ? rawCoins : 500)),
